@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주도주 스크리너 · STARFOLIO Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #0b0e14;
+      color: #e5e7eb;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- Sticky Top Header -->
+  <header class="sticky top-0 z-30 bg-[#0b0e14]/95 backdrop-blur border-b border-gray-800/80">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5">
+      <!-- Top Row: Brand, Country Tabs & Meta Badges -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-400 font-bold text-sm">S</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">주도주 스크리너</h1>
+                <span class="text-[11px] font-mono uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">STARFOLIO</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Country Selector Tabs -->
+          <div class="flex items-center bg-[#121722] p-0.5 rounded-lg border border-gray-800 ml-1 sm:ml-3" role="tablist" aria-label="국가 선택">
+            <button id="btn-country-kr" type="button" onclick="switchCountry('KR')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white shadow">
+              🇰🇷 한국
+            </button>
+            <button id="btn-country-us" type="button" onclick="switchCountry('US')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-gray-400 hover:text-gray-200">
+              🇺🇸 미국
+            </button>
+          </div>
+        </div>
+
+        <!-- Status & Refresh Meta Badges -->
+        <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-gray-400">
+          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#121722] border border-gray-800 text-gray-300 font-mono">
+            가격 로딩중...
+          </span>
+          <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#121722] border border-gray-800 text-gray-400">
+            17시 갱신 시작 · 18시/18:30/20시 재시도
+          </span>
+          <span class="px-2 py-0.5 rounded bg-[#121722] border border-gray-800 text-blue-400 font-mono" id="view-counter-badge">
+            조회 2,183
+          </span>
+          <button id="btn-watchlist-only" type="button" onclick="toggleWatchlistFilter()" class="px-2.5 py-0.5 rounded bg-[#121722] hover:bg-gray-800 border border-gray-700 text-amber-400 font-medium transition">
+            ★ 관심종목 <span id="watchlist-count">2</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1st Tier Navigation Bar (Market & Stock Screening) -->
+      <nav class="mt-2.5 flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 border-b border-gray-800/60" aria-label="1단 시장 및 종목 스크리닝 탭">
+        <button id="tab-onset" type="button" onclick="switchTab('onset')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/40">
+          <span>초입</span>
+          <span id="badge-count-onset" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-blue-500/20 text-blue-300">13</span>
+        </button>
+        <button id="tab-progress" type="button" onclick="switchTab('progress')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>진행</span>
+          <span id="badge-count-progress" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-gray-800 text-gray-400">4</span>
+        </button>
+        <button id="tab-warning" type="button" onclick="switchTab('warning')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>경계</span>
+          <span id="badge-count-warning" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-gray-800 text-gray-400">0</span>
+        </button>
+        <button id="tab-oscillator" type="button" onclick="switchTab('oscillator')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>수급오실레이터</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">KIS</span>
+        </button>
+        <button id="tab-industry" type="button" onclick="switchTab('industry')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>산업 강도</span>
+        </button>
+        <button id="tab-thermometer" type="button" onclick="switchTab('thermometer')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>🌡️ 체온</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/10 text-amber-300">49.8</span>
+        </button>
+      </nav>
+
+      <!-- 2nd Tier Navigation Bar (Macro, Rules, Journal, Private Research) -->
+      <nav class="mt-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5" aria-label="2단 매크로 및 리서치 탭">
+        <button id="tab-macro" type="button" onclick="switchTab('macro')" class="tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>📈 매크로·금리</span>
+          <span class="text-[10px] font-mono px-1 rounded bg-gray-800 text-gray-300">FRED</span>
+        </button>
+        <button id="tab-rules" type="button" onclick="switchTab('rules')" class="tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>⚙️ 매수·매도 규칙</span>
+          <span class="text-[10px] px-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">글로벌</span>
+        </button>
+        <button id="tab-journal" type="button" onclick="switchTab('journal')" class="tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>📝 내 기록</span>
+          <span id="journal-count-badge" class="text-[10px] font-mono px-1 rounded bg-gray-800 text-gray-300">2</span>
+        </button>
+        <button id="tab-research" type="button" onclick="switchTab('research')" class="tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
+          <span>🔒 리서치·자산배분</span>
+          <span class="text-[10px] px-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">UPDATE</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Community Feedback Bar -->
+  <section class="bg-[#10141d] border-b border-gray-800/70">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2 text-gray-300">
+          <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
+          <span id="feedback-tab-label" class="font-medium">한국 · 초입 탭 의견을 나눠보세요</span>
+          <span id="stage-summary-note" class="text-gray-400 hidden sm:inline">(정배열 6주 이하 · 준비기간 15주 이상 · 변동성 수축 스크리닝)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-like-tab" type="button" onclick="toggleTabLike()" class="px-2.5 py-1 rounded-md bg-[#161c28] hover:bg-gray-800 border border-gray-700/80 text-gray-200 flex items-center gap-1.5 transition text-xs">
+            <span>👍 좋아요</span>
+            <span id="like-count-display" class="font-mono text-blue-400 font-semibold">42</span>
+          </button>
+          <button id="btn-toggle-comments" type="button" onclick="toggleCommentsDrawer()" class="px-2.5 py-1 rounded-md bg-[#161c28] hover:bg-gray-800 border border-gray-700/80 text-gray-300 flex items-center gap-1 transition text-xs">
+            <span>💬 댓글</span>
+            <span id="comment-count-display" class="font-mono text-gray-400">3</span>
+            <span id="comment-caret">▾</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsible Comments Drawer -->
+      <div id="comments-drawer" class="hidden mt-2.5 pt-2.5 border-t border-gray-800/80 space-y-2">
+        <div id="comments-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs"></div>
+        <form id="comment-form" onsubmit="submitTabComment(event)" class="flex gap-2">
+          <input id="comment-input" type="text" placeholder="현재 탭 종목이나 수급·매크로 흐름에 대한 메모를 남겨보세요..." class="flex-1 bg-[#0b0e14] border border-gray-700 rounded-md px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500" />
+          <button type="submit" class="px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition">등록</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4">
+    <div id="data-load-error" class="hidden mb-4 bg-rose-950/50 border border-rose-500/50 rounded-xl p-4 text-xs text-rose-200 space-y-2">
+      <div class="font-bold text-sm text-rose-300">⚠️ data.json 파일을 불러오지 못했습니다</div>
+      <p>파일을 더블클릭(<code>file://</code> 주소)으로 직접 열면 브라우저 보안 정책(CORS) 때문에 <code>data.json</code>을 읽을 수 없습니다.</p>
+      <p class="font-semibold text-white">해결 방법: 압축을 푼 폴더 안에 있는 <code class="px-1.5 py-0.5 rounded bg-rose-900 text-amber-300">run_local.bat</code> 파일을 더블클릭해 실행해 주세요!</p>
+    </div>
+
+    <!-- VIEW 1: STOCK SCREENER (초입 / 진행 / 경계) -->
+    <div id="view-screener" class="space-y-4">
+      <!-- Filter & Search Controls -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-[#121722] p-3 rounded-xl border border-gray-800">
+        <div class="flex items-center gap-2 flex-1">
+          <div class="relative flex-1 max-w-md">
+            <input id="stock-search-input" type="text" oninput="handleSearchInput(this.value)" placeholder="종목명, 티커(251970, VRTX), 테마(화장품, 밸류업, 반도체) 검색..." class="w-full bg-[#0b0e14] border border-gray-700/80 rounded-lg pl-3 pr-8 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500" />
+            <button type="button" onclick="clearSearchInput()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs" title="검색어 지우기">✕</button>
+          </div>
+          <select id="sector-filter-select" onchange="handleSectorFilter(this.value)" aria-label="업종 필터" class="bg-[#0b0e14] border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-blue-500">
+            <option value="ALL">전체 업종</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between sm:justify-end gap-2 text-[11px] text-gray-400">
+          <span>표시된 대표 종목: <strong id="filtered-stock-count" class="text-white font-mono">4</strong>종목 (Starfolio 탭 전체: <strong id="real-tab-total-count" class="text-blue-400 font-mono">13</strong>)</span>
+        </div>
+      </div>
+
+      <!-- Screener Grid: Left Stock Card List + Right Interactive Detail & Chart View -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <!-- Left Column: Stock Cards List -->
+        <div id="stock-cards-container" class="lg:col-span-5 space-y-2.5"></div>
+
+        <!-- Right Column: Selected Stock Detail & Chart Panel -->
+        <div id="stock-detail-panel" class="lg:col-span-7 bg-[#121722] rounded-xl border border-gray-800 p-4 sticky top-28 space-y-4">
+          <!-- Detail Header -->
+          <div class="flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-gray-800">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 id="detail-stock-name" class="text-lg font-bold text-white">펌텍코리아</h2>
+                <span id="detail-stock-ticker" class="text-xs font-mono text-gray-400">251970 · KOSDAQ</span>
+                <span id="detail-stock-change" class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400">▼4.5%</span>
+                <span id="detail-stock-badge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-600 text-white">등급 B</span>
+              </div>
+              <p id="detail-stock-submeta" class="text-xs text-gray-400 mt-1">
+                화학 · 플라스틱제품 제조업 · 시총 9,164억 · 종가 73,900원 · onset 2026-11-13
+              </p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btn-detail-bookmark" type="button" onclick="toggleCurrentStockBookmark()" class="px-2.5 py-1 rounded-lg bg-[#0b0e14] hover:bg-gray-800 border border-gray-700 text-xs font-medium text-amber-400 transition">
+                ★ 관심등록
+              </button>
+              <button type="button" onclick="openJournalModalForCurrent()" class="px-2.5 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-xs font-medium text-blue-300 transition">
+                ✎ 기록 추가
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Controls Toolbar (MA Legend, Timeframe, Log Scale Toggle) -->
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="flex items-center gap-1 text-gray-300 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block"></span> 종가 추이
+              </span>
+              <span class="flex items-center gap-1 text-amber-400">
+                <span class="w-2.5 h-0.5 bg-amber-400 inline-block"></span> 4주선
+              </span>
+              <span class="flex items-center gap-1 text-emerald-400">
+                <span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span> 13주선
+              </span>
+              <span id="detail-volume-badge" class="text-[11px] font-mono text-gray-400 bg-[#0b0e14] px-2 py-0.5 rounded border border-gray-800">
+                거래량 489.92K
+              </span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button type="button" id="btn-range-6m" onclick="setChartRange('ALL')" class="px-2 py-1 rounded text-[11px] font-medium bg-blue-600 text-white">6개월</button>
+              <button type="button" id="btn-range-3m" onclick="setChartRange('3M')" class="px-2 py-1 rounded text-[11px] font-medium bg-[#0b0e14] text-gray-400 hover:text-gray-200 border border-gray-800">3개월</button>
+              <button type="button" id="btn-range-1m" onclick="setChartRange('1M')" class="px-2 py-1 rounded text-[11px] font-medium bg-[#0b0e14] text-gray-400 hover:text-gray-200 border border-gray-800">1개월</button>
+              <button type="button" id="btn-log-scale" onclick="toggleLogScale()" class="ml-1 px-2 py-1 rounded text-[11px] font-mono bg-[#0b0e14] text-gray-300 hover:bg-gray-800 border border-gray-700 transition">
+                로그 OFF
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Container (Fixed Height h-72 per Web App Rules) -->
+          <div class="relative h-72 w-full bg-[#0b0e14] rounded-lg border border-gray-800/90 p-2">
+            <canvas id="stockPriceChart"></canvas>
+          </div>
+
+          <!-- Verdict Strip -->
+          <div class="bg-[#0b0e14] rounded-lg p-3 border border-gray-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="text-xs">
+              <span class="text-blue-400 font-semibold mr-1.5">판정 요약</span>
+              <span id="detail-verdict-text" class="text-gray-200 font-mono">정배열 0주(초입) · 준비20주 · 변동성수축 · 거래대금회복 · 섹터상위(#23) · 거래대금 가점 · 시총 가점</span>
+            </div>
+            <div id="detail-tags-list" class="flex flex-wrap gap-1"></div>
+          </div>
+
+          <!-- Expandable Accordions: 1) 점수 근거 ▾  2) 분기 실적 및 펀더멘털 ▾ -->
+          <div class="space-y-2">
+            <!-- Score Breakdown Accordion -->
+            <div id="score-accordion-wrapper" class="border border-gray-800 rounded-lg overflow-hidden bg-[#0b0e14]">
+              <button type="button" onclick="toggleAccordion('score')" class="w-full px-3.5 py-2.5 flex items-center justify-between text-left text-xs font-semibold text-gray-200 hover:bg-gray-800/40 transition">
+                <span id="score-accordion-title">점수 12 / 12 ▾ (점수 근거 — 정배열·준비기간·거래대금·섹터·과열 기준)</span>
+                <span id="score-accordion-icon" class="text-gray-400">▾</span>
+              </button>
+              <div id="score-accordion-body" class="px-3.5 pb-3 pt-1 border-t border-gray-800/80 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs"></div>
+            </div>
+
+            <!-- Earnings Breakdown Accordion -->
+            <div class="border border-gray-800 rounded-lg overflow-hidden bg-[#0b0e14]">
+              <button type="button" onclick="toggleAccordion('earnings')" class="w-full px-3.5 py-2.5 flex items-center justify-between text-left text-xs font-semibold text-gray-200 hover:bg-gray-800/40 transition">
+                <span id="earnings-accordion-title">실적 2026 반기 · 영익 +11.4% 연결 ▾</span>
+                <span id="earnings-accordion-icon" class="text-gray-400">▾</span>
+              </button>
+              <div id="earnings-accordion-body" class="px-3.5 pb-3 pt-2 border-t border-gray-800/80 space-y-2 text-xs"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: SUPPLY OSCILLATOR (수급오실레이터 — KIS Open API) -->
+    <div id="view-oscillator" class="hidden space-y-4">
+      <div class="bg-[#121722] rounded-xl border border-gray-800 p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-800">
+          <div>
+            <h2 class="text-base font-bold text-white">외국인·기관 수급 오실레이터 (KIS Open API)</h2>
+            <p class="text-xs text-gray-400 mt-0.5">
+              산식: 최근 77거래일 · 외국인+기관 5일 누적 순매수대금 ÷ 시가총액 → EMA 12·26 → Signal 9 (매일 19:00 순차 갱신)
+            </p>
+          </div>
+          <div class="w-full sm:w-64">
+            <input id="osc-search-input" type="text" oninput="filterOscillatorList(this.value)" placeholder="종목명 또는 6자리 코드 검색 (예: 060310)" class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4 items-start">
+          <div id="osc-cards-grid" class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5"></div>
+          <div class="lg:col-span-7 bg-[#0b0e14] rounded-xl border border-gray-800 p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 id="osc-detail-title" class="text-sm font-bold text-white">HK이노엔 (195940) 수급 오실레이터 및 77거래일 위치 비교</h3>
+                <p id="osc-detail-sub" class="text-xs text-gray-400 mt-0.5">현재 오실레이터 +0.010% (우측 축 0.01%) · 상태: 중립 · 77거래일 중 위치 61%</p>
+              </div>
+              <span id="osc-detail-close" class="text-xs font-mono px-2.5 py-1 rounded bg-[#121722] border border-gray-800 text-blue-400">종가 36,100원</span>
+            </div>
+            <div class="relative h-72 w-full">
+              <canvas id="oscillatorChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: INDUSTRY STRENGTH BOARD (산업 강도판) -->
+    <div id="view-industry" class="hidden space-y-4">
+      <!-- Top Summary Banner -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-[#121722] rounded-xl border border-emerald-500/30 p-3.5 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-semibold text-emerald-400 uppercase">힘이 강해진 산업 TOP (20일 기준)</span>
+            <p class="text-sm font-bold text-white mt-0.5">운송/물류 (강도 100) · 부동산 (95) · 서비스 (91) · 통신 (86)</p>
+          </div>
+          <span class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-300">통신 +45.5 급등</span>
+        </div>
+        <div class="bg-[#121722] rounded-xl border border-rose-500/30 p-3.5 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] font-semibold text-rose-400 uppercase">힘이 약해진 산업 하위 (20일 기준)</span>
+            <p class="text-sm font-bold text-white mt-0.5">항공우주/방산 (강도 0) · 조선 (강도 5)</p>
+          </div>
+          <span class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-300">방산 -12.7% 조정</span>
+        </div>
+      </div>
+
+      <!-- 2-Column Split: 4-Quadrant Scatter Chart + Industry List -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div class="lg:col-span-7 bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-bold text-white">산업 강도 4분면 매트릭스 (X축: 현재 강도 0~100 / Y축: 강도 변화폭)</h2>
+              <p class="text-xs text-gray-400">한국 전체 2,387종목 대상 · 기준일 2026-11-13 (20일 수익률 및 모멘텀 기준)</p>
+            </div>
+          </div>
+          <div class="relative h-72 w-full bg-[#0b0e14] rounded-lg border border-gray-800 p-2">
+            <canvas id="industryScatterChart"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-2.5">
+          <h3 class="text-sm font-bold text-white pb-2 border-b border-gray-800">산업별 강도 점수 및 변화폭 (2026-11-13)</h3>
+          <div id="industry-list-container" class="space-y-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: MARKET THERMOMETER (시장 체온계 — 하워드 막스 체크리스트) -->
+    <div id="view-thermometer" class="hidden space-y-4">
+      <div class="bg-[#121722] rounded-xl border border-gray-800 p-5 space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+          <div>
+            <span class="text-xs font-semibold text-amber-400">하워드 막스 《시장은 반드시 반복된다》 계량화 모델</span>
+            <h2 class="text-lg font-bold text-white mt-0.5">한국 시장 체온계 · 종합 점수 49.8 / 100</h2>
+            <p class="text-xs text-gray-400 mt-1">
+              0(차가움·공포) ~ 100(뜨거움·과열) 기준 · 현재 판정: <strong class="text-amber-300">중립 (막스식 처방 — 공격·방어 균형 유지)</strong>
+            </p>
+          </div>
+          <div class="flex items-center gap-3 bg-[#0b0e14] px-4 py-3 rounded-xl border border-gray-800">
+            <div class="text-right">
+              <div class="text-[11px] text-gray-400">종합 체온 지수</div>
+              <div class="text-2xl font-bold font-mono text-amber-400">49.8°</div>
+            </div>
+            <div class="h-10 w-px bg-gray-800"></div>
+            <div class="text-xs text-gray-300">
+              <div>밸류에이션 과열(97.9) vs</div>
+              <div>신용·유동성 냉각(29.0) 상쇄</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 Evaluation Axes Progress Bars -->
+        <div id="thermometer-axes-list" class="space-y-3.5"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: MACRO DASHBOARD (매크로·금리 주봉 차트 — FRED) -->
+    <div id="view-macro" class="hidden space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="macro-cards-container"></div>
+      <div class="bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-white">미 국채 수익률곡선 (2Y · 10Y · 30Y) 주봉 이동평균 비교 (출처: FRED)</h2>
+            <p class="text-xs text-gray-400">2년물(4.86%, 주봉 정배열) vs 10년물(5.10%, 비정배열) vs 30년물(5.43%, 비정배열) 및 이동평균(MA4·13·26·52)</p>
+          </div>
+        </div>
+        <div class="relative h-72 w-full bg-[#0b0e14] rounded-lg border border-gray-800 p-2">
+          <canvas id="macroYieldChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: BUY/SELL RULES & CUSTOM SCORING SIMULATOR (매수·매도 규칙) -->
+    <div id="view-rules" class="hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-6 bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-3">
+          <h2 class="text-base font-bold text-white">나만의 주도주 스코어링 시뮬레이터 (12점 만점 + 기술적 필터)</h2>
+          <p class="text-xs text-gray-400">
+            Starfolio 기본 12점 척도(정배열 초입 3점 · 준비기간 3점 · 변동성 수축 1점 · 거래대금 회복 1점 · 주도 섹터 2점 · 비과열 1점 · 거래대금/시총 가점 1점)를 체크해 예상 점수와 진입 등급을 시뮬레이션합니다.
+          </p>
+          <div id="rule-simulator-controls" class="space-y-2 pt-2"></div>
+        </div>
+
+        <div class="lg:col-span-6 bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-4">
+          <div class="bg-[#0b0e14] rounded-xl p-4 border border-gray-800 flex items-center justify-between">
+            <div>
+              <span class="text-xs text-gray-400">시뮬레이션 합산 점수</span>
+              <div id="sim-total-score" class="text-2xl font-bold font-mono text-blue-400 mt-0.5">12.0 / 12.0점</div>
+              <p id="sim-grade-verdict" class="text-xs text-emerald-400 mt-1">등급 B (초입 최우선 주도주 · 1차 분할매수 적격)</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-gray-400">추세 관리 기준</span>
+              <div class="text-sm font-mono font-semibold text-rose-400 mt-1">4주(20일)선 · 13주선 점검</div>
+              <div class="text-xs font-mono text-gray-400">트레일링 스탑 연동</div>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-xs text-gray-300">
+            <h3 class="font-bold text-white">추세 단계별 스크리닝 구조</h3>
+            <div class="p-3 rounded-lg bg-[#0b0e14] border border-gray-800 space-y-1.5">
+              <div><strong class="text-blue-400">1. 초입 (정배열 ≤6주 · 준비 ≥15주):</strong> 장기 베이스(준비기간)와 변동성 수축 후 거래대금이 회복되며 정배열에 진입한 종목.</div>
+              <div><strong class="text-emerald-400">2. 진행 (확산 · 신고가 영역):</strong> 정배열 12~20주 이상 지속되며 신고가 또는 고점 부근에서 이탈 신호 없이 추세가 확산되는 종목.</div>
+              <div><strong class="text-amber-400">3. 경계 (고점 대비 조정 심화):</strong> 장기 정배열 진행 중 고점 대비 큰 폭(예: -21% ~ -23%) 조정이 발생하여 추세 건강도 점검이 필요한 종목.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 7: TRADING JOURNAL (내 기록) -->
+    <div id="view-journal" class="hidden space-y-4">
+      <div class="bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-800">
+          <div>
+            <h2 class="text-base font-bold text-white">내 매매·리서치 기록장 (journal.html)</h2>
+            <p class="text-xs text-gray-400">관심 주도주의 정배열 진입 근거, 목표가, 트레일링 스탑 기준을 기록하고 관리합니다.</p>
+          </div>
+        </div>
+
+        <form id="journal-form" onsubmit="addJournalEntry(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-[#0b0e14] p-3.5 rounded-xl border border-gray-800">
+          <input id="journal-stock-input" type="text" required placeholder="종목명/티커 (예: 삼성E&A 028050)" class="sm:col-span-3 bg-[#121722] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+          <select id="journal-stage-input" class="sm:col-span-2 bg-[#121722] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500">
+            <option value="초입">초입 공략</option>
+            <option value="진행">진행 보유</option>
+            <option value="경계">경계 점검</option>
+            <option value="매크로">매크로 노트</option>
+          </select>
+          <input id="journal-note-input" type="text" required placeholder="진입 근거, 이평선 위치, 손절/익절 기준 메모..." class="sm:col-span-5 bg-[#121722] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+          <button type="submit" class="sm:col-span-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 text-xs font-semibold transition">
+            + 기록 저장
+          </button>
+        </form>
+
+        <div id="journal-entries-list" class="space-y-2.5"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 8: PRIVATE RESEARCH & ASSET ALLOCATION (리서치·자산배분) -->
+    <div id="view-research" class="hidden space-y-4">
+      <div id="research-lock-screen" class="bg-[#121722] rounded-xl border border-gray-800 p-8 text-center max-w-lg mx-auto my-6 space-y-4">
+        <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl">
+          🔒
+        </div>
+        <div>
+          <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">STARFOLIO · PRIVATE</span>
+          <h2 class="text-base font-bold text-white mt-2">비공개 리서치 · 자산배분 자료실</h2>
+          <p class="text-xs text-gray-400 mt-1">
+            실제 사이트에서는 비밀번호 인증 게이트로 보호되는 영역입니다. 프로토타입 데모 잠금 해제를 눌러 내부 구성을 확인해 보세요.
+          </p>
+        </div>
+        <div class="flex items-center justify-center gap-2 pt-2">
+          <input id="research-pass-input" type="password" value="starfolio2026" aria-label="비밀번호 입력" class="bg-[#0b0e14] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 w-44 text-center font-mono" />
+          <button type="button" onclick="unlockResearchView()" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition">
+            잠금 해제 (데모)
+          </button>
+        </div>
+      </div>
+
+      <div id="research-unlocked-content" class="hidden space-y-3">
+        <div class="flex items-center justify-between bg-[#121722] p-3.5 rounded-xl border border-gray-800">
+          <div>
+            <span class="text-xs font-semibold text-emerald-400">UNLOCKED · STARFOLIO PRIVATE</span>
+            <h2 class="text-sm font-bold text-white">2026년 11월 13일 기준 매크로·주도 섹터 핵심 리서치 요약</h2>
+          </div>
+          <button type="button" onclick="lockResearchView()" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-xs text-gray-300">다시 잠그기</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div class="bg-[#121722] p-4 rounded-xl border border-gray-800 space-y-2">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[11px]">금리·체온계 점검 (2026-11-13)</span>
+            <h3 class="text-sm font-bold text-white">미 국채 10년물 5.10% 및 시장 체온계 밸류에이션(97.9) 점검</h3>
+            <p class="text-gray-300 leading-relaxed">
+              미 국채 10년물 금리가 5.10%(2년물 4.86%, 30년물 5.43%)를 기록하고 시장 체온계 밸류에이션 점수가 97.9로 높게 나타난 반면, 신용·유동성(29.0)과 투기 열기(28.8)는 낮은 수준을 유지해 종합 체온은 49.8(중립)을 기록했습니다.
+            </p>
+          </div>
+          <div class="bg-[#121722] p-4 rounded-xl border border-gray-800 space-y-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[11px]">섹터 로테이션 (산업 강도판 연동)</span>
+            <h3 class="text-sm font-bold text-white">운송/물류(100)·부동산(95)·서비스(91)·통신(86) 강세</h3>
+            <p class="text-gray-300 leading-relaxed">
+              20일 산업 강도 기준 운송/물류(강도 100, 변화폭 +4.5), 부동산(95, +13.6), 서비스(91, +27.3), 통신(86, +45.5)이 상위권을 형성했으며, 조선(강도 5)과 항공우주/방산(강도 0, -4.5)은 하위권에 위치해 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast-banner" class="fixed bottom-4 right-4 z-50 hidden bg-blue-600 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium border border-blue-400/40"></div>
+
+  <script>
+    // =========================================================================
+    // 1. Dynamic Dataset Loaded from data.json (Step 1: Separation of Data & UI)
+    // =========================================================================
+    let TAB_META = { KR: { onset: { label: '초입', realTotal: 0, desc: '' }, progress: { label: '진행', realTotal: 0, desc: '' }, warning: { label: '경계', realTotal: 0, desc: '' } }, US: { onset: { label: '초입', realTotal: 0, desc: '' }, progress: { label: '진행', realTotal: 0, desc: '' }, warning: { label: '경계', realTotal: 0, desc: '' } } };
+    let STOCKS_DATA = [];
+    let OSCILLATOR_DATA = [];
+    let INDUSTRY_DATA = [];
+    let THERMOMETER_AXES = [];
+    let MACRO_YIELDS = [];
+    let SIMULATOR_RULES = [];
+    let DATA_META = { priceDate: '2026-11-13', updatedSchedule: '17시 갱신 시작 · 18시/18:30/20시 재시도', viewCount: 2183 };
+
+    // =========================================================================
+    // 2. Application State
+    // =========================================================================
+    let state = {
+      country: 'KR',
+      activeTab: 'onset',
+      searchQuery: '',
+      sectorFilter: 'ALL',
+      watchlistOnly: false,
+      watchlist: new Set(['KR-251970', 'KR-028050']),
+      selectedStockId: 'KR-251970',
+      chartRange: 'ALL',
+      logScale: false,
+      accordions: { score: true, earnings: true },
+      selectedOscCode: '195940',
+      oscSearchQuery: '',
+      tabLikes: { onset: 42, progress: 29, warning: 11, oscillator: 35, industry: 38, thermometer: 51, macro: 33, rules: 27, journal: 14, research: 19 },
+      likedTabs: new Set(),
+      commentsOpen: false,
+      comments: [
+        { author: '모멘텀트레이더', time: '14분 전', text: '펌텍코리아(12점)와 삼성E&A(11점, 영익 +51%)가 초입 상단에 포착되었네요.' },
+        { author: '퀀트매크로', time: '1시간 전', text: '시장 체온계 밸류에이션이 97.9로 높으니 실적 찍히는 정배열 종목 위주로만 압축 대응합니다.' },
+        { author: '밸류업헌터', time: '2시간 전', text: '롯데렌탈 정배열 14주 확산 구간에서 58,400원 신고가 흐름이 견조합니다.' }
+      ],
+      journalEntries: [
+        { id: 1, date: '2026-11-16', stock: '삼성E&A (028050)', stage: '초입', note: '정배열 2주 · 준비 43주 · 26.2Q 영업이익 2,731억(+51%). 66,000원 지지 확인하며 트레일링 스탑 대응.' },
+        { id: 2, date: '2026-11-16', stock: '펌텍코리아 (251970)', stage: '초입', note: '초입 12점 만점 · 변동성 수축 후 돌파. 20일 이동평균선 지지 여부 체크.' }
+      ]
+    };
+
+    let stockChartInstance = null;
+    let oscChartInstance = null;
+    let industryChartInstance = null;
+    let macroChartInstance = null;
+
+    // =========================================================================
+    // 3. Helper & Utility Functions
+    // =========================================================================
+    function showToast(msg) {
+      const el = document.getElementById('toast-banner');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 2600);
+    }
+
+    function computeMovingAverage(values, windowSize) {
+      return values.map((_, idx) => {
+        const start = Math.max(0, idx - windowSize + 1);
+        const slice = values.slice(start, idx + 1);
+        const sum = slice.reduce((a, b) => a + b, 0);
+        return Number((sum / slice.length).toFixed(2));
+      });
+    }
+
+    // =========================================================================
+    // 4. Navigation & Country / Tab Switching
+    // =========================================================================
+    function switchCountry(countryCode) {
+      state.country = countryCode;
+      state.sectorFilter = 'ALL';
+
+      const btnKr = document.getElementById('btn-country-kr');
+      const btnUs = document.getElementById('btn-country-us');
+      if (countryCode === 'KR') {
+        btnKr.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white shadow';
+        btnUs.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-gray-400 hover:text-gray-200';
+        document.getElementById('tab-oscillator').classList.remove('hidden');
+      } else {
+        btnUs.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white shadow';
+        btnKr.className = 'px-2.5 py-1 rounded-md text-xs font-semibold transition-all text-gray-400 hover:text-gray-200';
+        document.getElementById('tab-oscillator').classList.add('hidden');
+        if (state.activeTab === 'oscillator') {
+          state.activeTab = 'onset';
+        }
+      }
+
+      document.getElementById('badge-count-onset').textContent = TAB_META[countryCode].onset.realTotal;
+      document.getElementById('badge-count-progress').textContent = TAB_META[countryCode].progress.realTotal;
+      document.getElementById('badge-count-warning').textContent = TAB_META[countryCode].warning.realTotal;
+
+      populateSectorOptions();
+      ensureValidSelectedStock();
+      renderAll();
+    }
+
+    function switchTab(tabKey) {
+      state.activeTab = tabKey;
+      ensureValidSelectedStock();
+      renderAll();
+    }
+
+    function ensureValidSelectedStock() {
+      if (['onset', 'progress', 'warning'].includes(state.activeTab)) {
+        const list = getFilteredStocks();
+        if (list.length > 0 && !list.some(s => s.id === state.selectedStockId)) {
+          state.selectedStockId = list[0].id;
+        }
+      }
+    }
+
+    function populateSectorOptions() {
+      const sel = document.getElementById('sector-filter-select');
+      if (!sel) return;
+      const countryStocks = STOCKS_DATA.filter(s => s.country === state.country);
+      const industries = Array.from(new Set(countryStocks.map(s => s.industry)));
+      sel.innerHTML = '<option value="ALL">전체 업종</option>' +
+        industries.map(ind => `<option value="${ind}">${ind}</option>`).join('');
+      sel.value = state.sectorFilter;
+    }
+
+    // =========================================================================
+    // 5. Filtering & Stock Screener Rendering
+    // =========================================================================
+    function getFilteredStocks() {
+      return STOCKS_DATA.filter(s => {
+        if (s.country !== state.country) return false;
+        if (['onset', 'progress', 'warning'].includes(state.activeTab) && s.stage !== state.activeTab) return false;
+        if (state.watchlistOnly && !state.watchlist.has(s.id)) return false;
+        if (state.sectorFilter !== 'ALL' && s.industry !== state.sectorFilter) return false;
+        if (state.searchQuery.trim() !== '') {
+          const q = state.searchQuery.trim().toLowerCase();
+          const matchName = s.name.toLowerCase().includes(q);
+          const matchTicker = s.ticker.toLowerCase().includes(q);
+          const matchTag = s.tags.some(t => t.toLowerCase().includes(q));
+          const matchInd = s.industry.toLowerCase().includes(q);
+          if (!matchName && !matchTicker && !matchTag && !matchInd) return false;
+        }
+        return true;
+      });
+    }
+
+    function handleSearchInput(val) {
+      state.searchQuery = val;
+      ensureValidSelectedStock();
+      renderScreenerView();
+    }
+
+    function clearSearchInput() {
+      const inp = document.getElementById('stock-search-input');
+      if (inp) inp.value = '';
+      state.searchQuery = '';
+      ensureValidSelectedStock();
+      renderScreenerView();
+    }
+
+    function handleSectorFilter(val) {
+      state.sectorFilter = val;
+      ensureValidSelectedStock();
+      renderScreenerView();
+    }
+
+    function toggleWatchlistFilter() {
+      state.watchlistOnly = !state.watchlistOnly;
+      const btn = document.getElementById('btn-watchlist-only');
+      if (state.watchlistOnly) {
+        btn.className = 'px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-400 text-amber-300 font-semibold transition';
+      } else {
+        btn.className = 'px-2.5 py-0.5 rounded bg-[#121722] hover:bg-gray-800 border border-gray-700 text-amber-400 font-medium transition';
+      }
+      if (!['onset', 'progress', 'warning'].includes(state.activeTab)) {
+        state.activeTab = 'onset';
+      }
+      ensureValidSelectedStock();
+      renderAll();
+    }
+
+    function selectStockCard(stockId) {
+      state.selectedStockId = stockId;
+      renderScreenerView();
+    }
+
+    function toggleCurrentStockBookmark() {
+      if (!state.selectedStockId) return;
+      if (state.watchlist.has(state.selectedStockId)) {
+        state.watchlist.delete(state.selectedStockId);
+        showToast('관심종목에서 해제되었습니다.');
+      } else {
+        state.watchlist.add(state.selectedStockId);
+        showToast('★ 관심종목에 추가되었습니다.');
+      }
+      document.getElementById('watchlist-count').textContent = state.watchlist.size;
+      renderScreenerView();
+    }
+
+    function renderScreenerView() {
+      const stageKey = ['onset', 'progress', 'warning'].includes(state.activeTab) ? state.activeTab : 'onset';
+      const meta = TAB_META[state.country][stageKey];
+      const list = getFilteredStocks();
+
+      document.getElementById('filtered-stock-count').textContent = list.length;
+      document.getElementById('real-tab-total-count').textContent = meta.realTotal;
+
+      const container = document.getElementById('stock-cards-container');
+      const detailPanel = document.getElementById('stock-detail-panel');
+
+      if (list.length === 0) {
+        const emptyMsg = (state.country === 'KR' && stageKey === 'warning' && !state.searchQuery && !state.watchlistOnly)
+          ? '건강도 경계 종목이 없어요. (한국 시장 기준일 2026-11-13 경계 종목 0개)'
+          : '현재 검색·필터 조건에 해당하는 종목이 없습니다.';
+        container.innerHTML = `
+          <div class="bg-[#121722] rounded-xl border border-gray-800 p-8 text-center space-y-2">
+            <div class="text-2xl">📭</div>
+            <p class="text-sm font-semibold text-gray-200">${emptyMsg}</p>
+            <p class="text-xs text-gray-400">상단에서 '초입' 또는 '진행' 탭을 선택하거나 국가를 '🇺🇸 미국(경계 2종목)'으로 전환해 보세요.</p>
+          </div>
+        `;
+        detailPanel.classList.add('opacity-50');
+        return;
+      }
+
+      detailPanel.classList.remove('opacity-50');
+
+      container.innerHTML = list.map(stock => {
+        const isSelected = stock.id === state.selectedStockId;
+        const isBookmarked = state.watchlist.has(stock.id);
+
+        let changeClass = 'text-gray-400';
+        if (stock.changePct > 0) changeClass = 'text-red-400 font-semibold';
+        if (stock.changePct < 0) changeClass = 'text-blue-400 font-semibold';
+
+        let rightBadgeClass = 'bg-blue-600/20 text-blue-400 border-blue-500/40';
+        if (stock.rightBadgeType === 'DIFF') rightBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        if (stock.rightBadgeType === 'WARN') rightBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+
+        const metricLine = stock.stage === 'onset'
+          ? `정배열 ${stock.alignWeeks}주 · 준비 ${stock.prepWeeks}주 · <strong class="text-blue-300">점수 ${stock.score}</strong> · 섹터${stock.sectorRank}`
+          : `정배열 ${stock.alignWeeks}주 · <strong class="text-emerald-300">${stock.statusLabel}</strong> · 섹터${stock.sectorRank}`;
+
+        const opClass = stock.opPositive
+          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+          : 'bg-rose-500/10 text-rose-300 border-rose-500/30';
+
+        return `
+          <div onclick="selectStockCard('${stock.id}')" class="cursor-pointer rounded-xl p-3.5 transition-all border ${
+            isSelected
+              ? 'bg-[#171e2c] border-blue-500 shadow-lg shadow-blue-950/30'
+              : 'bg-[#121722] hover:bg-[#161c29] border-gray-800'
+          }">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-sm font-bold text-white">${stock.name}</span>
+                  <span class="text-[11px] font-mono text-gray-400">${stock.ticker}·${stock.exchange}</span>
+                  <span class="text-xs font-mono ${changeClass}">${stock.changeText}</span>
+                  <span class="text-[11px] px-1.5 py-0.2 rounded bg-gray-800 text-gray-300">${stock.industry}</span>
+                  ${isBookmarked ? '<span class="text-amber-400 text-xs" title="관심종목">★</span>' : ''}
+                </div>
+                <div class="text-xs text-gray-300 mt-1.5 font-mono">
+                  ${metricLine}
+                </div>
+              </div>
+              <span class="shrink-0 px-2 py-0.5 rounded-md text-xs font-mono font-bold border ${rightBadgeClass}">
+                ${stock.rightBadge}
+              </span>
+            </div>
+
+            <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-[#0b0e14] border border-gray-800 text-gray-300 font-mono">
+                시총 ${stock.marketCap}
+              </span>
+              <span class="px-2 py-0.5 rounded border font-mono ${opClass}">
+                ${stock.opBadge}
+              </span>
+              ${stock.tags.map(t => `<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">#${t}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      renderSelectedStockDetail();
+    }
+
+    function renderSelectedStockDetail() {
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (!stock) return;
+
+      document.getElementById('detail-stock-name').textContent = stock.name;
+      document.getElementById('detail-stock-ticker').textContent = `${stock.ticker} · ${stock.exchange}`;
+
+      const chgEl = document.getElementById('detail-stock-change');
+      chgEl.textContent = stock.changeText;
+      chgEl.className = stock.changePct > 0
+        ? 'text-xs font-mono font-semibold px-2 py-0.5 rounded bg-red-500/15 text-red-400'
+        : stock.changePct < 0
+          ? 'text-xs font-mono font-semibold px-2 py-0.5 rounded bg-blue-500/15 text-blue-400'
+          : 'text-xs font-mono font-semibold px-2 py-0.5 rounded bg-gray-800 text-gray-300';
+
+      const badgeEl = document.getElementById('detail-stock-badge');
+      badgeEl.textContent = stock.stage === 'onset' ? `등급 ${stock.rightBadge} · 점수 ${stock.score}` : `${stock.rightBadge} · ${stock.statusLabel}`;
+      badgeEl.className = stock.rightBadgeType === 'B'
+        ? 'text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-600 text-white'
+        : stock.rightBadgeType === 'DIFF'
+          ? 'text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-600 text-white'
+          : 'text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-600 text-white';
+
+      document.getElementById('detail-stock-submeta').textContent =
+        `${stock.subIndustry} · 시총 ${stock.marketCap} · 최근 종가 ${stock.lastClose} · onset ${stock.onsetDate}`;
+
+      const bmBtn = document.getElementById('btn-detail-bookmark');
+      if (state.watchlist.has(stock.id)) {
+        bmBtn.textContent = '★ 관심등록됨';
+        bmBtn.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-400 text-xs font-semibold text-amber-300 transition';
+      } else {
+        bmBtn.textContent = '☆ 관심등록';
+        bmBtn.className = 'px-2.5 py-1 rounded-lg bg-[#0b0e14] hover:bg-gray-800 border border-gray-700 text-xs font-medium text-gray-300 transition';
+      }
+
+      document.getElementById('detail-volume-badge').textContent = `거래량 ${stock.volumeText}`;
+      document.getElementById('detail-verdict-text').textContent = stock.verdict;
+      document.getElementById('detail-tags-list').innerHTML = stock.tags
+        .map(t => `<span class="text-[11px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">#${t}</span>`)
+        .join('');
+
+      // Score Accordion
+      const scoreWrapper = document.getElementById('score-accordion-wrapper');
+      if (stock.scoreBreakdown && stock.scoreBreakdown.length > 0) {
+        scoreWrapper.classList.remove('hidden');
+        document.getElementById('score-accordion-title').textContent =
+          `점수 ${stock.score} / 12 ▾ (점수 근거 — 정배열·준비기간·거래대금·섹터·과열 기준)`;
+        const scoreBody = document.getElementById('score-accordion-body');
+        scoreBody.innerHTML = stock.scoreBreakdown.map(item => `
+          <div class="flex items-center justify-between px-2.5 py-1.5 rounded bg-[#121722] border border-gray-800/80">
+            <span class="${item.passed ? 'text-gray-200' : 'text-gray-500'}">
+              ${item.passed ? '<strong class="text-emerald-400 mr-1">✓</strong>' : '<span class="text-gray-600 mr-1">·</span>'}
+              ${item.label}
+            </span>
+            <span class="font-mono font-semibold ${item.passed ? 'text-blue-400' : 'text-gray-500'}">${item.score}</span>
+          </div>
+        `).join('');
+        scoreBody.classList.toggle('hidden', !state.accordions.score);
+      } else {
+        scoreWrapper.classList.add('hidden');
+      }
+
+      // Earnings Accordion
+      document.getElementById('earnings-accordion-title').textContent = `${stock.earningsTitle} ▾`;
+      const earnBody = document.getElementById('earnings-accordion-body');
+      const headers = stock.tableHeaders || ['분기', '매출액(단순)', '영업이익', '당기순이익'];
+      earnBody.innerHTML = `
+        <div class="text-gray-300 font-medium">${stock.earningsSummary}</div>
+        <div class="overflow-x-auto pt-1">
+          <table class="w-full text-left border-collapse font-mono text-[11px]">
+            <thead>
+              <tr class="border-b border-gray-800 text-gray-400">
+                <th class="py-1.5 pr-3">${headers[0]}</th>
+                <th class="py-1.5 pr-3">${headers[1]}</th>
+                <th class="py-1.5 pr-3">${headers[2]}</th>
+                <th class="py-1.5">${headers[3]}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/60">
+              ${stock.quarters.map(q => `
+                <tr>
+                  <td class="py-1.5 pr-3 text-blue-300 font-semibold">${q.c1}</td>
+                  <td class="py-1.5 pr-3 text-gray-200">${q.c2}</td>
+                  <td class="py-1.5 pr-3 text-emerald-300">${q.c3}</td>
+                  <td class="py-1.5 text-gray-300">${q.c4}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      earnBody.classList.toggle('hidden', !state.accordions.earnings);
+
+      renderStockChart(stock);
+    }
+
+    function toggleAccordion(key) {
+      state.accordions[key] = !state.accordions[key];
+      renderSelectedStockDetail();
+    }
+
+    function setChartRange(rangeKey) {
+      state.chartRange = rangeKey;
+      ['6m', '3m', '1m'].forEach(k => {
+        const btn = document.getElementById(`btn-range-${k}`);
+        if (!btn) return;
+        const match = (rangeKey === 'ALL' && k === '6m') || (rangeKey === '3M' && k === '3m') || (rangeKey === '1M' && k === '1m');
+        btn.className = match
+          ? 'px-2 py-1 rounded text-[11px] font-medium bg-blue-600 text-white'
+          : 'px-2 py-1 rounded text-[11px] font-medium bg-[#0b0e14] text-gray-400 hover:text-gray-200 border border-gray-800';
+      });
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (stock) renderStockChart(stock);
+    }
+
+    function toggleLogScale() {
+      state.logScale = !state.logScale;
+      const btn = document.getElementById('btn-log-scale');
+      if (state.logScale) {
+        btn.textContent = '로그 ON';
+        btn.className = 'ml-1 px-2 py-1 rounded text-[11px] font-mono bg-blue-600/30 text-blue-300 border border-blue-500 transition';
+      } else {
+        btn.textContent = '로그 OFF';
+        btn.className = 'ml-1 px-2 py-1 rounded text-[11px] font-mono bg-[#0b0e14] text-gray-300 hover:bg-gray-800 border border-gray-700 transition';
+      }
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (stock) renderStockChart(stock);
+    }
+
+    function renderStockChart(stock) {
+      const ctx = document.getElementById('stockPriceChart');
+      if (!ctx) return;
+
+      const allPoints = stock.series;
+      const allPrices = allPoints.map(pt => pt.p);
+      const ma4Full = computeMovingAverage(allPrices, 3);
+      const ma13Full = computeMovingAverage(allPrices, 6);
+
+      let sliceStart = 0;
+      if (state.chartRange === '3M') sliceStart = Math.max(0, allPoints.length - 10);
+      if (state.chartRange === '1M') sliceStart = Math.max(0, allPoints.length - 6);
+
+      const labels = allPoints.slice(sliceStart).map(pt => pt.d);
+      const prices = allPrices.slice(sliceStart);
+      const ma4 = ma4Full.slice(sliceStart);
+      const ma13 = ma13Full.slice(sliceStart);
+
+      if (stockChartInstance) {
+        stockChartInstance.destroy();
+      }
+
+      stockChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: `${stock.name} 종가`,
+              data: prices,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.12)',
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointBackgroundColor: '#60a5fa',
+              fill: true,
+              tension: 0.25
+            },
+            {
+              label: '4주선',
+              data: ma4,
+              borderColor: '#fbbf24',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0,
+              fill: false,
+              tension: 0.25
+            },
+            {
+              label: '13주선',
+              data: ma13,
+              borderColor: '#10b981',
+              borderWidth: 1.5,
+              pointRadius: 0,
+              fill: false,
+              tension: 0.25
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#121722',
+              borderColor: '#374151',
+              borderWidth: 1,
+              titleColor: '#f3f4f6',
+              bodyColor: '#e5e7eb'
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9ca3af', font: { size: 11 } }
+            },
+            y: {
+              type: state.logScale ? 'logarithmic' : 'linear',
+              position: 'right',
+              grid: { color: 'rgba(255,255,255,0.06)' },
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 11 },
+                callback: function(val) {
+                  return Number(val).toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 6. Supply Oscillator View (`수급오실레이터`)
+    // =========================================================================
+    function filterOscillatorList(val) {
+      state.oscSearchQuery = val;
+      renderOscillatorView();
+    }
+
+    function selectOscStock(code) {
+      state.selectedOscCode = code;
+      renderOscillatorView();
+    }
+
+    function renderOscillatorView() {
+      const q = state.oscSearchQuery.trim().toLowerCase();
+      const filtered = OSCILLATOR_DATA.filter(item =>
+        !q || item.name.toLowerCase().includes(q) || item.code.includes(q)
+      );
+
+      const grid = document.getElementById('osc-cards-grid');
+      grid.innerHTML = filtered.map(item => {
+        const isSel = item.code === state.selectedOscCode;
+        const statusColor = item.status === '약화' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
+        return `
+          <div onclick="selectOscStock('${item.code}')" class="cursor-pointer p-3.5 rounded-xl border transition ${
+            isSel ? 'bg-[#171e2c] border-blue-500' : 'bg-[#0b0e14] hover:bg-gray-900 border-gray-800'
+          }">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-bold text-white">${item.name}</span>
+                <span class="text-xs font-mono text-gray-400 ml-1">${item.code}</span>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded border font-semibold ${statusColor}">${item.status}</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs font-mono">
+              <span class="text-gray-400">오실레이터: <strong class="text-white">${item.oscValue}</strong></span>
+              <span class="text-blue-400">77일 위치 ${item.percentile}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const activeItem = OSCILLATOR_DATA.find(i => i.code === state.selectedOscCode) || OSCILLATOR_DATA[0];
+      document.getElementById('osc-detail-title').textContent = `${activeItem.name} (${activeItem.code}) 수급 오실레이터 및 77거래일 위치 비교`;
+      document.getElementById('osc-detail-sub').textContent =
+        `현재 오실레이터 ${activeItem.oscValue} (우측 축 ${activeItem.axisLabel}) · 상태: ${activeItem.status} · 77거래일 중 위치 ${activeItem.percentile}%`;
+      document.getElementById('osc-detail-close').textContent = `종가 ${activeItem.close}`;
+
+      const ctx = document.getElementById('oscillatorChart');
+      if (!ctx) return;
+      if (oscChartInstance) oscChartInstance.destroy();
+
+      const labels = OSCILLATOR_DATA.map(d => `${d.name} (${d.code})`);
+      oscChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: '수급 오실레이터 수치 (%)',
+              data: OSCILLATOR_DATA.map(d => d.oscNumeric),
+              backgroundColor: OSCILLATOR_DATA.map(d =>
+                d.code === activeItem.code
+                  ? '#3b82f6'
+                  : (d.oscNumeric >= 0 ? 'rgba(16, 185, 129, 0.55)' : 'rgba(244, 63, 94, 0.55)')
+              ),
+              yAxisID: 'yOsc',
+              borderRadius: 6
+            },
+            {
+              type: 'line',
+              label: '77거래일 중 백분위 위치 (%)',
+              data: OSCILLATOR_DATA.map(d => d.percentile),
+              borderColor: '#fbbf24',
+              backgroundColor: '#fbbf24',
+              borderWidth: 2,
+              pointRadius: 4,
+              yAxisID: 'yPct',
+              tension: 0.2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#d1d5db', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            yOsc: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: '오실레이터 (%)', color: '#93c5fd' },
+              ticks: { color: '#93c5fd' },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            yPct: {
+              type: 'linear',
+              position: 'right',
+              min: 0,
+              max: 100,
+              title: { display: true, text: '77일 위치 (%)', color: '#fbbf24' },
+              ticks: { color: '#fbbf24' },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 7. Industry Strength View (`산업 강도판`)
+    // =========================================================================
+    function renderIndustryView() {
+      const listEl = document.getElementById('industry-list-container');
+      listEl.innerHTML = INDUSTRY_DATA.map(ind => {
+        const isStrong = ind.group === 'strong';
+        const deltaText = ind.delta >= 0 ? `+${ind.delta}` : `${ind.delta}`;
+        return `
+          <div class="p-3 rounded-lg bg-[#0b0e14] border border-gray-800 flex items-center justify-between text-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm">${ind.name}</span>
+                <span class="text-[11px] font-mono text-gray-400">${ind.count}</span>
+              </div>
+              <div class="text-gray-400 mt-0.5 font-mono">
+                20일 수익률 ${ind.ret20d} · 변화폭 <strong class="${ind.delta >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${deltaText}</strong>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-md font-mono font-bold text-sm ${
+                isStrong ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+              }">
+                강도 ${ind.score}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const ctx = document.getElementById('industryScatterChart');
+      if (!ctx) return;
+      if (industryChartInstance) industryChartInstance.destroy();
+
+      industryChartInstance = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [
+            {
+              label: '상위 강세 산업 (운송/물류·부동산·서비스·통신)',
+              data: INDUSTRY_DATA.filter(d => d.group === 'strong').map(d => ({ x: d.score, y: d.delta, name: d.name })),
+              backgroundColor: '#10b981',
+              pointRadius: 7
+            },
+            {
+              label: '하위 약세 산업 (조선·항공우주/방산)',
+              data: INDUSTRY_DATA.filter(d => d.group === 'weak').map(d => ({ x: d.score, y: d.delta, name: d.name })),
+              backgroundColor: '#f43f5e',
+              pointRadius: 7
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#d1d5db', font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const raw = context.raw;
+                  return `${raw.name}: 현재 강도 ${raw.x}점 (변화폭 ${raw.y >= 0 ? '+' : ''}${raw.y})`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: -5,
+              max: 105,
+              title: { display: true, text: '현재 산업 강도 점수 (0 ~ 100)', color: '#9ca3af' },
+              ticks: { color: '#9ca3af' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            },
+            y: {
+              title: { display: true, text: '강도 변화폭 (Delta)', color: '#9ca3af' },
+              ticks: { color: '#9ca3af' },
+              grid: { color: 'rgba(255,255,255,0.06)' }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 8. Market Thermometer View (`체온`)
+    // =========================================================================
+    function renderThermometerView() {
+      const container = document.getElementById('thermometer-axes-list');
+      container.innerHTML = THERMOMETER_AXES.map(ax => {
+        const barColor = ax.score >= 75 ? 'bg-rose-500' : ax.score >= 40 ? 'bg-amber-400' : 'bg-blue-500';
+        return `
+          <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm">${ax.name}</span>
+                <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-mono">비중 ${ax.weight}</span>
+                <span class="text-gray-400 hidden sm:inline">· ${ax.desc}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400">${ax.status}</span>
+                <span class="font-mono font-bold text-sm text-white">${ax.score}</span>
+              </div>
+            </div>
+            <div class="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full transition-all" style="width: ${ax.score}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 9. Macro View (`매크로`)
+    // =========================================================================
+    function renderMacroView() {
+      const cardsEl = document.getElementById('macro-cards-container');
+      cardsEl.innerHTML = MACRO_YIELDS.map(m => `
+        <div class="bg-[#121722] rounded-xl border border-gray-800 p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">${m.title}</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded ${
+              m.aligned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+            }">${m.badge}</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-mono text-blue-400">${m.current}</span>
+            <span class="text-xs font-mono text-gray-400">(${m.change1m})</span>
+          </div>
+          <div class="text-[11px] font-mono text-gray-400 pt-1 border-t border-gray-800/80">
+            MA4 ${m.ma4.toFixed(2)} · MA13 ${m.ma13.toFixed(2)} · MA26 ${m.ma26.toFixed(2)} · MA52 ${m.ma52.toFixed(2)}
+          </div>
+        </div>
+      `).join('');
+
+      const ctx = document.getElementById('macroYieldChart');
+      if (!ctx) return;
+      if (macroChartInstance) macroChartInstance.destroy();
+
+      macroChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['52주 이평(MA52)', '26주 이평(MA26)', '13주 이평(MA13)', '4주 이평(MA4)', '현재 금리(11-13)'],
+          datasets: [
+            {
+              label: '미 국채 2년 (4.86%)',
+              data: [4.02, 4.40, 4.63, 4.66, 4.86],
+              backgroundColor: 'rgba(59, 130, 246, 0.7)'
+            },
+            {
+              label: '미 국채 10년 (5.10%)',
+              data: [4.50, 4.78, 4.99, 4.98, 5.10],
+              backgroundColor: 'rgba(245, 158, 11, 0.7)'
+            },
+            {
+              label: '미 국채 30년 (5.43%)',
+              data: [5.03, 5.22, 5.38, 5.33, 5.43],
+              backgroundColor: 'rgba(244, 63, 94, 0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#e5e7eb', font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+            y: { min: 3.5, max: 5.8, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.06)' } }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 10. Buy/Sell Rule Simulator (`매수·매도 규칙`)
+    // =========================================================================
+    function toggleSimRule(idx) {
+      SIMULATOR_RULES[idx].checked = !SIMULATOR_RULES[idx].checked;
+      renderRulesView();
+    }
+
+    function renderRulesView() {
+      const container = document.getElementById('rule-simulator-controls');
+      container.innerHTML = SIMULATOR_RULES.map((r, i) => `
+        <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#0b0e14] border border-gray-800 cursor-pointer hover:border-gray-700 transition text-xs">
+          <span class="flex items-center gap-2 text-gray-200">
+            <input type="checkbox" ${r.checked ? 'checked' : ''} onchange="toggleSimRule(${i})" class="rounded bg-gray-900 border-gray-700 text-blue-600 focus:ring-0" />
+            <span>${r.label}</span>
+          </span>
+          <span class="font-mono font-bold text-blue-400">+${r.pts.toFixed(1)}점</span>
+        </label>
+      `).join('');
+
+      const total = SIMULATOR_RULES.reduce((acc, r) => acc + (r.checked ? r.pts : 0), 0);
+      document.getElementById('sim-total-score').textContent = `${total.toFixed(1)} / 12.0점`;
+      const verdictEl = document.getElementById('sim-grade-verdict');
+      if (total >= 10.0) {
+        verdictEl.textContent = '등급 B (초입 최우선 주도주 · 1차 분할매수 적격)';
+        verdictEl.className = 'text-xs text-emerald-400 mt-1 font-semibold';
+      } else if (total >= 7.5) {
+        verdictEl.textContent = '등급 W (관심 대기 · 거래대금 및 섹터 순위 상승 확인 후 진입)';
+        verdictEl.className = 'text-xs text-amber-400 mt-1 font-semibold';
+      } else {
+        verdictEl.textContent = '기준 미달 (추세 준비 부족 · 관망 권장)';
+        verdictEl.className = 'text-xs text-rose-400 mt-1 font-semibold';
+      }
+    }
+
+    // =========================================================================
+    // 11. Trading Journal (`내 기록`) & Research Unlock
+    // =========================================================================
+    function openJournalModalForCurrent() {
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      state.activeTab = 'journal';
+      renderAll();
+      const inp = document.getElementById('journal-stock-input');
+      if (inp && stock) {
+        inp.value = `${stock.name} (${stock.ticker})`;
+        document.getElementById('journal-note-input').focus();
+      }
+    }
+
+    function addJournalEntry(e) {
+      e.preventDefault();
+      const stockVal = document.getElementById('journal-stock-input').value.trim();
+      const stageVal = document.getElementById('journal-stage-input').value;
+      const noteVal = document.getElementById('journal-note-input').value.trim();
+      if (!stockVal || !noteVal) return;
+
+      state.journalEntries.unshift({
+        id: Date.now(),
+        date: '2026-11-16',
+        stock: stockVal,
+        stage: stageVal,
+        note: noteVal
+      });
+      document.getElementById('journal-stock-input').value = '';
+      document.getElementById('journal-note-input').value = '';
+      document.getElementById('journal-count-badge').textContent = state.journalEntries.length;
+      renderJournalView();
+      showToast('새 매매·리서치 기록이 저장되었습니다.');
+    }
+
+    function deleteJournalEntry(id) {
+      state.journalEntries = state.journalEntries.filter(item => item.id !== id);
+      document.getElementById('journal-count-badge').textContent = state.journalEntries.length;
+      renderJournalView();
+    }
+
+    function renderJournalView() {
+      const listEl = document.getElementById('journal-entries-list');
+      if (state.journalEntries.length === 0) {
+        listEl.innerHTML = `<div class="p-6 text-center text-xs text-gray-500">저장된 기록이 없습니다. 상단 입력창에서 첫 기록을 남겨보세요.</div>`;
+        return;
+      }
+      listEl.innerHTML = state.journalEntries.map(item => `
+        <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-gray-800 flex items-start justify-between gap-3 text-xs">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 font-semibold">${item.stage}</span>
+              <span class="font-bold text-white text-sm">${item.stock}</span>
+              <span class="font-mono text-gray-500">${item.date}</span>
+            </div>
+            <p class="text-gray-300 leading-relaxed">${item.note}</p>
+          </div>
+          <button type="button" onclick="deleteJournalEntry(${item.id})" class="text-gray-500 hover:text-rose-400 px-2 py-1" title="삭제">삭제</button>
+        </div>
+      `).join('');
+    }
+
+    function unlockResearchView() {
+      document.getElementById('research-lock-screen').classList.add('hidden');
+      document.getElementById('research-unlocked-content').classList.remove('hidden');
+      showToast('비공개 리서치 탭 잠금이 해제되었습니다.');
+    }
+
+    function lockResearchView() {
+      document.getElementById('research-unlocked-content').classList.add('hidden');
+      document.getElementById('research-lock-screen').classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // 12. Community Feedback Bar (Likes & Comments)
+    // =========================================================================
+    function toggleTabLike() {
+      const key = state.activeTab;
+      if (state.likedTabs.has(key)) {
+        state.likedTabs.delete(key);
+        state.tabLikes[key] -= 1;
+      } else {
+        state.likedTabs.add(key);
+        state.tabLikes[key] += 1;
+      }
+      renderFeedbackBar();
+    }
+
+    function toggleCommentsDrawer() {
+      state.commentsOpen = !state.commentsOpen;
+      const drawer = document.getElementById('comments-drawer');
+      drawer.classList.toggle('hidden', !state.commentsOpen);
+      document.getElementById('comment-caret').textContent = state.commentsOpen ? '▴' : '▾';
+      renderCommentsList();
+    }
+
+    function submitTabComment(e) {
+      e.preventDefault();
+      const inp = document.getElementById('comment-input');
+      const text = inp.value.trim();
+      if (!text) return;
+      state.comments.unshift({ author: '나 (투자자)', time: '방금 전', text });
+      inp.value = '';
+      document.getElementById('comment-count-display').textContent = state.comments.length;
+      renderCommentsList();
+    }
+
+    function renderCommentsList() {
+      const el = document.getElementById('comments-list');
+      el.innerHTML = state.comments.map(c => `
+        <div class="p-2 rounded bg-[#0b0e14] border border-gray-800/80 flex items-start justify-between gap-2">
+          <div>
+            <span class="font-semibold text-blue-400 mr-1.5">${c.author}</span>
+            <span class="text-gray-200">${c.text}</span>
+          </div>
+          <span class="text-[10px] font-mono text-gray-500 shrink-0">${c.time}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderFeedbackBar() {
+      const tabNames = {
+        onset: '초입', progress: '진행', warning: '경계',
+        oscillator: '수급오실레이터', industry: '산업 강도', thermometer: '시장 체온계',
+        macro: '매크로·금리', rules: '매수·매도 규칙', journal: '내 기록', research: '리서치·자산배분'
+      };
+      const cName = state.country === 'KR' ? '한국' : '미국';
+      document.getElementById('feedback-tab-label').textContent =
+        `${cName} · ${tabNames[state.activeTab] || '초입'} 탭 의견을 나눠보세요`;
+
+      const noteEl = document.getElementById('stage-summary-note');
+      if (['onset', 'progress', 'warning'].includes(state.activeTab)) {
+        noteEl.textContent = `(${TAB_META[state.country][state.activeTab].desc})`;
+      } else {
+        noteEl.textContent = '(장 마감 후 배치 데이터 기반 프로토타입 대시보드)';
+      }
+
+      document.getElementById('like-count-display').textContent = state.tabLikes[state.activeTab] || 20;
+      document.getElementById('comment-count-display').textContent = state.comments.length;
+    }
+
+    // =========================================================================
+    // 13. Master Render Orchestrator
+    // =========================================================================
+    function renderAll() {
+      const allTabs = ['onset', 'progress', 'warning', 'oscillator', 'industry', 'thermometer', 'macro', 'rules', 'journal', 'research'];
+      allTabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (!btn) return;
+        const isTier1 = ['onset', 'progress', 'warning', 'oscillator', 'industry', 'thermometer'].includes(t);
+        if (state.activeTab === t) {
+          btn.className = isTier1
+            ? 'tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/50'
+            : 'tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-semibold transition flex items-center gap-1 bg-blue-600/20 text-blue-300 border border-blue-500/40';
+        } else {
+          btn.className = isTier1
+            ? 'tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent'
+            : 'tier2-tab shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent';
+        }
+      });
+
+      const views = {
+        screener: ['onset', 'progress', 'warning'].includes(state.activeTab),
+        oscillator: state.activeTab === 'oscillator',
+        industry: state.activeTab === 'industry',
+        thermometer: state.activeTab === 'thermometer',
+        macro: state.activeTab === 'macro',
+        rules: state.activeTab === 'rules',
+        journal: state.activeTab === 'journal',
+        research: state.activeTab === 'research'
+      };
+
+      Object.keys(views).forEach(vKey => {
+        const el = document.getElementById(`view-${vKey}`);
+        if (el) el.classList.toggle('hidden', !views[vKey]);
+      });
+
+      renderFeedbackBar();
+
+      if (views.screener) renderScreenerView();
+      if (views.oscillator) renderOscillatorView();
+      if (views.industry) renderIndustryView();
+      if (views.thermometer) renderThermometerView();
+      if (views.macro) renderMacroView();
+      if (views.rules) renderRulesView();
+      if (views.journal) renderJournalView();
+    }
+
+    async function loadDataAndInit() {
+      try {
+        const res = await fetch('./data.json?t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        DATA_META = data.meta || DATA_META;
+        TAB_META = data.TAB_META;
+        STOCKS_DATA = data.STOCKS_DATA;
+        OSCILLATOR_DATA = data.OSCILLATOR_DATA;
+        INDUSTRY_DATA = data.INDUSTRY_DATA;
+        THERMOMETER_AXES = data.THERMOMETER_AXES;
+        MACRO_YIELDS = data.MACRO_YIELDS;
+        SIMULATOR_RULES = data.SIMULATOR_RULES;
+
+        const priceBadge = document.getElementById('price-date-badge');
+        if (priceBadge && DATA_META.priceDate) {
+          priceBadge.textContent = '가격 ' + DATA_META.priceDate;
+        }
+        const viewBadge = document.getElementById('view-counter-badge');
+        if (viewBadge && DATA_META.viewCount) {
+          viewBadge.textContent = '조회 ' + Number(DATA_META.viewCount).toLocaleString();
+        }
+
+        document.getElementById('badge-count-onset').textContent = TAB_META[state.country].onset.realTotal;
+        document.getElementById('badge-count-progress').textContent = TAB_META[state.country].progress.realTotal;
+        document.getElementById('badge-count-warning').textContent = TAB_META[state.country].warning.realTotal;
+
+        populateSectorOptions();
+        ensureValidSelectedStock();
+        renderCommentsList();
+        renderAll();
+      } catch (err) {
+        console.error('Failed to load data.json:', err);
+        const errBox = document.getElementById('data-load-error');
+        if (errBox) errBox.classList.remove('hidden');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadDataAndInit);
+  </script>
+</body>
+</html>
