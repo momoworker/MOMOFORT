@@ -26,7 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 주가·이평선 수집 및 data.json 갱신
+      - name: 전 탭(종목·수급·산업강도·체온·매크로) 자동 계산 및 data.json 갱신
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: python update_data.py
 
       - name: 변경된 data.json 저장소에 자동 반영
@@ -34,4 +38,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git diff --staged --quiet || (git commit -m "chore: auto-update data.json" && git push)
+          git diff --staged --quiet || (git commit -m "chore: auto-update all tabs in data.json" && git push)
