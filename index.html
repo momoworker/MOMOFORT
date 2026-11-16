@@ -105,7 +105,7 @@
         </button>
         <button id="tab-thermometer" type="button" onclick="switchTab('thermometer')" class="tier1-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-transparent">
           <span>🌡️ 체온</span>
-          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/10 text-amber-300">49.8</span>
+          <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/10 text-amber-300">49.8</span>
         </button>
       </nav>
 
@@ -325,16 +325,16 @@
         <div class="bg-[#121722] rounded-xl border border-emerald-500/30 p-3.5 flex items-center justify-between">
           <div>
             <span class="text-[11px] font-semibold text-emerald-400 uppercase">힘이 강해진 산업 TOP (20일 기준)</span>
-            <p class="text-sm font-bold text-white mt-0.5">운송/물류 (강도 100) · 부동산 (95) · 서비스 (91) · 통신 (86)</p>
+            <p id="ind-strong-summary" class="text-sm font-bold text-white mt-0.5">운송/물류 (강도 100) · 부동산 (95) · 서비스 (91) · 통신 (86)</p>
           </div>
-          <span class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-300">통신 +45.5 급등</span>
+          <span id="ind-strong-badge" class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-300">강세 주도</span>
         </div>
         <div class="bg-[#121722] rounded-xl border border-rose-500/30 p-3.5 flex items-center justify-between">
           <div>
             <span class="text-[11px] font-semibold text-rose-400 uppercase">힘이 약해진 산업 하위 (20일 기준)</span>
-            <p class="text-sm font-bold text-white mt-0.5">항공우주/방산 (강도 0) · 조선 (강도 5)</p>
+            <p id="ind-weak-summary" class="text-sm font-bold text-white mt-0.5">항공우주/방산 (강도 0) · 조선 (강도 5)</p>
           </div>
-          <span class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-300">방산 -12.7% 조정</span>
+          <span id="ind-weak-badge" class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-300">약세 주의</span>
         </div>
       </div>
 
@@ -365,15 +365,15 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
           <div>
             <span class="text-xs font-semibold text-amber-400">하워드 막스 《시장은 반드시 반복된다》 계량화 모델</span>
-            <h2 class="text-lg font-bold text-white mt-0.5">한국 시장 체온계 · 종합 점수 49.8 / 100</h2>
+            <h2 id="thermo-title-score" class="text-lg font-bold text-white mt-0.5">한국 시장 체온계 · 종합 점수 49.8 / 100</h2>
             <p class="text-xs text-gray-400 mt-1">
-              0(차가움·공포) ~ 100(뜨거움·과열) 기준 · 현재 판정: <strong class="text-amber-300">중립 (막스식 처방 — 공격·방어 균형 유지)</strong>
+              0(차가움·공포) ~ 100(뜨거움·과열) 기준 · 현재 판정: <strong id="thermo-verdict-label" class="text-amber-300">중립 (막스식 처방 — 공격·방어 균형 유지)</strong>
             </p>
           </div>
           <div class="flex items-center gap-3 bg-[#0b0e14] px-4 py-3 rounded-xl border border-gray-800">
             <div class="text-right">
               <div class="text-[11px] text-gray-400">종합 체온 지수</div>
-              <div class="text-2xl font-bold font-mono text-amber-400">49.8°</div>
+              <div id="thermo-big-degree" class="text-2xl font-bold font-mono text-amber-400">49.8°</div>
             </div>
             <div class="h-10 w-px bg-gray-800"></div>
             <div class="text-xs text-gray-300">
@@ -720,6 +720,7 @@
         showToast('★ 관심종목에 추가되었습니다.');
       }
       document.getElementById('watchlist-count').textContent = state.watchlist.size;
+      saveLocalState();
       renderScreenerView();
     }
 
@@ -1149,6 +1150,16 @@
     // 7. Industry Strength View (`산업 강도판`)
     // =========================================================================
     function renderIndustryView() {
+      const strongItems = INDUSTRY_DATA.filter(d => d.group === 'strong');
+      const weakItems = INDUSTRY_DATA.filter(d => d.group === 'weak');
+      const strongSumEl = document.getElementById('ind-strong-summary');
+      if (strongSumEl && strongItems.length > 0) {
+        strongSumEl.textContent = strongItems.map(d => `${d.name} (${d.score})`).join(' · ');
+      }
+      const weakSumEl = document.getElementById('ind-weak-summary');
+      if (weakSumEl && weakItems.length > 0) {
+        weakSumEl.textContent = weakItems.map(d => `${d.name} (${d.score})`).join(' · ');
+      }
       const listEl = document.getElementById('industry-list-container');
       listEl.innerHTML = INDUSTRY_DATA.map(ind => {
         const isStrong = ind.group === 'strong';
@@ -1233,6 +1244,26 @@
     // 8. Market Thermometer View (`체온`)
     // =========================================================================
     function renderThermometerView() {
+      const weights = [0.25, 0.30, 0.20, 0.15, 0.10];
+      let calcTotal = 49.8;
+      if (THERMOMETER_AXES && THERMOMETER_AXES.length === 5) {
+        calcTotal = Number(THERMOMETER_AXES.reduce((acc, ax, idx) => acc + Number(ax.score) * weights[idx], 0).toFixed(1));
+      }
+      const scoreVal = (DATA_META && DATA_META.thermometerScore) ? DATA_META.thermometerScore : calcTotal;
+      const badgeEl = document.getElementById('badge-thermometer-score');
+      if (badgeEl) badgeEl.textContent = scoreVal;
+      const titleEl = document.getElementById('thermo-title-score');
+      if (titleEl) titleEl.textContent = `한국 시장 체온계 · 종합 점수 ${scoreVal} / 100`;
+      const degEl = document.getElementById('thermo-big-degree');
+      if (degEl) degEl.textContent = `${scoreVal}°`;
+      const verdEl = document.getElementById('thermo-verdict-label');
+      if (verdEl) {
+        verdEl.textContent = scoreVal >= 70
+          ? '과열 경계 (막스식 처방 — 방어적 비중 축소 및 현금 확보)'
+          : scoreVal <= 35
+            ? '차가움·공포 (막스식 처방 — 적극적 분할 매수 구간)'
+            : '중립 (막스식 처방 — 공격·방어 균형 유지)';
+      }
       const container = document.getElementById('thermometer-axes-list');
       container.innerHTML = THERMOMETER_AXES.map(ax => {
         const barColor = ax.score >= 75 ? 'bg-rose-500' : ax.score >= 40 ? 'bg-amber-400' : 'bg-blue-500';
@@ -1384,6 +1415,7 @@
       document.getElementById('journal-stock-input').value = '';
       document.getElementById('journal-note-input').value = '';
       document.getElementById('journal-count-badge').textContent = state.journalEntries.length;
+      saveLocalState();
       renderJournalView();
       showToast('새 매매·리서치 기록이 저장되었습니다.');
     }
@@ -1391,6 +1423,7 @@
     function deleteJournalEntry(id) {
       state.journalEntries = state.journalEntries.filter(item => item.id !== id);
       document.getElementById('journal-count-badge').textContent = state.journalEntries.length;
+      saveLocalState();
       renderJournalView();
     }
 
@@ -1541,7 +1574,28 @@
       if (views.journal) renderJournalView();
     }
 
+    function loadSavedLocalState() {
+      try {
+        const savedWl = localStorage.getItem('screener_watchlist_v1');
+        if (savedWl) {
+          state.watchlist = new Set(JSON.parse(savedWl));
+        }
+        const savedJl = localStorage.getItem('screener_journal_v1');
+        if (savedJl) {
+          state.journalEntries = JSON.parse(savedJl);
+        }
+      } catch (e) {}
+    }
+
+    function saveLocalState() {
+      try {
+        localStorage.setItem('screener_watchlist_v1', JSON.stringify(Array.from(state.watchlist)));
+        localStorage.setItem('screener_journal_v1', JSON.stringify(state.journalEntries));
+      } catch (e) {}
+    }
+
     async function loadDataAndInit() {
+      loadSavedLocalState();
       try {
         const res = await fetch('./data.json?t=' + Date.now());
         if (!res.ok) throw new Error('HTTP ' + res.status);
