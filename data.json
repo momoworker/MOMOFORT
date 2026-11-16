@@ -2,7 +2,7 @@
   "meta": {
     "priceDate": "2026-11-16",
     "updatedSchedule": "17시 갱신 시작 · 18시/18:30/20시 재시도",
-    "viewCount": 2187,
+    "viewCount": 2188,
     "thermometerScore": 25.7
   },
   "TAB_META": {
@@ -667,162 +667,6 @@
       ]
     },
     {
-      "id": "KR-290550",
-      "country": "KR",
-      "stage": "onset",
-      "name": "디케이티",
-      "ticker": "290550",
-      "exchange": "KOSDAQ",
-      "changePct": -0.7,
-      "changeText": "▼0.7%",
-      "industry": "우량기업부",
-      "subIndustry": "우량기업부 · KOSDAQ",
-      "rightBadge": "B",
-      "rightBadgeType": "B",
-      "alignWeeks": 1,
-      "prepWeeks": 51,
-      "score": 11.0,
-      "statusLabel": "점수 11.0",
-      "sectorRank": "#5",
-      "marketCap": "5,380억",
-      "lastClose": "27,650원",
-      "onsetDate": "2026-11-16",
-      "opBadge": "RSI 55.2",
-      "opPositive": true,
-      "tags": [
-        "우량기업부"
-      ],
-      "volumeText": "771.43K",
-      "verdict": "정배열 1주(초입) · 20일선 > 120일선 · RSI 55.2 · 거래회복",
-      "scoreBreakdown": [
-        {
-          "label": "정배열 초입 (≤6주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "준비기간 충분 (≥15주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "변동성 수축 (VCP)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "거래량 회복 (5일≥20일)",
-          "score": "1/1",
-          "passed": true
-        },
-        {
-          "label": "20일·120일선 정배열",
-          "score": "2/2",
-          "passed": true
-        },
-        {
-          "label": "과열 아님 (RSI<72)",
-          "score": "1/1",
-          "passed": true
-        },
-        {
-          "label": "보너스: 시총·유동성",
-          "score": "1.0/1",
-          "passed": true
-        }
-      ],
-      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 27,650원 · 20일선 24,360원 · 120일선 20,938원 · 기간 고점 대비 -20.9%",
-      "tableHeaders": [
-        "기준일",
-        "단기선 (20일)",
-        "장기선 (120일)",
-        "기간 고점 / RSI"
-      ],
-      "quarters": [
-        {
-          "c1": "2026-11-16",
-          "c2": "24,360원",
-          "c3": "20,938원",
-          "c4": "34,950원 / RSI 55.2"
-        }
-      ],
-      "series": [
-        {
-          "d": "05-22",
-          "p": 28150.0
-        },
-        {
-          "d": "06-04",
-          "p": 24550.0
-        },
-        {
-          "d": "06-15",
-          "p": 21500.0
-        },
-        {
-          "d": "06-24",
-          "p": 19310.0
-        },
-        {
-          "d": "07-03",
-          "p": 22650.0
-        },
-        {
-          "d": "07-14",
-          "p": 20800.0
-        },
-        {
-          "d": "07-24",
-          "p": 21300.0
-        },
-        {
-          "d": "08-04",
-          "p": 18170.0
-        },
-        {
-          "d": "08-13",
-          "p": 19880.0
-        },
-        {
-          "d": "08-25",
-          "p": 15800.0
-        },
-        {
-          "d": "09-03",
-          "p": 14400.0
-        },
-        {
-          "d": "09-14",
-          "p": 15960.0
-        },
-        {
-          "d": "09-23",
-          "p": 22050.0
-        },
-        {
-          "d": "10-07",
-          "p": 23500.0
-        },
-        {
-          "d": "10-19",
-          "p": 21850.0
-        },
-        {
-          "d": "10-28",
-          "p": 25200.0
-        },
-        {
-          "d": "11-06",
-          "p": 20650.0
-        },
-        {
-          "d": "11-16",
-          "p": 27650.0
-        }
-      ]
-    },
-    {
       "id": "KR-328130",
       "country": "KR",
       "stage": "onset",
@@ -839,7 +683,7 @@
       "prepWeeks": 51,
       "score": 11.0,
       "statusLabel": "점수 11.0",
-      "sectorRank": "#6",
+      "sectorRank": "#5",
       "marketCap": "1조 945억",
       "lastClose": "14,700원",
       "onsetDate": "2026-11-16",
@@ -975,6 +819,162 @@
         {
           "d": "11-16",
           "p": 14700.0
+        }
+      ]
+    },
+    {
+      "id": "KR-290550",
+      "country": "KR",
+      "stage": "onset",
+      "name": "디케이티",
+      "ticker": "290550",
+      "exchange": "KOSDAQ",
+      "changePct": -0.7,
+      "changeText": "▼0.7%",
+      "industry": "우량기업부",
+      "subIndustry": "우량기업부 · KOSDAQ",
+      "rightBadge": "B",
+      "rightBadgeType": "B",
+      "alignWeeks": 1,
+      "prepWeeks": 51,
+      "score": 11.0,
+      "statusLabel": "점수 11.0",
+      "sectorRank": "#6",
+      "marketCap": "5,380억",
+      "lastClose": "27,650원",
+      "onsetDate": "2026-11-16",
+      "opBadge": "RSI 55.2",
+      "opPositive": true,
+      "tags": [
+        "우량기업부"
+      ],
+      "volumeText": "771.43K",
+      "verdict": "정배열 1주(초입) · 20일선 > 120일선 · RSI 55.2 · 거래회복",
+      "scoreBreakdown": [
+        {
+          "label": "정배열 초입 (≤6주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "준비기간 충분 (≥15주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "변동성 수축 (VCP)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "거래량 회복 (5일≥20일)",
+          "score": "1/1",
+          "passed": true
+        },
+        {
+          "label": "20일·120일선 정배열",
+          "score": "2/2",
+          "passed": true
+        },
+        {
+          "label": "과열 아님 (RSI<72)",
+          "score": "1/1",
+          "passed": true
+        },
+        {
+          "label": "보너스: 시총·유동성",
+          "score": "1.0/1",
+          "passed": true
+        }
+      ],
+      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
+      "earningsSummary": "현재가 27,650원 · 20일선 24,360원 · 120일선 20,938원 · 기간 고점 대비 -20.9%",
+      "tableHeaders": [
+        "기준일",
+        "단기선 (20일)",
+        "장기선 (120일)",
+        "기간 고점 / RSI"
+      ],
+      "quarters": [
+        {
+          "c1": "2026-11-16",
+          "c2": "24,360원",
+          "c3": "20,938원",
+          "c4": "34,950원 / RSI 55.2"
+        }
+      ],
+      "series": [
+        {
+          "d": "05-22",
+          "p": 28150.0
+        },
+        {
+          "d": "06-04",
+          "p": 24550.0
+        },
+        {
+          "d": "06-15",
+          "p": 21500.0
+        },
+        {
+          "d": "06-24",
+          "p": 19310.0
+        },
+        {
+          "d": "07-03",
+          "p": 22650.0
+        },
+        {
+          "d": "07-14",
+          "p": 20800.0
+        },
+        {
+          "d": "07-24",
+          "p": 21300.0
+        },
+        {
+          "d": "08-04",
+          "p": 18170.0
+        },
+        {
+          "d": "08-13",
+          "p": 19880.0
+        },
+        {
+          "d": "08-25",
+          "p": 15800.0
+        },
+        {
+          "d": "09-03",
+          "p": 14400.0
+        },
+        {
+          "d": "09-14",
+          "p": 15960.0
+        },
+        {
+          "d": "09-23",
+          "p": 22050.0
+        },
+        {
+          "d": "10-07",
+          "p": 23500.0
+        },
+        {
+          "d": "10-19",
+          "p": 21850.0
+        },
+        {
+          "d": "10-28",
+          "p": 25200.0
+        },
+        {
+          "d": "11-06",
+          "p": 20650.0
+        },
+        {
+          "d": "11-16",
+          "p": 27650.0
         }
       ]
     },
@@ -4489,14 +4489,14 @@
       "statusLabel": "점수 11.0",
       "sectorRank": "#1",
       "marketCap": "S&P500",
-      "lastClose": "$266.27",
+      "lastClose": "$266.24",
       "onsetDate": "2026-11-16",
       "opBadge": "RSI 69.8",
       "opPositive": true,
       "tags": [
         "Information Technology"
       ],
-      "volumeText": "47.96K",
+      "volumeText": "48.75K",
       "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 69.8 · 변동성수축",
       "scoreBreakdown": [
         {
@@ -4536,7 +4536,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $266.27 · 20일선 $255.38 · 120일선 $229.69 · 기간 고점 대비 -4.6%",
+      "earningsSummary": "현재가 $266.24 · 20일선 $255.38 · 120일선 $229.69 · 기간 고점 대비 -4.7%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -4622,7 +4622,7 @@
         },
         {
           "d": "11-16",
-          "p": 266.27
+          "p": 266.24
         }
       ]
     },
@@ -4633,8 +4633,8 @@
       "name": "Roivant Sciences",
       "ticker": "ROIV",
       "exchange": "NASDAQ",
-      "changePct": -0.2,
-      "changeText": "▼0.2%",
+      "changePct": -0.3,
+      "changeText": "▼0.3%",
       "industry": "헬스케어",
       "subIndustry": "헬스케어 · NASDAQ",
       "rightBadge": "B",
@@ -4645,15 +4645,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#2",
       "marketCap": "Biotech",
-      "lastClose": "$39.47",
+      "lastClose": "$39.40",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 60.3",
+      "opBadge": "RSI 60.0",
       "opPositive": true,
       "tags": [
         "바이오"
       ],
-      "volumeText": "249.46K",
-      "verdict": "정배열 2주(초입) · 20일선 > 120일선 · RSI 60.3 · 거래회복",
+      "volumeText": "260.64K",
+      "verdict": "정배열 2주(초입) · 20일선 > 120일선 · RSI 60.0 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -4692,7 +4692,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $39.47 · 20일선 $37.91 · 120일선 $35.32 · 기간 고점 대비 -7.1%",
+      "earningsSummary": "현재가 $39.40 · 20일선 $37.90 · 120일선 $35.32 · 기간 고점 대비 -7.3%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -4702,9 +4702,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$37.91",
+          "c2": "$37.90",
           "c3": "$35.32",
-          "c4": "$42.50 / RSI 60.3"
+          "c4": "$42.50 / RSI 60.0"
         }
       ],
       "series": [
@@ -4778,163 +4778,7 @@
         },
         {
           "d": "11-16",
-          "p": 39.47
-        }
-      ]
-    },
-    {
-      "id": "US-ABT",
-      "country": "US",
-      "stage": "onset",
-      "name": "Abbott Laboratories",
-      "ticker": "ABT",
-      "exchange": "US",
-      "changePct": 1.1,
-      "changeText": "▲1.1%",
-      "industry": "Health Care",
-      "subIndustry": "Health Care · US",
-      "rightBadge": "B",
-      "rightBadgeType": "B",
-      "alignWeeks": 3,
-      "prepWeeks": 49,
-      "score": 10.0,
-      "statusLabel": "점수 10.0",
-      "sectorRank": "#3",
-      "marketCap": "S&P500",
-      "lastClose": "$109.71",
-      "onsetDate": "2026-11-16",
-      "opBadge": "RSI 62.4",
-      "opPositive": true,
-      "tags": [
-        "Health Care"
-      ],
-      "volumeText": "434.19K",
-      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 62.4 · 거래회복",
-      "scoreBreakdown": [
-        {
-          "label": "정배열 초입 (≤6주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "준비기간 충분 (≥15주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "변동성 수축 (VCP)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "거래량 회복 (5일≥20일)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "20일·120일선 정배열",
-          "score": "2/2",
-          "passed": true
-        },
-        {
-          "label": "과열 아님 (RSI<72)",
-          "score": "1/1",
-          "passed": true
-        },
-        {
-          "label": "보너스: 시총·유동성",
-          "score": "1.0/1",
-          "passed": true
-        }
-      ],
-      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $109.71 · 20일선 $107.24 · 120일선 $101.65 · 기간 고점 대비 -6.5%",
-      "tableHeaders": [
-        "기준일",
-        "단기선 (20일)",
-        "장기선 (120일)",
-        "기간 고점 / RSI"
-      ],
-      "quarters": [
-        {
-          "c1": "2026-11-16",
-          "c2": "$107.24",
-          "c3": "$101.65",
-          "c4": "$117.34 / RSI 62.4"
-        }
-      ],
-      "series": [
-        {
-          "d": "06-01",
-          "p": 87.78
-        },
-        {
-          "d": "06-10",
-          "p": 89.17
-        },
-        {
-          "d": "06-22",
-          "p": 87.83
-        },
-        {
-          "d": "07-01",
-          "p": 92.18
-        },
-        {
-          "d": "07-13",
-          "p": 92.11
-        },
-        {
-          "d": "07-22",
-          "p": 100.57
-        },
-        {
-          "d": "07-31",
-          "p": 105.7
-        },
-        {
-          "d": "08-11",
-          "p": 109.72
-        },
-        {
-          "d": "08-20",
-          "p": 114.14
-        },
-        {
-          "d": "08-31",
-          "p": 110.36
-        },
-        {
-          "d": "09-10",
-          "p": 103.36
-        },
-        {
-          "d": "09-21",
-          "p": 102.98
-        },
-        {
-          "d": "09-30",
-          "p": 98.83
-        },
-        {
-          "d": "10-09",
-          "p": 99.6
-        },
-        {
-          "d": "10-20",
-          "p": 102.45
-        },
-        {
-          "d": "10-29",
-          "p": 104.57
-        },
-        {
-          "d": "11-09",
-          "p": 110.51
-        },
-        {
-          "d": "11-16",
-          "p": 109.71
+          "p": 39.4
         }
       ]
     },
@@ -4945,8 +4789,8 @@
       "name": "3M",
       "ticker": "MMM",
       "exchange": "US",
-      "changePct": 0.0,
-      "changeText": "-0.0%",
+      "changePct": 0.2,
+      "changeText": "▲0.2%",
       "industry": "Industrials",
       "subIndustry": "Industrials · US",
       "rightBadge": "B",
@@ -4955,17 +4799,17 @@
       "prepWeeks": 49,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#4",
+      "sectorRank": "#3",
       "marketCap": "S&P500",
-      "lastClose": "$183.69",
+      "lastClose": "$184.09",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 62.2",
+      "opBadge": "RSI 62.5",
       "opPositive": true,
       "tags": [
         "Industrials"
       ],
-      "volumeText": "87.18K",
-      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 62.2 · 거래회복",
+      "volumeText": "91.21K",
+      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 62.5 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -5004,7 +4848,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $183.69 · 20일선 $180.34 · 120일선 $168.99 · 기간 고점 대비 -6.7%",
+      "earningsSummary": "현재가 $184.09 · 20일선 $180.36 · 120일선 $168.99 · 기간 고점 대비 -6.5%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5014,9 +4858,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$180.34",
+          "c2": "$180.36",
           "c3": "$168.99",
-          "c4": "$196.90 / RSI 62.2"
+          "c4": "$196.90 / RSI 62.5"
         }
       ],
       "series": [
@@ -5090,38 +4934,38 @@
         },
         {
           "d": "11-16",
-          "p": 183.69
+          "p": 184.09
         }
       ]
     },
     {
-      "id": "US-APD",
+      "id": "US-ABT",
       "country": "US",
       "stage": "onset",
-      "name": "Air Products",
-      "ticker": "APD",
+      "name": "Abbott Laboratories",
+      "ticker": "ABT",
       "exchange": "US",
-      "changePct": -0.2,
-      "changeText": "▼0.2%",
-      "industry": "Materials",
-      "subIndustry": "Materials · US",
+      "changePct": 1.1,
+      "changeText": "▲1.1%",
+      "industry": "Health Care",
+      "subIndustry": "Health Care · US",
       "rightBadge": "B",
       "rightBadgeType": "B",
-      "alignWeeks": 4,
-      "prepWeeks": 48,
+      "alignWeeks": 3,
+      "prepWeeks": 49,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#5",
+      "sectorRank": "#4",
       "marketCap": "S&P500",
-      "lastClose": "$315.84",
+      "lastClose": "$109.68",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 59.7",
+      "opBadge": "RSI 62.3",
       "opPositive": true,
       "tags": [
-        "Materials"
+        "Health Care"
       ],
-      "volumeText": "23.43K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 59.7 · 거래회복",
+      "volumeText": "449.47K",
+      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 62.3 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -5160,7 +5004,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $315.84 · 20일선 $310.90 · 120일선 $295.16 · 기간 고점 대비 -2.5%",
+      "earningsSummary": "현재가 $109.68 · 20일선 $107.24 · 120일선 $101.65 · 기간 고점 대비 -6.5%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5170,9 +5014,165 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$310.90",
-          "c3": "$295.16",
-          "c4": "$324.00 / RSI 59.7"
+          "c2": "$107.24",
+          "c3": "$101.65",
+          "c4": "$117.34 / RSI 62.3"
+        }
+      ],
+      "series": [
+        {
+          "d": "06-01",
+          "p": 87.78
+        },
+        {
+          "d": "06-10",
+          "p": 89.17
+        },
+        {
+          "d": "06-22",
+          "p": 87.83
+        },
+        {
+          "d": "07-01",
+          "p": 92.18
+        },
+        {
+          "d": "07-13",
+          "p": 92.11
+        },
+        {
+          "d": "07-22",
+          "p": 100.57
+        },
+        {
+          "d": "07-31",
+          "p": 105.7
+        },
+        {
+          "d": "08-11",
+          "p": 109.72
+        },
+        {
+          "d": "08-20",
+          "p": 114.14
+        },
+        {
+          "d": "08-31",
+          "p": 110.36
+        },
+        {
+          "d": "09-10",
+          "p": 103.36
+        },
+        {
+          "d": "09-21",
+          "p": 102.98
+        },
+        {
+          "d": "09-30",
+          "p": 98.83
+        },
+        {
+          "d": "10-09",
+          "p": 99.6
+        },
+        {
+          "d": "10-20",
+          "p": 102.45
+        },
+        {
+          "d": "10-29",
+          "p": 104.57
+        },
+        {
+          "d": "11-09",
+          "p": 110.51
+        },
+        {
+          "d": "11-16",
+          "p": 109.68
+        }
+      ]
+    },
+    {
+      "id": "US-APD",
+      "country": "US",
+      "stage": "onset",
+      "name": "Air Products",
+      "ticker": "APD",
+      "exchange": "US",
+      "changePct": -0.1,
+      "changeText": "▼0.1%",
+      "industry": "Materials",
+      "subIndustry": "Materials · US",
+      "rightBadge": "B",
+      "rightBadgeType": "B",
+      "alignWeeks": 4,
+      "prepWeeks": 48,
+      "score": 10.0,
+      "statusLabel": "점수 10.0",
+      "sectorRank": "#5",
+      "marketCap": "S&P500",
+      "lastClose": "$316.36",
+      "onsetDate": "2026-11-16",
+      "opBadge": "RSI 60.4",
+      "opPositive": true,
+      "tags": [
+        "Materials"
+      ],
+      "volumeText": "24.64K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 60.4 · 거래회복",
+      "scoreBreakdown": [
+        {
+          "label": "정배열 초입 (≤6주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "준비기간 충분 (≥15주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "변동성 수축 (VCP)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "거래량 회복 (5일≥20일)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "20일·120일선 정배열",
+          "score": "2/2",
+          "passed": true
+        },
+        {
+          "label": "과열 아님 (RSI<72)",
+          "score": "1/1",
+          "passed": true
+        },
+        {
+          "label": "보너스: 시총·유동성",
+          "score": "1.0/1",
+          "passed": true
+        }
+      ],
+      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
+      "earningsSummary": "현재가 $316.36 · 20일선 $310.93 · 120일선 $295.17 · 기간 고점 대비 -2.4%",
+      "tableHeaders": [
+        "기준일",
+        "단기선 (20일)",
+        "장기선 (120일)",
+        "기간 고점 / RSI"
+      ],
+      "quarters": [
+        {
+          "c1": "2026-11-16",
+          "c2": "$310.93",
+          "c3": "$295.17",
+          "c4": "$324.00 / RSI 60.4"
         }
       ],
       "series": [
@@ -5246,7 +5246,7 @@
         },
         {
           "d": "11-16",
-          "p": 315.84
+          "p": 316.36
         }
       ]
     },
@@ -5257,8 +5257,8 @@
       "name": "Airbnb",
       "ticker": "ABNB",
       "exchange": "US",
-      "changePct": -1.5,
-      "changeText": "▼1.5%",
+      "changePct": -1.1,
+      "changeText": "▼1.1%",
       "industry": "Consumer Discretionary",
       "subIndustry": "Consumer Discretionary · US",
       "rightBadge": "B",
@@ -5269,15 +5269,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#6",
       "marketCap": "S&P500",
-      "lastClose": "$184.01",
+      "lastClose": "$184.82",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 60.9",
+      "opBadge": "RSI 61.6",
       "opPositive": true,
       "tags": [
         "Consumer Discretionary"
       ],
-      "volumeText": "744.20K",
-      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 60.9 · 거래회복",
+      "volumeText": "784.84K",
+      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 61.6 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -5316,7 +5316,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $184.01 · 20일선 $176.00 · 120일선 $161.10 · 기간 고점 대비 -7.0%",
+      "earningsSummary": "현재가 $184.82 · 20일선 $176.04 · 120일선 $161.11 · 기간 고점 대비 -6.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5326,9 +5326,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$176.00",
-          "c3": "$161.10",
-          "c4": "$197.87 / RSI 60.9"
+          "c2": "$176.04",
+          "c3": "$161.11",
+          "c4": "$197.87 / RSI 61.6"
         }
       ],
       "series": [
@@ -5402,7 +5402,7 @@
         },
         {
           "d": "11-16",
-          "p": 184.01
+          "p": 184.82
         }
       ]
     },
@@ -5413,8 +5413,8 @@
       "name": "Allegion",
       "ticker": "ALLE",
       "exchange": "US",
-      "changePct": 0.2,
-      "changeText": "▲0.2%",
+      "changePct": 0.3,
+      "changeText": "▲0.3%",
       "industry": "Industrials",
       "subIndustry": "Industrials · US",
       "rightBadge": "B",
@@ -5425,15 +5425,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#7",
       "marketCap": "S&P500",
-      "lastClose": "$192.32",
+      "lastClose": "$192.57",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 66.1",
+      "opBadge": "RSI 66.4",
       "opPositive": true,
       "tags": [
         "Industrials"
       ],
-      "volumeText": "22.33K",
-      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 66.1 · 거래회복",
+      "volumeText": "23.48K",
+      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 66.4 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -5472,7 +5472,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $192.32 · 20일선 $183.81 · 120일선 $154.53 · 기간 고점 대비 -1.6%",
+      "earningsSummary": "현재가 $192.57 · 20일선 $183.82 · 120일선 $154.54 · 기간 고점 대비 -1.5%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5482,9 +5482,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$183.81",
-          "c3": "$154.53",
-          "c4": "$195.42 / RSI 66.1"
+          "c2": "$183.82",
+          "c3": "$154.54",
+          "c4": "$195.42 / RSI 66.4"
         }
       ],
       "series": [
@@ -5558,163 +5558,7 @@
         },
         {
           "d": "11-16",
-          "p": 192.32
-        }
-      ]
-    },
-    {
-      "id": "US-ALL",
-      "country": "US",
-      "stage": "onset",
-      "name": "Allstate",
-      "ticker": "ALL",
-      "exchange": "US",
-      "changePct": 0.7,
-      "changeText": "▲0.7%",
-      "industry": "Financials",
-      "subIndustry": "Financials · US",
-      "rightBadge": "B",
-      "rightBadgeType": "B",
-      "alignWeeks": 3,
-      "prepWeeks": 49,
-      "score": 10.0,
-      "statusLabel": "점수 10.0",
-      "sectorRank": "#8",
-      "marketCap": "S&P500",
-      "lastClose": "$269.62",
-      "onsetDate": "2026-11-16",
-      "opBadge": "RSI 65.9",
-      "opPositive": true,
-      "tags": [
-        "Financials"
-      ],
-      "volumeText": "71.84K",
-      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 65.9 · 거래회복",
-      "scoreBreakdown": [
-        {
-          "label": "정배열 초입 (≤6주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "준비기간 충분 (≥15주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "변동성 수축 (VCP)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "거래량 회복 (5일≥20일)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "20일·120일선 정배열",
-          "score": "2/2",
-          "passed": true
-        },
-        {
-          "label": "과열 아님 (RSI<72)",
-          "score": "1/1",
-          "passed": true
-        },
-        {
-          "label": "보너스: 시총·유동성",
-          "score": "1.0/1",
-          "passed": true
-        }
-      ],
-      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $269.62 · 20일선 $259.20 · 120일선 $246.07 · 기간 고점 대비 -4.1%",
-      "tableHeaders": [
-        "기준일",
-        "단기선 (20일)",
-        "장기선 (120일)",
-        "기간 고점 / RSI"
-      ],
-      "quarters": [
-        {
-          "c1": "2026-11-16",
-          "c2": "$259.20",
-          "c3": "$246.07",
-          "c4": "$281.11 / RSI 65.9"
-        }
-      ],
-      "series": [
-        {
-          "d": "06-01",
-          "p": 207.21
-        },
-        {
-          "d": "06-10",
-          "p": 223.34
-        },
-        {
-          "d": "06-22",
-          "p": 222.56
-        },
-        {
-          "d": "07-01",
-          "p": 243.12
-        },
-        {
-          "d": "07-13",
-          "p": 256.45
-        },
-        {
-          "d": "07-22",
-          "p": 251.83
-        },
-        {
-          "d": "07-31",
-          "p": 264.08
-        },
-        {
-          "d": "08-11",
-          "p": 262.23
-        },
-        {
-          "d": "08-20",
-          "p": 254.54
-        },
-        {
-          "d": "08-31",
-          "p": 257.8
-        },
-        {
-          "d": "09-10",
-          "p": 251.79
-        },
-        {
-          "d": "09-21",
-          "p": 242.86
-        },
-        {
-          "d": "09-30",
-          "p": 221.86
-        },
-        {
-          "d": "10-09",
-          "p": 229.43
-        },
-        {
-          "d": "10-20",
-          "p": 249.91
-        },
-        {
-          "d": "10-29",
-          "p": 255.92
-        },
-        {
-          "d": "11-09",
-          "p": 253.79
-        },
-        {
-          "d": "11-16",
-          "p": 269.62
+          "p": 192.57
         }
       ]
     },
@@ -5735,16 +5579,16 @@
       "prepWeeks": 51,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#9",
+      "sectorRank": "#8",
       "marketCap": "S&P500",
-      "lastClose": "$261.98",
+      "lastClose": "$261.91",
       "onsetDate": "2026-11-16",
       "opBadge": "RSI 56.2",
       "opPositive": true,
       "tags": [
         "Consumer Discretionary"
       ],
-      "volumeText": "6.33M",
+      "volumeText": "6.59M",
       "verdict": "정배열 1주(초입) · 20일선 > 120일선 · RSI 56.2 · 거래회복",
       "scoreBreakdown": [
         {
@@ -5784,7 +5628,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $261.98 · 20일선 $257.31 · 120일선 $253.03 · 기간 고점 대비 -8.8%",
+      "earningsSummary": "현재가 $261.91 · 20일선 $257.31 · 120일선 $253.03 · 기간 고점 대비 -8.8%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5870,38 +5714,38 @@
         },
         {
           "d": "11-16",
-          "p": 261.98
+          "p": 261.91
         }
       ]
     },
     {
-      "id": "US-MO",
+      "id": "US-ALL",
       "country": "US",
       "stage": "onset",
-      "name": "Altria",
-      "ticker": "MO",
+      "name": "Allstate",
+      "ticker": "ALL",
       "exchange": "US",
-      "changePct": 0.9,
-      "changeText": "▲0.9%",
-      "industry": "Consumer Staples",
-      "subIndustry": "Consumer Staples · US",
+      "changePct": 0.8,
+      "changeText": "▲0.8%",
+      "industry": "Financials",
+      "subIndustry": "Financials · US",
       "rightBadge": "B",
       "rightBadgeType": "B",
-      "alignWeeks": 2,
-      "prepWeeks": 50,
+      "alignWeeks": 3,
+      "prepWeeks": 49,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#10",
+      "sectorRank": "#9",
       "marketCap": "S&P500",
-      "lastClose": "$79.35",
+      "lastClose": "$269.73",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 71.8",
+      "opBadge": "RSI 65.9",
       "opPositive": true,
       "tags": [
-        "Consumer Staples"
+        "Financials"
       ],
-      "volumeText": "517.04K",
-      "verdict": "정배열 2주(초입) · 20일선 > 120일선 · RSI 71.8 · 거래회복",
+      "volumeText": "73.19K",
+      "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 65.9 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -5940,7 +5784,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $79.35 · 20일선 $76.25 · 120일선 $71.06 · 기간 고점 대비 -0.8%",
+      "earningsSummary": "현재가 $269.73 · 20일선 $259.21 · 120일선 $246.07 · 기간 고점 대비 -4.1%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -5950,9 +5794,165 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$76.25",
+          "c2": "$259.21",
+          "c3": "$246.07",
+          "c4": "$281.11 / RSI 65.9"
+        }
+      ],
+      "series": [
+        {
+          "d": "06-01",
+          "p": 207.21
+        },
+        {
+          "d": "06-10",
+          "p": 223.34
+        },
+        {
+          "d": "06-22",
+          "p": 222.56
+        },
+        {
+          "d": "07-01",
+          "p": 243.12
+        },
+        {
+          "d": "07-13",
+          "p": 256.45
+        },
+        {
+          "d": "07-22",
+          "p": 251.83
+        },
+        {
+          "d": "07-31",
+          "p": 264.08
+        },
+        {
+          "d": "08-11",
+          "p": 262.23
+        },
+        {
+          "d": "08-20",
+          "p": 254.54
+        },
+        {
+          "d": "08-31",
+          "p": 257.8
+        },
+        {
+          "d": "09-10",
+          "p": 251.79
+        },
+        {
+          "d": "09-21",
+          "p": 242.86
+        },
+        {
+          "d": "09-30",
+          "p": 221.86
+        },
+        {
+          "d": "10-09",
+          "p": 229.43
+        },
+        {
+          "d": "10-20",
+          "p": 249.91
+        },
+        {
+          "d": "10-29",
+          "p": 255.92
+        },
+        {
+          "d": "11-09",
+          "p": 253.79
+        },
+        {
+          "d": "11-16",
+          "p": 269.73
+        }
+      ]
+    },
+    {
+      "id": "US-MO",
+      "country": "US",
+      "stage": "onset",
+      "name": "Altria",
+      "ticker": "MO",
+      "exchange": "US",
+      "changePct": 0.7,
+      "changeText": "▲0.7%",
+      "industry": "Consumer Staples",
+      "subIndustry": "Consumer Staples · US",
+      "rightBadge": "B",
+      "rightBadgeType": "B",
+      "alignWeeks": 2,
+      "prepWeeks": 50,
+      "score": 10.0,
+      "statusLabel": "점수 10.0",
+      "sectorRank": "#10",
+      "marketCap": "S&P500",
+      "lastClose": "$79.21",
+      "onsetDate": "2026-11-16",
+      "opBadge": "RSI 71.5",
+      "opPositive": true,
+      "tags": [
+        "Consumer Staples"
+      ],
+      "volumeText": "569.42K",
+      "verdict": "정배열 2주(초입) · 20일선 > 120일선 · RSI 71.5 · 거래회복",
+      "scoreBreakdown": [
+        {
+          "label": "정배열 초입 (≤6주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "준비기간 충분 (≥15주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "변동성 수축 (VCP)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "거래량 회복 (5일≥20일)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "20일·120일선 정배열",
+          "score": "2/2",
+          "passed": true
+        },
+        {
+          "label": "과열 아님 (RSI<72)",
+          "score": "1/1",
+          "passed": true
+        },
+        {
+          "label": "보너스: 시총·유동성",
+          "score": "1.0/1",
+          "passed": true
+        }
+      ],
+      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
+      "earningsSummary": "현재가 $79.21 · 20일선 $76.24 · 120일선 $71.06 · 기간 고점 대비 -1.0%",
+      "tableHeaders": [
+        "기준일",
+        "단기선 (20일)",
+        "장기선 (120일)",
+        "기간 고점 / RSI"
+      ],
+      "quarters": [
+        {
+          "c1": "2026-11-16",
+          "c2": "$76.24",
           "c3": "$71.06",
-          "c4": "$79.97 / RSI 71.8"
+          "c4": "$79.97 / RSI 71.5"
         }
       ],
       "series": [
@@ -6026,163 +6026,7 @@
         },
         {
           "d": "11-16",
-          "p": 79.35
-        }
-      ]
-    },
-    {
-      "id": "US-AMT",
-      "country": "US",
-      "stage": "onset",
-      "name": "American Tower",
-      "ticker": "AMT",
-      "exchange": "US",
-      "changePct": 0.2,
-      "changeText": "▲0.2%",
-      "industry": "Real Estate",
-      "subIndustry": "Real Estate · US",
-      "rightBadge": "B",
-      "rightBadgeType": "B",
-      "alignWeeks": 4,
-      "prepWeeks": 48,
-      "score": 10.0,
-      "statusLabel": "점수 10.0",
-      "sectorRank": "#11",
-      "marketCap": "S&P500",
-      "lastClose": "$192.10",
-      "onsetDate": "2026-11-16",
-      "opBadge": "RSI 67.4",
-      "opPositive": true,
-      "tags": [
-        "Real Estate"
-      ],
-      "volumeText": "66.06K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 67.4 · 거래회복",
-      "scoreBreakdown": [
-        {
-          "label": "정배열 초입 (≤6주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "준비기간 충분 (≥15주)",
-          "score": "3/3",
-          "passed": true
-        },
-        {
-          "label": "변동성 수축 (VCP)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "거래량 회복 (5일≥20일)",
-          "score": "0/1",
-          "passed": false
-        },
-        {
-          "label": "20일·120일선 정배열",
-          "score": "2/2",
-          "passed": true
-        },
-        {
-          "label": "과열 아님 (RSI<72)",
-          "score": "1/1",
-          "passed": true
-        },
-        {
-          "label": "보너스: 시총·유동성",
-          "score": "1.0/1",
-          "passed": true
-        }
-      ],
-      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $192.10 · 20일선 $187.88 · 120일선 $176.67 · 기간 고점 대비 -5.1%",
-      "tableHeaders": [
-        "기준일",
-        "단기선 (20일)",
-        "장기선 (120일)",
-        "기간 고점 / RSI"
-      ],
-      "quarters": [
-        {
-          "c1": "2026-11-16",
-          "c2": "$187.88",
-          "c3": "$176.67",
-          "c4": "$202.50 / RSI 67.4"
-        }
-      ],
-      "series": [
-        {
-          "d": "06-01",
-          "p": 187.53
-        },
-        {
-          "d": "06-10",
-          "p": 192.5
-        },
-        {
-          "d": "06-22",
-          "p": 176.43
-        },
-        {
-          "d": "07-01",
-          "p": 166.08
-        },
-        {
-          "d": "07-13",
-          "p": 169.5
-        },
-        {
-          "d": "07-22",
-          "p": 166.06
-        },
-        {
-          "d": "07-31",
-          "p": 173.36
-        },
-        {
-          "d": "08-11",
-          "p": 169.55
-        },
-        {
-          "d": "08-20",
-          "p": 175.72
-        },
-        {
-          "d": "08-31",
-          "p": 175.7
-        },
-        {
-          "d": "09-10",
-          "p": 172.98
-        },
-        {
-          "d": "09-21",
-          "p": 174.6
-        },
-        {
-          "d": "09-30",
-          "p": 163.69
-        },
-        {
-          "d": "10-09",
-          "p": 182.24
-        },
-        {
-          "d": "10-20",
-          "p": 183.56
-        },
-        {
-          "d": "10-29",
-          "p": 185.88
-        },
-        {
-          "d": "11-09",
-          "p": 189.0
-        },
-        {
-          "d": "11-16",
-          "p": 192.1
+          "p": 79.21
         }
       ]
     },
@@ -6193,8 +6037,8 @@
       "name": "American International Group",
       "ticker": "AIG",
       "exchange": "US",
-      "changePct": 0.4,
-      "changeText": "▲0.4%",
+      "changePct": 0.7,
+      "changeText": "▲0.7%",
       "industry": "Financials",
       "subIndustry": "Financials · US",
       "rightBadge": "B",
@@ -6203,17 +6047,17 @@
       "prepWeeks": 47,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#12",
+      "sectorRank": "#11",
       "marketCap": "S&P500",
-      "lastClose": "$83.20",
+      "lastClose": "$83.42",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 61.4",
+      "opBadge": "RSI 62.0",
       "opPositive": true,
       "tags": [
         "Financials"
       ],
-      "volumeText": "149.90K",
-      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 61.4 · 거래회복",
+      "volumeText": "160.57K",
+      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 62.0 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -6252,7 +6096,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $83.20 · 20일선 $81.43 · 120일선 $77.47 · 기간 고점 대비 -0.8%",
+      "earningsSummary": "현재가 $83.42 · 20일선 $81.44 · 120일선 $77.48 · 기간 고점 대비 -0.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -6262,9 +6106,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$81.43",
-          "c3": "$77.47",
-          "c4": "$83.91 / RSI 61.4"
+          "c2": "$81.44",
+          "c3": "$77.48",
+          "c4": "$83.91 / RSI 62.0"
         }
       ],
       "series": [
@@ -6338,7 +6182,7 @@
         },
         {
           "d": "11-16",
-          "p": 83.2
+          "p": 83.42
         }
       ]
     },
@@ -6349,8 +6193,8 @@
       "name": "American Water Works",
       "ticker": "AWK",
       "exchange": "US",
-      "changePct": 0.9,
-      "changeText": "▲0.9%",
+      "changePct": 1.0,
+      "changeText": "▲1.0%",
       "industry": "Utilities",
       "subIndustry": "Utilities · US",
       "rightBadge": "B",
@@ -6359,17 +6203,17 @@
       "prepWeeks": 48,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#13",
+      "sectorRank": "#12",
       "marketCap": "S&P500",
-      "lastClose": "$150.93",
+      "lastClose": "$151.10",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 68.6",
+      "opBadge": "RSI 68.8",
       "opPositive": true,
       "tags": [
         "Utilities"
       ],
-      "volumeText": "47.32K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 68.6 · 거래회복",
+      "volumeText": "50.69K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 68.8 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -6408,7 +6252,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $150.93 · 20일선 $145.46 · 120일선 $134.65 · 기간 고점 대비 -1.8%",
+      "earningsSummary": "현재가 $151.10 · 20일선 $145.47 · 120일선 $134.65 · 기간 고점 대비 -1.7%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -6418,9 +6262,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$145.46",
+          "c2": "$145.47",
           "c3": "$134.65",
-          "c4": "$153.69 / RSI 68.6"
+          "c4": "$153.69 / RSI 68.8"
         }
       ],
       "series": [
@@ -6494,38 +6338,38 @@
         },
         {
           "d": "11-16",
-          "p": 150.93
+          "p": 151.1
         }
       ]
     },
     {
-      "id": "US-AJG",
+      "id": "US-AMT",
       "country": "US",
       "stage": "onset",
-      "name": "Arthur J. Gallagher & Co.",
-      "ticker": "AJG",
+      "name": "American Tower",
+      "ticker": "AMT",
       "exchange": "US",
-      "changePct": 1.6,
-      "changeText": "▲1.6%",
-      "industry": "Financials",
-      "subIndustry": "Financials · US",
+      "changePct": 0.4,
+      "changeText": "▲0.4%",
+      "industry": "Real Estate",
+      "subIndustry": "Real Estate · US",
       "rightBadge": "B",
       "rightBadgeType": "B",
       "alignWeeks": 4,
       "prepWeeks": 48,
       "score": 10.0,
       "statusLabel": "점수 10.0",
-      "sectorRank": "#14",
+      "sectorRank": "#13",
       "marketCap": "S&P500",
-      "lastClose": "$287.51",
+      "lastClose": "$192.37",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 71.7",
+      "opBadge": "RSI 67.8",
       "opPositive": true,
       "tags": [
-        "Financials"
+        "Real Estate"
       ],
-      "volumeText": "41.70K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 71.7 · 거래회복",
+      "volumeText": "67.83K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 67.8 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -6564,7 +6408,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $287.51 · 20일선 $274.53 · 120일선 $246.26 · 기간 고점 대비 -2.4%",
+      "earningsSummary": "현재가 $192.37 · 20일선 $187.89 · 120일선 $176.68 · 기간 고점 대비 -5.0%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -6574,9 +6418,165 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$274.53",
+          "c2": "$187.89",
+          "c3": "$176.68",
+          "c4": "$202.50 / RSI 67.8"
+        }
+      ],
+      "series": [
+        {
+          "d": "06-01",
+          "p": 187.53
+        },
+        {
+          "d": "06-10",
+          "p": 192.5
+        },
+        {
+          "d": "06-22",
+          "p": 176.43
+        },
+        {
+          "d": "07-01",
+          "p": 166.08
+        },
+        {
+          "d": "07-13",
+          "p": 169.5
+        },
+        {
+          "d": "07-22",
+          "p": 166.06
+        },
+        {
+          "d": "07-31",
+          "p": 173.36
+        },
+        {
+          "d": "08-11",
+          "p": 169.55
+        },
+        {
+          "d": "08-20",
+          "p": 175.72
+        },
+        {
+          "d": "08-31",
+          "p": 175.7
+        },
+        {
+          "d": "09-10",
+          "p": 172.98
+        },
+        {
+          "d": "09-21",
+          "p": 174.6
+        },
+        {
+          "d": "09-30",
+          "p": 163.69
+        },
+        {
+          "d": "10-09",
+          "p": 182.24
+        },
+        {
+          "d": "10-20",
+          "p": 183.56
+        },
+        {
+          "d": "10-29",
+          "p": 185.88
+        },
+        {
+          "d": "11-09",
+          "p": 189.0
+        },
+        {
+          "d": "11-16",
+          "p": 192.37
+        }
+      ]
+    },
+    {
+      "id": "US-AJG",
+      "country": "US",
+      "stage": "onset",
+      "name": "Arthur J. Gallagher & Co.",
+      "ticker": "AJG",
+      "exchange": "US",
+      "changePct": 1.8,
+      "changeText": "▲1.8%",
+      "industry": "Financials",
+      "subIndustry": "Financials · US",
+      "rightBadge": "B",
+      "rightBadgeType": "B",
+      "alignWeeks": 4,
+      "prepWeeks": 48,
+      "score": 10.0,
+      "statusLabel": "점수 10.0",
+      "sectorRank": "#14",
+      "marketCap": "S&P500",
+      "lastClose": "$287.95",
+      "onsetDate": "2026-11-16",
+      "opBadge": "RSI 71.9",
+      "opPositive": true,
+      "tags": [
+        "Financials"
+      ],
+      "volumeText": "44.33K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 71.9 · 거래회복",
+      "scoreBreakdown": [
+        {
+          "label": "정배열 초입 (≤6주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "준비기간 충분 (≥15주)",
+          "score": "3/3",
+          "passed": true
+        },
+        {
+          "label": "변동성 수축 (VCP)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "거래량 회복 (5일≥20일)",
+          "score": "0/1",
+          "passed": false
+        },
+        {
+          "label": "20일·120일선 정배열",
+          "score": "2/2",
+          "passed": true
+        },
+        {
+          "label": "과열 아님 (RSI<72)",
+          "score": "1/1",
+          "passed": true
+        },
+        {
+          "label": "보너스: 시총·유동성",
+          "score": "1.0/1",
+          "passed": true
+        }
+      ],
+      "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
+      "earningsSummary": "현재가 $287.95 · 20일선 $274.55 · 120일선 $246.26 · 기간 고점 대비 -2.2%",
+      "tableHeaders": [
+        "기준일",
+        "단기선 (20일)",
+        "장기선 (120일)",
+        "기간 고점 / RSI"
+      ],
+      "quarters": [
+        {
+          "c1": "2026-11-16",
+          "c2": "$274.55",
           "c3": "$246.26",
-          "c4": "$294.53 / RSI 71.7"
+          "c4": "$294.53 / RSI 71.9"
         }
       ],
       "series": [
@@ -6650,7 +6650,7 @@
         },
         {
           "d": "11-16",
-          "p": 287.51
+          "p": 287.95
         }
       ]
     },
@@ -6661,8 +6661,8 @@
       "name": "Automatic Data Processing",
       "ticker": "ADP",
       "exchange": "US",
-      "changePct": 0.8,
-      "changeText": "▲0.8%",
+      "changePct": 1.0,
+      "changeText": "▲1.0%",
       "industry": "Industrials",
       "subIndustry": "Industrials · US",
       "rightBadge": "B",
@@ -6673,15 +6673,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#15",
       "marketCap": "S&P500",
-      "lastClose": "$312.40",
+      "lastClose": "$313.06",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 69.1",
+      "opBadge": "RSI 69.5",
       "opPositive": true,
       "tags": [
         "Industrials"
       ],
-      "volumeText": "95.94K",
-      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 69.1 · 거래회복",
+      "volumeText": "101.83K",
+      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 69.5 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -6720,7 +6720,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $312.40 · 20일선 $300.59 · 120일선 $264.15 · 기간 고점 대비 -0.8%",
+      "earningsSummary": "현재가 $313.06 · 20일선 $300.62 · 120일선 $264.16 · 기간 고점 대비 -0.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -6730,9 +6730,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$300.59",
-          "c3": "$264.15",
-          "c4": "$315.00 / RSI 69.1"
+          "c2": "$300.62",
+          "c3": "$264.16",
+          "c4": "$315.00 / RSI 69.5"
         }
       ],
       "series": [
@@ -6806,7 +6806,7 @@
         },
         {
           "d": "11-16",
-          "p": 312.4
+          "p": 313.06
         }
       ]
     },
@@ -6817,8 +6817,8 @@
       "name": "Avery Dennison",
       "ticker": "AVY",
       "exchange": "US",
-      "changePct": 0.4,
-      "changeText": "▲0.4%",
+      "changePct": 0.6,
+      "changeText": "▲0.6%",
       "industry": "Materials",
       "subIndustry": "Materials · US",
       "rightBadge": "B",
@@ -6829,15 +6829,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#16",
       "marketCap": "S&P500",
-      "lastClose": "$188.78",
+      "lastClose": "$189.21",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 62.6",
+      "opBadge": "RSI 63.1",
       "opPositive": true,
       "tags": [
         "Materials"
       ],
-      "volumeText": "33.52K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 62.6 · 거래회복",
+      "volumeText": "34.98K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 63.1 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -6876,7 +6876,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $188.78 · 20일선 $185.21 · 120일선 $170.78 · 기간 고점 대비 -5.4%",
+      "earningsSummary": "현재가 $189.21 · 20일선 $185.23 · 120일선 $170.78 · 기간 고점 대비 -5.2%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -6886,9 +6886,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$185.21",
+          "c2": "$185.23",
           "c3": "$170.78",
-          "c4": "$199.54 / RSI 62.6"
+          "c4": "$199.54 / RSI 63.1"
         }
       ],
       "series": [
@@ -6962,7 +6962,7 @@
         },
         {
           "d": "11-16",
-          "p": 188.78
+          "p": 189.21
         }
       ]
     },
@@ -6973,8 +6973,8 @@
       "name": "Ball Corporation",
       "ticker": "BALL",
       "exchange": "US",
-      "changePct": 0.4,
-      "changeText": "▲0.4%",
+      "changePct": 0.3,
+      "changeText": "▲0.3%",
       "industry": "Materials",
       "subIndustry": "Materials · US",
       "rightBadge": "B",
@@ -6985,15 +6985,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#17",
       "marketCap": "S&P500",
-      "lastClose": "$65.70",
+      "lastClose": "$65.67",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 54.1",
+      "opBadge": "RSI 54.0",
       "opPositive": true,
       "tags": [
         "Materials"
       ],
-      "volumeText": "31.62K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 54.1 · 거래회복",
+      "volumeText": "34.12K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 54.0 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -7032,7 +7032,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $65.70 · 20일선 $65.43 · 120일선 $61.29 · 기간 고점 대비 -5.6%",
+      "earningsSummary": "현재가 $65.67 · 20일선 $65.43 · 120일선 $61.29 · 기간 고점 대비 -5.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7044,7 +7044,7 @@
           "c1": "2026-11-16",
           "c2": "$65.43",
           "c3": "$61.29",
-          "c4": "$69.58 / RSI 54.1"
+          "c4": "$69.58 / RSI 54.0"
         }
       ],
       "series": [
@@ -7118,7 +7118,7 @@
         },
         {
           "d": "11-16",
-          "p": 65.7
+          "p": 65.67
         }
       ]
     },
@@ -7141,14 +7141,14 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#18",
       "marketCap": "S&P500",
-      "lastClose": "$25.99",
+      "lastClose": "$26.00",
       "onsetDate": "2026-11-16",
       "opBadge": "RSI 55.9",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "199.88K",
+      "volumeText": "209.15K",
       "verdict": "정배열 3주(초입) · 20일선 > 120일선 · RSI 55.9 · 거래회복",
       "scoreBreakdown": [
         {
@@ -7188,7 +7188,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $25.99 · 20일선 $25.33 · 120일선 $23.83 · 기간 고점 대비 -13.4%",
+      "earningsSummary": "현재가 $26.00 · 20일선 $25.33 · 120일선 $23.83 · 기간 고점 대비 -13.3%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7274,7 +7274,7 @@
         },
         {
           "d": "11-16",
-          "p": 25.99
+          "p": 26.0
         }
       ]
     },
@@ -7297,14 +7297,14 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#19",
       "marketCap": "S&P500",
-      "lastClose": "$83.91",
+      "lastClose": "$83.90",
       "onsetDate": "2026-11-16",
       "opBadge": "RSI 63.3",
       "opPositive": true,
       "tags": [
         "Financials"
       ],
-      "volumeText": "284.79K",
+      "volumeText": "301.68K",
       "verdict": "정배열 2주(초입) · 20일선 > 120일선 · RSI 63.3 · 거래회복",
       "scoreBreakdown": [
         {
@@ -7344,7 +7344,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $83.91 · 20일선 $80.52 · 120일선 $78.13 · 기간 고점 대비 -6.1%",
+      "earningsSummary": "현재가 $83.90 · 20일선 $80.52 · 120일선 $78.13 · 기간 고점 대비 -6.1%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7430,7 +7430,7 @@
         },
         {
           "d": "11-16",
-          "p": 83.91
+          "p": 83.9
         }
       ]
     },
@@ -7441,8 +7441,8 @@
       "name": "BlackRock",
       "ticker": "BLK",
       "exchange": "US",
-      "changePct": -0.7,
-      "changeText": "▼0.7%",
+      "changePct": -0.5,
+      "changeText": "▼0.5%",
       "industry": "Financials",
       "subIndustry": "Financials · US",
       "rightBadge": "B",
@@ -7453,15 +7453,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#20",
       "marketCap": "S&P500",
-      "lastClose": "$1,214.38",
+      "lastClose": "$1,216.46",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 63.4",
+      "opBadge": "RSI 63.9",
       "opPositive": true,
       "tags": [
         "Financials"
       ],
-      "volumeText": "30.60K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 63.4 · 거래회복",
+      "volumeText": "31.84K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 63.9 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -7500,7 +7500,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $1,214.38 · 20일선 $1,174.93 · 120일선 $1,089.96 · 기간 고점 대비 -2.2%",
+      "earningsSummary": "현재가 $1,216.46 · 20일선 $1,175.04 · 120일선 $1,089.98 · 기간 고점 대비 -2.1%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7510,9 +7510,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$1,174.93",
-          "c3": "$1,089.96",
-          "c4": "$1,242.12 / RSI 63.4"
+          "c2": "$1,175.04",
+          "c3": "$1,089.98",
+          "c4": "$1,242.12 / RSI 63.9"
         }
       ],
       "series": [
@@ -7586,7 +7586,7 @@
         },
         {
           "d": "11-16",
-          "p": 1214.38
+          "p": 1216.46
         }
       ]
     },
@@ -7597,8 +7597,8 @@
       "name": "Bristol Myers Squibb",
       "ticker": "BMY",
       "exchange": "US",
-      "changePct": 0.1,
-      "changeText": "▲0.1%",
+      "changePct": -0.0,
+      "changeText": "-0.0%",
       "industry": "Health Care",
       "subIndustry": "Health Care · US",
       "rightBadge": "B",
@@ -7609,15 +7609,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#21",
       "marketCap": "S&P500",
-      "lastClose": "$63.50",
+      "lastClose": "$63.41",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 58.3",
+      "opBadge": "RSI 57.9",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "565.41K",
-      "verdict": "정배열 1주(초입) · 20일선 > 120일선 · RSI 58.3 · 거래회복",
+      "volumeText": "584.32K",
+      "verdict": "정배열 1주(초입) · 20일선 > 120일선 · RSI 57.9 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -7656,7 +7656,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $63.50 · 20일선 $62.31 · 120일선 $61.27 · 기간 고점 대비 -7.5%",
+      "earningsSummary": "현재가 $63.41 · 20일선 $62.30 · 120일선 $61.27 · 기간 고점 대비 -7.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7666,9 +7666,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$62.31",
+          "c2": "$62.30",
           "c3": "$61.27",
-          "c4": "$68.64 / RSI 58.3"
+          "c4": "$68.64 / RSI 57.9"
         }
       ],
       "series": [
@@ -7742,7 +7742,7 @@
         },
         {
           "d": "11-16",
-          "p": 63.5
+          "p": 63.41
         }
       ]
     },
@@ -7753,8 +7753,8 @@
       "name": "Brown & Brown",
       "ticker": "BRO",
       "exchange": "US",
-      "changePct": 1.4,
-      "changeText": "▲1.4%",
+      "changePct": 1.7,
+      "changeText": "▲1.7%",
       "industry": "Financials",
       "subIndustry": "Financials · US",
       "rightBadge": "B",
@@ -7765,15 +7765,15 @@
       "statusLabel": "점수 10.0",
       "sectorRank": "#22",
       "marketCap": "S&P500",
-      "lastClose": "$72.96",
+      "lastClose": "$73.15",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 63.4",
+      "opBadge": "RSI 63.8",
       "opPositive": true,
       "tags": [
         "Financials"
       ],
-      "volumeText": "62.79K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 63.4 · 거래회복",
+      "volumeText": "71.77K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 63.8 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -7812,7 +7812,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $72.96 · 20일선 $71.20 · 120일선 $66.84 · 기간 고점 대비 -4.1%",
+      "earningsSummary": "현재가 $73.15 · 20일선 $71.20 · 120일선 $66.84 · 기간 고점 대비 -3.8%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7824,7 +7824,7 @@
           "c1": "2026-11-16",
           "c2": "$71.20",
           "c3": "$66.84",
-          "c4": "$76.07 / RSI 63.4"
+          "c4": "$76.07 / RSI 63.8"
         }
       ],
       "series": [
@@ -7898,7 +7898,7 @@
         },
         {
           "d": "11-16",
-          "p": 72.96
+          "p": 73.15
         }
       ]
     },
@@ -7909,8 +7909,8 @@
       "name": "Amcor",
       "ticker": "AMCR",
       "exchange": "US",
-      "changePct": 0.9,
-      "changeText": "▲0.9%",
+      "changePct": 1.0,
+      "changeText": "▲1.0%",
       "industry": "Materials",
       "subIndustry": "Materials · US",
       "rightBadge": "W",
@@ -7921,15 +7921,15 @@
       "statusLabel": "점수 9.0",
       "sectorRank": "#23",
       "marketCap": "S&P500",
-      "lastClose": "$44.21",
+      "lastClose": "$44.26",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 43.3",
+      "opBadge": "RSI 43.5",
       "opPositive": false,
       "tags": [
         "Materials"
       ],
-      "volumeText": "142.03K",
-      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 43.3 · 거래회복",
+      "volumeText": "149.27K",
+      "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 43.5 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -7968,7 +7968,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $44.21 · 20일선 $45.82 · 120일선 $43.74 · 기간 고점 대비 -13.2%",
+      "earningsSummary": "현재가 $44.26 · 20일선 $45.82 · 120일선 $43.74 · 기간 고점 대비 -13.1%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -7980,7 +7980,7 @@
           "c1": "2026-11-16",
           "c2": "$45.82",
           "c3": "$43.74",
-          "c4": "$50.94 / RSI 43.3"
+          "c4": "$50.94 / RSI 43.5"
         }
       ],
       "series": [
@@ -8054,7 +8054,7 @@
         },
         {
           "d": "11-16",
-          "p": 44.21
+          "p": 44.26
         }
       ]
     },
@@ -8077,15 +8077,15 @@
       "statusLabel": "점수 9.0",
       "sectorRank": "#24",
       "marketCap": "S&P500",
-      "lastClose": "$111.32",
+      "lastClose": "$111.41",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 76.4",
+      "opBadge": "RSI 76.5",
       "opPositive": true,
       "tags": [
         "Financials"
       ],
-      "volumeText": "77.08K",
-      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 76.4 · 거래회복",
+      "volumeText": "80.69K",
+      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 76.5 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -8124,7 +8124,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $111.32 · 20일선 $106.18 · 120일선 $98.59 · 기간 고점 대비 -2.0%",
+      "earningsSummary": "현재가 $111.41 · 20일선 $106.19 · 120일선 $98.59 · 기간 고점 대비 -2.0%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -8134,9 +8134,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$106.18",
+          "c2": "$106.19",
           "c3": "$98.59",
-          "c4": "$113.63 / RSI 76.4"
+          "c4": "$113.63 / RSI 76.5"
         }
       ],
       "series": [
@@ -8210,7 +8210,7 @@
         },
         {
           "d": "11-16",
-          "p": 111.32
+          "p": 111.41
         }
       ]
     },
@@ -8240,7 +8240,7 @@
       "tags": [
         "Financials"
       ],
-      "volumeText": "10.34K",
+      "volumeText": "10.52K",
       "verdict": "정배열 4주(초입) · 20일선 > 120일선 · RSI 87.1 · 거래회복",
       "scoreBreakdown": [
         {
@@ -8377,8 +8377,8 @@
       "name": "Broadridge Financial Solutions",
       "ticker": "BR",
       "exchange": "US",
-      "changePct": 1.0,
-      "changeText": "▲1.0%",
+      "changePct": 0.9,
+      "changeText": "▲0.9%",
       "industry": "Industrials",
       "subIndustry": "Industrials · US",
       "rightBadge": "W",
@@ -8389,15 +8389,15 @@
       "statusLabel": "점수 9.0",
       "sectorRank": "#26",
       "marketCap": "S&P500",
-      "lastClose": "$194.41",
+      "lastClose": "$194.26",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 80.4",
+      "opBadge": "RSI 80.3",
       "opPositive": true,
       "tags": [
         "Industrials"
       ],
-      "volumeText": "15.27K",
-      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 80.4 · 거래회복",
+      "volumeText": "18.38K",
+      "verdict": "정배열 5주(초입) · 20일선 > 120일선 · RSI 80.3 · 거래회복",
       "scoreBreakdown": [
         {
           "label": "정배열 초입 (≤6주)",
@@ -8436,7 +8436,7 @@
         }
       ],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $194.41 · 20일선 $185.89 · 120일선 $163.85 · 기간 고점 대비 -1.5%",
+      "earningsSummary": "현재가 $194.26 · 20일선 $185.89 · 120일선 $163.85 · 기간 고점 대비 -1.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -8448,7 +8448,7 @@
           "c1": "2026-11-16",
           "c2": "$185.89",
           "c3": "$163.85",
-          "c4": "$197.38 / RSI 80.4"
+          "c4": "$197.38 / RSI 80.3"
         }
       ],
       "series": [
@@ -8522,7 +8522,7 @@
         },
         {
           "d": "11-16",
-          "p": 194.41
+          "p": 194.26
         }
       ]
     },
@@ -8552,7 +8552,7 @@
       "tags": [
         "Health Care"
       ],
-      "volumeText": "411.84K",
+      "volumeText": "434.29K",
       "verdict": "확산 · 정배열 15주 · 신고가 · RSI 68.5 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
@@ -8653,8 +8653,8 @@
       "name": "Becton Dickinson",
       "ticker": "BDX",
       "exchange": "US",
-      "changePct": 0.3,
-      "changeText": "▲0.3%",
+      "changePct": 0.2,
+      "changeText": "▲0.2%",
       "industry": "Health Care",
       "subIndustry": "Health Care · US",
       "rightBadge": "확산",
@@ -8665,18 +8665,18 @@
       "statusLabel": "신고가",
       "sectorRank": "#2",
       "marketCap": "S&P500",
-      "lastClose": "$218.68",
+      "lastClose": "$218.53",
       "onsetDate": "2026-11-16",
       "opBadge": "RSI 84.7",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "66.85K",
+      "volumeText": "70.38K",
       "verdict": "확산 · 정배열 14주 · 신고가 · RSI 84.7 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $218.68 · 20일선 $204.82 · 120일선 $175.13 · 기간 고점 대비 -0.8%",
+      "earningsSummary": "현재가 $218.53 · 20일선 $204.82 · 120일선 $175.13 · 기간 고점 대비 -0.8%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -8762,7 +8762,7 @@
         },
         {
           "d": "11-16",
-          "p": 218.68
+          "p": 218.53
         }
       ]
     },
@@ -8773,8 +8773,8 @@
       "name": "AbbVie",
       "ticker": "ABBV",
       "exchange": "US",
-      "changePct": 1.5,
-      "changeText": "▲1.5%",
+      "changePct": 1.4,
+      "changeText": "▲1.4%",
       "industry": "Health Care",
       "subIndustry": "Health Care · US",
       "rightBadge": "확산",
@@ -8785,18 +8785,18 @@
       "statusLabel": "신고가",
       "sectorRank": "#3",
       "marketCap": "S&P500",
-      "lastClose": "$299.49",
+      "lastClose": "$299.23",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 64.3",
+      "opBadge": "RSI 64.1",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "392.37K",
-      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 64.3 — 추세 진행 중",
+      "volumeText": "404.48K",
+      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 64.1 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $299.49 · 20일선 $290.49 · 120일선 $258.56 · 기간 고점 대비 -1.1%",
+      "earningsSummary": "현재가 $299.23 · 20일선 $290.48 · 120일선 $258.55 · 기간 고점 대비 -1.2%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -8806,9 +8806,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$290.49",
-          "c3": "$258.56",
-          "c4": "$302.93 / RSI 64.3"
+          "c2": "$290.48",
+          "c3": "$258.55",
+          "c4": "$302.93 / RSI 64.1"
         }
       ],
       "series": [
@@ -8882,7 +8882,7 @@
         },
         {
           "d": "11-16",
-          "p": 299.49
+          "p": 299.23
         }
       ]
     },
@@ -8905,18 +8905,18 @@
       "statusLabel": "신고가",
       "sectorRank": "#4",
       "marketCap": "S&P500",
-      "lastClose": "$354.70",
+      "lastClose": "$355.02",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 55.3",
+      "opBadge": "RSI 55.6",
       "opPositive": true,
       "tags": [
         "Information Technology"
       ],
-      "volumeText": "6.44M",
-      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 55.3 — 추세 진행 중",
+      "volumeText": "6.57M",
+      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 55.6 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $354.70 · 20일선 $346.74 · 120일선 $322.82 · 기간 고점 대비 -1.7%",
+      "earningsSummary": "현재가 $355.02 · 20일선 $346.75 · 120일선 $322.82 · 기간 고점 대비 -1.6%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -8926,9 +8926,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$346.74",
+          "c2": "$346.75",
           "c3": "$322.82",
-          "c4": "$360.83 / RSI 55.3"
+          "c4": "$360.83 / RSI 55.6"
         }
       ],
       "series": [
@@ -9002,7 +9002,7 @@
         },
         {
           "d": "11-16",
-          "p": 354.7
+          "p": 355.02
         }
       ]
     },
@@ -9025,18 +9025,18 @@
       "statusLabel": "신고가",
       "sectorRank": "#5",
       "marketCap": "S&P500",
-      "lastClose": "$253.85",
+      "lastClose": "$253.83",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 51.0",
+      "opBadge": "RSI 50.9",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "73.51K",
-      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 51.0 — 추세 진행 중",
+      "volumeText": "75.60K",
+      "verdict": "확산 · 정배열 15주 · 신고가 · RSI 50.9 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $253.85 · 20일선 $250.24 · 120일선 $217.60 · 기간 고점 대비 -2.7%",
+      "earningsSummary": "현재가 $253.83 · 20일선 $250.24 · 120일선 $217.60 · 기간 고점 대비 -2.7%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9048,7 +9048,7 @@
           "c1": "2026-11-16",
           "c2": "$250.24",
           "c3": "$217.60",
-          "c4": "$261.00 / RSI 51.0"
+          "c4": "$261.00 / RSI 50.9"
         }
       ],
       "series": [
@@ -9122,7 +9122,7 @@
         },
         {
           "d": "11-16",
-          "p": 253.85
+          "p": 253.83
         }
       ]
     },
@@ -9133,8 +9133,8 @@
       "name": "Amgen",
       "ticker": "AMGN",
       "exchange": "US",
-      "changePct": 0.9,
-      "changeText": "▲0.9%",
+      "changePct": 1.1,
+      "changeText": "▲1.1%",
       "industry": "Health Care",
       "subIndustry": "Health Care · US",
       "rightBadge": "확산",
@@ -9145,18 +9145,18 @@
       "statusLabel": "신고가",
       "sectorRank": "#6",
       "marketCap": "S&P500",
-      "lastClose": "$470.05",
+      "lastClose": "$470.58",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 65.2",
+      "opBadge": "RSI 65.4",
       "opPositive": true,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "124.26K",
-      "verdict": "확산 · 정배열 7주 · 신고가 · RSI 65.2 — 추세 진행 중",
+      "volumeText": "128.92K",
+      "verdict": "확산 · 정배열 7주 · 신고가 · RSI 65.4 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $470.05 · 20일선 $458.11 · 120일선 $400.22 · 기간 고점 대비 -2.9%",
+      "earningsSummary": "현재가 $470.58 · 20일선 $458.14 · 120일선 $400.22 · 기간 고점 대비 -2.8%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9166,9 +9166,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$458.11",
+          "c2": "$458.14",
           "c3": "$400.22",
-          "c4": "$483.99 / RSI 65.2"
+          "c4": "$483.99 / RSI 65.4"
         }
       ],
       "series": [
@@ -9242,7 +9242,7 @@
         },
         {
           "d": "11-16",
-          "p": 470.05
+          "p": 470.58
         }
       ]
     },
@@ -9253,8 +9253,8 @@
       "name": "Best Buy",
       "ticker": "BBY",
       "exchange": "US",
-      "changePct": -0.8,
-      "changeText": "▼0.8%",
+      "changePct": -0.5,
+      "changeText": "▼0.5%",
       "industry": "Consumer Discretionary",
       "subIndustry": "Consumer Discretionary · US",
       "rightBadge": "확산",
@@ -9265,18 +9265,18 @@
       "statusLabel": "고점 -3%",
       "sectorRank": "#7",
       "marketCap": "S&P500",
-      "lastClose": "$103.19",
+      "lastClose": "$103.54",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 56.6",
+      "opBadge": "RSI 57.2",
       "opPositive": true,
       "tags": [
         "Consumer Discretionary"
       ],
-      "volumeText": "82.86K",
-      "verdict": "확산 · 정배열 15주 · 고점 -3% · RSI 56.6 — 추세 진행 중",
+      "volumeText": "100.49K",
+      "verdict": "확산 · 정배열 15주 · 고점 -3% · RSI 57.2 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $103.19 · 20일선 $99.69 · 120일선 $86.65 · 기간 고점 대비 -3.4%",
+      "earningsSummary": "현재가 $103.54 · 20일선 $99.71 · 120일선 $86.65 · 기간 고점 대비 -3.1%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9286,9 +9286,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$99.69",
+          "c2": "$99.71",
           "c3": "$86.65",
-          "c4": "$106.83 / RSI 56.6"
+          "c4": "$106.83 / RSI 57.2"
         }
       ],
       "series": [
@@ -9362,7 +9362,7 @@
         },
         {
           "d": "11-16",
-          "p": 103.19
+          "p": 103.54
         }
       ]
     },
@@ -9392,7 +9392,7 @@
       "tags": [
         "임상수탁"
       ],
-      "volumeText": "6.71K",
+      "volumeText": "6.76K",
       "verdict": "확산 · 정배열 15주 · 고점 -6% · RSI 43.8 — 추세 진행 중",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
@@ -9505,18 +9505,18 @@
       "statusLabel": "고점 -5%",
       "sectorRank": "#1",
       "marketCap": "S&P500",
-      "lastClose": "$173.28",
+      "lastClose": "$173.21",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 44.9",
+      "opBadge": "RSI 44.8",
       "opPositive": false,
       "tags": [
         "Health Care"
       ],
-      "volumeText": "56.42K",
+      "volumeText": "58.03K",
       "verdict": "경계 · 정배열 15주 · 고점 대비 -5.3% 조정 — 지지선 점검",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $173.28 · 20일선 $175.75 · 120일선 $151.67 · 기간 고점 대비 -5.3%",
+      "earningsSummary": "현재가 $173.21 · 20일선 $175.75 · 120일선 $151.67 · 기간 고점 대비 -5.3%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9528,7 +9528,7 @@
           "c1": "2026-11-16",
           "c2": "$175.75",
           "c3": "$151.67",
-          "c4": "$182.99 / RSI 44.9"
+          "c4": "$182.99 / RSI 44.8"
         }
       ],
       "series": [
@@ -9602,7 +9602,7 @@
         },
         {
           "d": "11-16",
-          "p": 173.28
+          "p": 173.21
         }
       ]
     },
@@ -9613,8 +9613,8 @@
       "name": "Accenture",
       "ticker": "ACN",
       "exchange": "US",
-      "changePct": 0.8,
-      "changeText": "▲0.8%",
+      "changePct": 1.0,
+      "changeText": "▲1.0%",
       "industry": "Information Technology",
       "subIndustry": "Information Technology · US",
       "rightBadge": "경계",
@@ -9625,18 +9625,18 @@
       "statusLabel": "고점 -7%",
       "sectorRank": "#2",
       "marketCap": "S&P500",
-      "lastClose": "$252.55",
+      "lastClose": "$253.07",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 62.6",
+      "opBadge": "RSI 62.9",
       "opPositive": true,
       "tags": [
         "Information Technology"
       ],
-      "volumeText": "223.06K",
-      "verdict": "경계 · 정배열 8주 · 고점 대비 -7.1% 조정 — 지지선 점검",
+      "volumeText": "234.84K",
+      "verdict": "경계 · 정배열 8주 · 고점 대비 -6.9% 조정 — 지지선 점검",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $252.55 · 20일선 $252.18 · 120일선 $185.39 · 기간 고점 대비 -7.1%",
+      "earningsSummary": "현재가 $253.07 · 20일선 $252.21 · 120일선 $185.39 · 기간 고점 대비 -6.9%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9646,9 +9646,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$252.18",
+          "c2": "$252.21",
           "c3": "$185.39",
-          "c4": "$271.76 / RSI 62.6"
+          "c4": "$271.76 / RSI 62.9"
         }
       ],
       "series": [
@@ -9722,7 +9722,7 @@
         },
         {
           "d": "11-16",
-          "p": 252.55
+          "p": 253.07
         }
       ]
     },
@@ -9733,8 +9733,8 @@
       "name": "APA Corporation",
       "ticker": "APA",
       "exchange": "US",
-      "changePct": -1.8,
-      "changeText": "▼1.8%",
+      "changePct": -1.5,
+      "changeText": "▼1.5%",
       "industry": "Energy",
       "subIndustry": "Energy · US",
       "rightBadge": "경계",
@@ -9745,18 +9745,18 @@
       "statusLabel": "고점 -10%",
       "sectorRank": "#3",
       "marketCap": "S&P500",
-      "lastClose": "$47.56",
+      "lastClose": "$47.69",
       "onsetDate": "2026-11-16",
-      "opBadge": "RSI 40.7",
+      "opBadge": "RSI 41.0",
       "opPositive": false,
       "tags": [
         "Energy"
       ],
-      "volumeText": "377.81K",
-      "verdict": "경계 · 정배열 10주 · 고점 대비 -10.2% 조정 — 지지선 점검",
+      "volumeText": "396.05K",
+      "verdict": "경계 · 정배열 10주 · 고점 대비 -10.0% 조정 — 지지선 점검",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
-      "earningsSummary": "현재가 $47.56 · 20일선 $48.40 · 120일선 $41.04 · 기간 고점 대비 -10.2%",
+      "earningsSummary": "현재가 $47.69 · 20일선 $48.41 · 120일선 $41.04 · 기간 고점 대비 -10.0%",
       "tableHeaders": [
         "기준일",
         "단기선 (20일)",
@@ -9766,9 +9766,9 @@
       "quarters": [
         {
           "c1": "2026-11-16",
-          "c2": "$48.40",
+          "c2": "$48.41",
           "c3": "$41.04",
-          "c4": "$52.96 / RSI 40.7"
+          "c4": "$52.96 / RSI 41.0"
         }
       ],
       "series": [
@@ -9842,7 +9842,7 @@
         },
         {
           "d": "11-16",
-          "p": 47.56
+          "p": 47.69
         }
       ]
     },
@@ -9872,7 +9872,7 @@
       "tags": [
         "Utilities"
       ],
-      "volumeText": "1.25M",
+      "volumeText": "1.28M",
       "verdict": "경계 · 정배열 15주 · 고점 대비 -15.4% 조정 — 지지선 점검",
       "scoreBreakdown": [],
       "earningsTitle": "일봉·주봉 이동평균선 자동 스캔 (2026-11-16 기준)",
