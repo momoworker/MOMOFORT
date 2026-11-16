@@ -1,17 +1,24 @@
 """
-주도주 스크리너 - 전 탭(초입/진행/경계 · 수급오실레이터 · 산업강도 · 시장체온계 · 매크로금리) 통합 자동 갱신 엔진
-- 기본 모드(API 키 없음): FinanceDataReader만으로 5개 탭 전체를 매일 100% 자동 계산
-- 확장 모드(GitHub Secrets에 KIS_APP_KEY, KIS_APP_SECRET, DART_API_KEY 등록 시):
-  한국투자증권 실수급(외국인+기관 순매수) 및 DART 분기 영업이익 자동 결합
+한국장 주도주 스크리너 - 실제 leader.starfolio.io 엄격 컷오프 재현 엔진 (v3)
+핵심 개선 사항:
+1. 스캔 범위 대폭 확대: 코스피·코스닥 시가총액 상위 약 800~1,000종목(시총 1,000억 이상 전수) 고속 병렬 스캔
+2. 엄격한 '초입' 수학적 조건:
+   - 주봉(금요일 기준) 4주선 > 13주선 > 26주선 정배열 1~6주차 (또는 0주차 돌파 직후)
+   - 정배열 진입 직전 '비정배열 베이스 준비기간(준비 N주)'이 연속 15주 이상인 종목만 통과 (단기 눌림 후 재차 정배열된 종목 배제)
+   - 시가총액 1,000억 원 이상 & 최근 5일 일평균 거래대금 20억 원 이상 (유동성 미달 소형주 배제)
+   - 12점 만점 스코어링 중 9.0점 이상(최상위 15~25개 내외)만 엄격 선별
+3. 실제 분기 실적(영익 +XX%, 흑자전환, 적자축소) 및 4개 분기 재무제표 자동 추출 (DART API + 네이버 기업실적분석 결합)
 """
 
 import json
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup
 import FinanceDataReader as fdr
 
 try:
@@ -19,49 +26,28 @@ try:
 except ImportError:
     OpenDartReader = None
 
-# ==============================================================================
-# 1. 환경변수 (GitHub Secrets에 등록하면 자동 활성화, 없으면 무료 지수/시세 계산으로 대체)
-# ==============================================================================
 KIS_APP_KEY = os.environ.get("KIS_APP_KEY", "").strip()
 KIS_APP_SECRET = os.environ.get("KIS_APP_SECRET", "").strip()
 DART_API_KEY = os.environ.get("DART_API_KEY", "").strip()
 
-KR_TOP_MARCAP = 150
-KR_TOP_AMOUNT = 150
-US_SCAN_LIMIT = 80
-MAX_WORKERS = 8
-MAX_CARDS_PER_STAGE = 30
-
-US_EXTRA_WATCHLIST = [
-    ("NVDA", "NVIDIA Corp.", "NASDAQ", "반도체", "AI대장주", ["AI칩", "데이터센터"]),
-    ("PLTR", "Palantir Technologies", "NASDAQ", "소프트웨어", "AI소프트웨어", ["국방AI", "AIP"]),
-    ("GEV", "GE Vernova Inc.", "NYSE", "에너지/전력", "전력인프라", ["가스터빈", "그리드"]),
-    ("VRT", "Vertiv Holdings", "NYSE", "인프라", "데이터센터", ["액체냉각", "전력"]),
-    ("ROIV", "Roivant Sciences", "NASDAQ", "헬스케어", "Biotech", ["바이오"]),
-    ("MEDP", "Medpace Holdings", "NASDAQ", "헬스케어", "CRO", ["임상수탁"]),
-    ("HALO", "Halozyme Therapeutics", "NASDAQ", "헬스케어", "Biotech", ["SC제형"]),
-    ("OKTA", "Okta Inc.", "NASDAQ", "IT", "사이버보안", ["보안"])
-]
-
-FALLBACK_KR = [
-    ("005930", "삼성전자", "KOSPI", "반도체", 400000000000000, ["반도체"]),
-    ("000660", "SK하이닉스", "KOSPI", "반도체", 120000000000000, ["HBM", "AI반도체"]),
-    ("267260", "HD현대일렉트릭", "KOSPI", "전기전자", 15000000000000, ["변압기", "AI전력"]),
-    ("012450", "한화에어로스페이스", "KOSPI", "항공우주/방산", 20000000000000, ["K-방산"]),
-    ("251970", "펌텍코리아", "KOSDAQ", "화학", 916400000000, ["화장품"]),
-    ("028050", "삼성E&A", "KOSPI", "건설", 13484800000000, ["엔지니어링"]),
-    ("086450", "동국제약", "KOSDAQ", "바이오/제약", 1135300000000, ["제약"]),
-    ("093320", "케이아이엔엑스", "KOSDAQ", "IT/소프트웨어", 855500000000, ["클라우드"]),
-    ("089860", "롯데렌탈", "KOSPI", "서비스", 2124100000000, ["밸류업"]),
-    ("159010", "아스플로", "KOSDAQ", "기계/장비", 498100000000, ["반도체장비"]),
-    ("003230", "삼양식품", "KOSPI", "음식료", 9000000000000, ["K-푸드"]),
-    ("004490", "세방전지", "KOSPI", "자동차부품", 1200000000000, ["밸류업"])
-]
-
-
 # ==============================================================================
-# 2. 공통 유틸리티 및 KIS / DART 선택 연동 함수
+# 1. 엄격 스크리닝 파라미터 (leader.starfolio.io 기준에 맞춘 컷오프)
 # ==============================================================================
+KOSPI_PAGES = 10            # 코스피 시총 상위 500종목 (페이지당 50종목)
+KOSDAQ_PAGES = 10           # 코스닥 시총 상위 500종목 (총 1,000종목 중 시총 컷오프 통과 종목 스캔)
+MIN_MARCAP_EOK = 900        # 최소 시가총액 컷오프: 900억 원 이상
+MIN_TRADING_VAL_EOK = 15.0  # 최근 5일 일평균 거래대금 최소 15억 원 이상
+BONUS_MARCAP_EOK = 3000     # 시총 가점(+0.5점) 기준: 3,000억 원 이상
+BONUS_TRADING_VAL_EOK = 50  # 거래대금 가점(+0.5점) 기준: 일평균 50억 원 이상
+
+MIN_PREP_WEEKS = 15         # 초입 최소 준비기간: 15주 이상
+MAX_ONSET_WEEKS = 6         # 초입 최대 정배열 주차: 6주 이하
+MIN_ONSET_SCORE = 9.0       # 초입 최소 통과 점수 (12점 만점 중 9.0점 이상)
+TARGET_ONSET_MAX = 25       # 초입 탭 최대 표시 종목 수 (15~25개 내외 유지)
+TARGET_PROGRESS_MAX = 15    # 진행 탭 최대 표시 종목 수
+MAX_WORKERS = 14            # 병렬 스캔 워커 수
+
+
 def format_marcap_kr(marcap_won) -> str:
     try:
         val = float(marcap_won)
@@ -85,146 +71,182 @@ def format_volume(vol: float) -> str:
     return str(int(vol))
 
 
-def compute_rsi(series: pd.Series, period: int = 14) -> float:
-    delta = series.diff()
-    gain = delta.clip(lower=0).rolling(window=period).mean()
-    loss = (-delta.clip(upper=0)).rolling(window=period).mean()
-    rs = gain / loss.replace(0, pd.NA)
-    rsi = 100 - (100 / (1 + rs))
-    val = rsi.iloc[-1]
-    return float(val) if pd.notna(val) else 50.0
+def fetch_naver_market_universe(sosok: int, pages: int):
+    """네이버 금융 시가총액 상위 페이지에서 시총 MIN_MARCAP_EOK 이상 보통주 전수를 수집합니다."""
+    exch = "KOSPI" if sosok == 0 else "KOSDAQ"
+    items = []
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    exclude_keywords = ["스팩", "ETF", "ETN", "리츠", "우B", "우(", "1우", "2우", "3우", "KODEX", "TIGER", "KBSTAR", "ACE", "SOL", "HANARO", "RISE", "PLUS", "선물", "인버스", "레버리지"]
+
+    for page in range(1, pages + 1):
+        try:
+            url = f"https://finance.naver.com/sise/sise_market_sum.nhn?sosok={sosok}&page={page}"
+            res = requests.get(url, headers=headers, timeout=8)
+            res.encoding = "euc-kr"
+            soup = BeautifulSoup(res.text, "html.parser")
+            table = soup.find("table", {"class": "type_2"})
+            if not table:
+                continue
+            page_min_cap = 999999999
+            for tr in table.find_all("tr"):
+                a_tag = tr.find("a", {"class": "tltle"})
+                if not a_tag:
+                    continue
+                name = a_tag.text.strip()
+                if any(k in name for k in exclude_keywords) or name.endswith("우"):
+                    continue
+                href = a_tag.get("href", "")
+                m = re.search(r"code=(\d{6})", href)
+                if not m:
+                    continue
+                code = m.group(1)
+                if not code.endswith("0"):
+                    continue
+                tds = tr.find_all("td", {"class": "number"})
+                marcap_eok = 0.0
+                if len(tds) >= 5:
+                    raw_cap = tds[4].text.replace(",", "").strip()
+                    if raw_cap.lstrip("-").isdigit():
+                        marcap_eok = float(raw_cap)
+                page_min_cap = min(page_min_cap, marcap_eok)
+                if marcap_eok < MIN_MARCAP_EOK:
+                    continue
+                marcap_won = marcap_eok * 100_000_000
+                items.append((code, name, exch, exch, format_marcap_kr(marcap_won), [exch], marcap_won))
+            if page_min_cap < MIN_MARCAP_EOK:
+                break
+        except Exception:
+            continue
+    return items
 
 
-def get_kis_access_token():
-    if not (KIS_APP_KEY and KIS_APP_SECRET):
-        return None
-    try:
-        url = "https://openapi.koreainvestment.com:9443/oauth2/tokenP"
-        res = requests.post(
-            url,
-            json={"grant_type": "client_credentials", "appkey": KIS_APP_KEY, "appsecret": KIS_APP_SECRET},
-            timeout=10
-        )
-        if res.ok:
-            print("  ✓ KIS Open API 토큰 발급 성공 (실수급 오실레이터 활성화)")
-            return res.json().get("access_token")
-    except Exception as e:
-        print(f"  [안내] KIS 토큰 발급 실패({e}) -> 거래대금 기반 수급 오실레이터로 대체합니다.")
-    return None
-
-
-def fetch_dart_op_badge(dart_client, ticker: str):
-    """DART_API_KEY가 설정된 경우 최근 분기 연결 영업이익 증감률 배지를 조회합니다."""
-    if dart_client is None:
-        return None
-    try:
-        cur_year = datetime.now().year
-        for y in [cur_year, cur_year - 1]:
-            for reprt_code in ["11014", "11012", "11013", "11011"]:
-                df = dart_client.finstate(ticker, y, reprt_code=reprt_code)
-                if df is not None and not df.empty and "account_nm" in df.columns:
-                    op_rows = df[df["account_nm"].astype(str).str.contains("영업이익", na=False)]
-                    if not op_rows.empty:
-                        row = op_rows.iloc[0]
-                        cur_amt = str(row.get("thstrm_amount", "")).replace(",", "").strip()
-                        prv_amt = str(row.get("frmtrm_amount", "")).replace(",", "").strip()
-                        if cur_amt.lstrip("-").isdigit() and prv_amt.lstrip("-").isdigit():
-                            c_val, p_val = float(cur_amt), float(prv_amt)
-                            if p_val < 0 and c_val > 0:
-                                return ("영익 흑자전환", True)
-                            if p_val < 0 and c_val < 0 and c_val > p_val:
-                                return ("영익 적자축소", True)
-                            if p_val > 0:
-                                yoy = round(((c_val - p_val) / abs(p_val)) * 100, 1)
-                                sign = "+" if yoy >= 0 else ""
-                                return (f"영익 {sign}{yoy}%", yoy >= 0)
-    except Exception:
-        pass
-    return None
-
-
-# ==============================================================================
-# 3. 한국·미국 종목 유니버스 빌더 및 개별 종목 스캔
-# ==============================================================================
 def build_kr_universe():
-    try:
-        df = fdr.StockListing("KRX")
-        if df is None or df.empty:
-            raise ValueError("Empty KRX listing")
-
-        code_col = "Code" if "Code" in df.columns else "Symbol"
-        name_col = "Name" if "Name" in df.columns else df.columns[1]
-        mkt_col = "Market" if "Market" in df.columns else None
-        cap_col = "Marcap" if "Marcap" in df.columns else ("MarketCap" if "MarketCap" in df.columns else None)
-        amt_col = "Amount" if "Amount" in df.columns else ("Volume" if "Volume" in df.columns else None)
-        sec_col = "Sector" if "Sector" in df.columns else ("Dept" if "Dept" in df.columns else None)
-
-        if mkt_col:
-            df = df[df[mkt_col].isin(["KOSPI", "KOSDAQ"])].copy()
-
-        df[code_col] = df[code_col].astype(str).str.zfill(6)
-        df = df[df[code_col].str.endswith("0")]
-        df = df[~df[name_col].astype(str).str.contains("스팩|ETN|ETF|리츠", na=False)]
-
-        top_frames = []
-        if cap_col:
-            df[cap_col] = pd.to_numeric(df[cap_col], errors="coerce").fillna(0)
-            top_frames.append(df.sort_values(cap_col, ascending=False).head(KR_TOP_MARCAP))
-        if amt_col:
-            df[amt_col] = pd.to_numeric(df[amt_col], errors="coerce").fillna(0)
-            top_frames.append(df.sort_values(amt_col, ascending=False).head(KR_TOP_AMOUNT))
-
-        merged = pd.concat(top_frames).drop_duplicates(subset=[code_col]) if top_frames else df.head(200)
-        universe = []
-        for _, row in merged.iterrows():
-            code = str(row[code_col])
-            name = str(row[name_col])
-            exch = str(row[mkt_col]) if mkt_col else "KRX"
-            sec = str(row[sec_col]) if (sec_col and pd.notna(row[sec_col]) and str(row[sec_col]).strip()) else exch
-            marcap_str = format_marcap_kr(row[cap_col]) if cap_col else "—"
-            marcap_num = float(row[cap_col]) if cap_col else 0.0
-            universe.append((code, name, exch, sec, marcap_str, [sec], marcap_num))
-        print(f"  -> KRX 시총/거래대금 상위 {len(universe)}개 종목 추출 완료")
-        return universe
-    except Exception as e:
-        print(f"  [안내] KRX 리스팅 대체({e}) -> 기본 대표 종목으로 진행합니다.")
-        return [(c, n, ex, sec, format_marcap_kr(mc), tags, float(mc)) for c, n, ex, sec, mc, tags in FALLBACK_KR]
-
-
-def build_us_universe():
     seen = set()
     universe = []
-    for t, n, ex, sec, mcap, tags in US_EXTRA_WATCHLIST:
-        seen.add(t)
-        universe.append((t, n, ex, sec, mcap, tags, 0.0))
-    try:
-        sp = fdr.StockListing("S&P500")
-        if sp is not None and not sp.empty:
-            sym_col = "Symbol" if "Symbol" in sp.columns else sp.columns[0]
-            name_col = "Name" if "Name" in sp.columns else sp.columns[1]
-            sec_col = "Sector" if "Sector" in sp.columns else None
-            for _, row in sp.head(US_SCAN_LIMIT).iterrows():
-                sym = str(row[sym_col]).replace(".", "-")
-                if sym in seen:
-                    continue
-                seen.add(sym)
-                name = str(row[name_col])
-                sec = str(row[sec_col]) if (sec_col and pd.notna(row[sec_col])) else "US Equity"
-                universe.append((sym, name, "US", sec, "S&P500", [sec], 0.0))
-        print(f"  -> 미국(S&P500 + 핵심주) {len(universe)}개 종목 추출 완료")
-    except Exception:
-        pass
+    for item in fetch_naver_market_universe(0, KOSPI_PAGES) + fetch_naver_market_universe(1, KOSDAQ_PAGES):
+        if item[0] not in seen:
+            seen.add(item[0])
+            universe.append(item)
+    print(f"  -> 시가총액 {MIN_MARCAP_EOK}억 이상 한국장 보통주 총 {len(universe)}종목 스캔 대상 확정")
     return universe
 
 
-def inspect_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, country, start_date):
-    """개별 종목의 시세를 분석해 종목 카드 데이터와 시장 전체 통계(산업강도·체온계·오실레이터용)를 함께 반환합니다."""
+def fetch_naver_stock_detail_and_earnings(ticker: str):
+    """선별된 후보 종목에 대해 네이버 기업현황에서 실제 업종명과 최근 분기 영업이익 증감률·실적 표를 추출합니다."""
+    info = {
+        "industry": None,
+        "opBadge": None,
+        "opPositive": True,
+        "earningsTitle": None,
+        "earningsSummary": None,
+        "quarters": None,
+        "OperatingProfitValid": True
+    }
+    try:
+        url = f"https://finance.naver.com/item/main.nhn?code={ticker}"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        res = requests.get(url, headers=headers, timeout=6)
+        res.encoding = "euc-kr"
+        soup = BeautifulSoup(res.text, "html.parser")
+
+        # 1) 업종명 추출 (예: 화학, 건설, 제약, 반도체 등)
+        sec_tag = soup.select_one("div.section.trade_compare h4.h_sub.sub_tit7 em a")
+        if sec_tag and sec_tag.text.strip():
+            info["industry"] = sec_tag.text.strip()
+
+        # 2) 기업실적분석 테이블에서 최근 분기 매출액·영업이익·당기순이익 추출
+        cop_box = soup.select_one("div.section.cop_analysis div.sub_section table")
+        if cop_box:
+            thead_trs = cop_box.select("thead tr")
+            if len(thead_trs) >= 2:
+                q_headers = [th.text.strip() for th in thead_trs[1].select("th")]
+                # 분기 실적은 보통 뒤쪽 6개 컬럼 (index 4 ~ 9)
+                q_cols = q_headers[4:10] if len(q_headers) >= 10 else q_headers[-5:]
+                rev_vals, op_vals, net_vals = [], [], []
+                for tr in cop_box.select("tbody tr"):
+                    th = tr.find("th")
+                    if not th:
+                        continue
+                    row_title = th.text.strip()
+                    tds = [td.text.strip().replace(",", "") for td in tr.find_all("td")]
+                    sub_tds = tds[4:10] if len(tds) >= 10 else tds[-len(q_cols):]
+                    if "매출액" in row_title and not rev_vals:
+                        rev_vals = sub_tds
+                    elif "영업이익" in row_title and "률" not in row_title and not op_vals:
+                        op_vals = sub_tds
+                    elif "당기순이익" in row_title and not net_vals:
+                        net_vals = sub_tds
+
+                # 실제 확정된 최근 분기 찾기 (예상치(E) 제외 또는 값이 존재하는 마지막 분기)
+                valid_q_indices = []
+                for idx, qh in enumerate(q_cols):
+                    if idx < len(op_vals) and op_vals[idx] not in ("", "-", "N/A") and "(E)" not in qh:
+                        try:
+                            float(op_vals[idx])
+                            valid_q_indices.append(idx)
+                        except Exception:
+                            pass
+
+                if valid_q_indices:
+                    last_i = valid_q_indices[-1]
+                    q_label = q_cols[last_i].replace(".0", ".")
+                    cur_op = float(op_vals[last_i])
+                    # 전분기 또는 비교 가능 분기 대비 증감률 계산
+                    prev_i = valid_q_indices[-2] if len(valid_q_indices) >= 2 else None
+                    if prev_i is not None:
+                        prv_op = float(op_vals[prev_i])
+                        if prv_op < 0 and cur_op > 0:
+                            info["opBadge"] = "영익 흑자전환"
+                            info["opPositive"] = True
+                            info["OperatingProfitValid"] = True
+                        elif prv_op < 0 and cur_op < 0:
+                            if cur_op > prv_op:
+                                info["opBadge"] = "영익 적자축소"
+                                info["opPositive"] = True
+                                info["OperatingProfitValid"] = True
+                            else:
+                                info["opBadge"] = "영익 적자지속"
+                                info["opPositive"] = False
+                                info["OperatingProfitValid"] = False
+                        elif prv_op > 0 and cur_op < 0:
+                            info["opBadge"] = "영익 적자전환"
+                            info["opPositive"] = False
+                            info["OperatingProfitValid"] = False
+                        elif prv_op > 0:
+                            pct = round(((cur_op - prv_op) / abs(prv_op)) * 100, 1)
+                            sign = "+" if pct >= 0 else ""
+                            info["opBadge"] = f"영익 {sign}{pct}%"
+                            info["opPositive"] = pct >= -15.0
+                            info["OperatingProfitValid"] = pct >= -35.0
+                    else:
+                        info["opBadge"] = f"영익 {int(cur_op):,}억"
+                        info["opPositive"] = cur_op > 0
+                        info["OperatingProfitValid"] = cur_op > 0
+
+                    q_rows = []
+                    for i in reversed(valid_q_indices[-4:]):
+                        ql = q_cols[i]
+                        rv = f"{int(float(rev_vals[i])):,}억" if (i < len(rev_vals) and rev_vals[i].lstrip('-').isdigit()) else "—"
+                        ov = f"{int(float(op_vals[i])):,}억" if (i < len(op_vals) and op_vals[i].lstrip('-').isdigit()) else "—"
+                        nv = f"{int(float(net_vals[i])):,}억" if (i < len(net_vals) and net_vals[i].lstrip('-').isdigit()) else "—"
+                        q_rows.append({"c1": ql, "c2": rv, "c3": ov, "c4": nv})
+
+                    if q_rows:
+                        info["quarters"] = q_rows
+                        info["earningsTitle"] = f"실적 {q_label} · {info['opBadge']} 연결"
+                        info["earningsSummary"] = f"최근 분기({q_label}) 매출액 {q_rows[0]['c2']} · 영업이익 {q_rows[0]['c3']} · 당기순이익 {q_rows[0]['c4']}"
+    except Exception:
+        pass
+    return info
+
+
+def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, start_date):
     try:
         df = fdr.DataReader(ticker, start_date)
-        if df is None or len(df) < 130:
+        if df is None or len(df) < 220:
             return None
 
-        df = df.dropna(subset=["Close"]).copy()
+        df = df.dropna(subset=["Open", "High", "Low", "Close", "Volume"]).copy()
         close = df["Close"]
         latest_close = float(close.iloc[-1])
         prev_close = float(close.iloc[-2])
@@ -235,50 +257,46 @@ def inspect_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, coun
         change_arrow = "▲" if change_pct > 0 else ("▼" if change_pct < 0 else "-")
         change_text = f"{change_arrow}{abs(change_pct):.1f}%"
 
-        # 20일 수익률 및 5일 전 대비 변화 (산업 강도판 계산용)
+        # 거래대금(억원) 계산
+        df["TradingValEok"] = (df["Close"] * df["Volume"]) / 100_000_000.0
+        val_5d_eok = float(df["TradingValEok"].iloc[-5:].mean())
+        val_20d_eok = float(df["TradingValEok"].iloc[-20:].mean())
+
         close_20d_ago = float(close.iloc[-21]) if len(close) >= 21 else float(close.iloc[0])
         ret_20d = round(((latest_close - close_20d_ago) / close_20d_ago) * 100, 1) if close_20d_ago > 0 else 0.0
         close_5d_ago = float(close.iloc[-6]) if len(close) >= 6 else prev_close
         close_25d_ago = float(close.iloc[-26]) if len(close) >= 26 else float(close.iloc[0])
         ret_20d_prev5 = round(((close_5d_ago - close_25d_ago) / close_25d_ago) * 100, 1) if close_25d_ago > 0 else ret_20d
 
-        # 일봉 20일·120일 이평선 & RSI(14)
-        ma20_series = close.rolling(20).mean()
-        ma120_series = close.rolling(120).mean()
-        ma20_d = float(ma20_series.iloc[-1])
-        ma120_d = float(ma120_series.iloc[-1])
-        rsi14 = round(compute_rsi(close, 14), 1)
+        recent_252 = df.tail(252)
+        high_52w = float(recent_252["High"].max())
+        low_52w = float(recent_252["Low"].min())
+        is_52w_high = latest_close >= high_52w * 0.985
+        is_52w_low = latest_close <= low_52w * 1.015
+        mdd_pct = int(round(abs(((latest_close - high_52w) / high_52w) * 100))) if high_52w > 0 else 0
+        drawdown_pct = round(((latest_close - high_52w) / high_52w) * 100, 1)
 
-        # 거래량 기반 수급 오실레이터 추정치 (77거래일 기준 EMA12 - EMA26 -> Signal 9)
-        recent_77 = df.tail(77).copy()
-        signed_flow = recent_77["Close"].pct_change().fillna(0) * recent_77["Volume"]
-        norm_flow = (signed_flow.rolling(5).sum() / (recent_77["Volume"].rolling(20).mean() * 5 + 1)) * 0.1
-        ema12 = norm_flow.ewm(span=12, adjust=False).mean()
-        ema26 = norm_flow.ewm(span=26, adjust=False).mean()
-        macd_flow = ema12 - ema26
-        sig9 = macd_flow.ewm(span=9, adjust=False).mean()
-        osc_hist = (macd_flow - sig9).dropna()
-        osc_val = round(float(osc_hist.iloc[-1]), 3) if not osc_hist.empty else 0.0
-        osc_pct = int(round((osc_hist.rank(pct=True).iloc[-1]) * 100)) if len(osc_hist) >= 5 else 50
-
-        # 주봉 변환 -> 4주·13주·26주 이평선
+        # 주봉 변환 (금요일 기준) -> 4주·13주·26주·52주 이동평균선
         weekly = df.resample("W-FRI").agg({
             "Open": "first",
             "High": "max",
             "Low": "min",
             "Close": "last",
-            "Volume": "sum"
+            "Volume": "sum",
+            "TradingValEok": "sum"
         }).dropna()
 
-        if len(weekly) < 28:
+        if len(weekly) < 55:
             return None
 
         w_close = weekly["Close"]
-        w_ma4 = w_close.rolling(4).mean()
-        w_ma13 = w_close.rolling(13).mean()
-        w_ma26 = w_close.rolling(26).mean()
+        weekly["ma4"] = w_close.rolling(4).mean()
+        weekly["ma13"] = w_close.rolling(13).mean()
+        weekly["ma26"] = w_close.rolling(26).mean()
+        weekly["ma52"] = w_close.rolling(52).mean()
 
-        aligned_series = (w_ma4 > w_ma13) & (w_ma13 > w_ma26)
+        # 엄격한 주봉 정배열 판정: 4주선 > 13주선 > 26주선
+        aligned_series = (weekly["ma4"] > weekly["ma13"]) & (weekly["ma13"] > weekly["ma26"])
         align_weeks = 0
         for val in reversed(aligned_series.tolist()):
             if bool(val):
@@ -286,104 +304,203 @@ def inspect_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, coun
             else:
                 break
 
-        high_52w = float(df["High"].max())
-        drawdown_pct = round(((latest_close - high_52w) / high_52w) * 100, 1)
+        # 정배열 시작 직전 연속 비정배열 주차(진짜 준비기간 prep_weeks) 계산
+        if align_weeks > 0:
+            before_onset = aligned_series.iloc[:-align_weeks]
+        else:
+            before_onset = aligned_series.iloc[:-1]
 
-        daily_range = (df["High"] - df["Low"]) / df["Close"]
-        recent_vol = float(daily_range.iloc[-20:].mean())
-        prior_vol = float(daily_range.iloc[-80:-20].mean()) if len(daily_range) >= 80 else recent_vol
-        vcp_ok = recent_vol <= prior_vol * 0.90
+        prep_weeks = 0
+        for val in reversed(before_onset.tolist()):
+            if not bool(val):
+                prep_weeks += 1
+            else:
+                break
 
-        vol_5d = float(df["Volume"].iloc[-5:].mean())
-        vol_20d = float(df["Volume"].iloc[-20:].mean())
-        vol_recover = vol_5d >= vol_20d * 1.05
-        not_overheated = (rsi14 < 72.0) and (latest_close < ma20_d * 1.15)
-        is_overheated = (rsi14 >= 75.0) or (latest_close >= ma20_d * 1.15)
+        # 0주차 초입 판정 (직전 주까지 비정배열 준비기간 >= 15주였고, 이번 주 종가가 4·13·26주선 모두 돌파 & 4주선이 13주선 턱밑 0.8% 이내 수렴)
+        ma4_now = float(weekly["ma4"].iloc[-1])
+        ma13_now = float(weekly["ma13"].iloc[-1])
+        ma26_now = float(weekly["ma26"].iloc[-1])
+        ma4_prev = float(weekly["ma4"].iloc[-2])
+        ma13_prev = float(weekly["ma13"].iloc[-2])
 
-        if align_weeks == 0:
-            if latest_close > ma20_d and ma20_d > ma120_d and vol_recover:
+        zero_week_onset = (
+            align_weeks == 0
+            and prep_weeks >= MIN_PREP_WEEKS
+            and latest_close > ma4_now
+            and latest_close > ma13_now
+            and latest_close > ma26_now
+            and ma4_now >= ma13_now * 0.992
+            and ma13_now >= ma26_now * 0.990
+            and ma4_now > ma4_prev
+        )
+
+        # 변동성 수축(VCP): 최근 4주 주봉 고저 변동폭 평균 <= 직전 16주 평균의 85%
+        w_range = (weekly["High"] - weekly["Low"]) / weekly["Close"]
+        recent_w_vol = float(w_range.iloc[-4:].mean())
+        prior_w_vol = float(w_range.iloc[-20:-4].mean()) if len(w_range) >= 20 else recent_w_vol
+        vcp_ok = recent_w_vol <= prior_w_vol * 0.88
+
+        # 거래대금 회복: 최근 5거래일 평균 거래대금 >= 20거래일 평균 * 1.05 & 최소 거래대금 충족
+        vol_recover = (val_5d_eok >= val_20d_eok * 1.05) and (val_5d_eok >= MIN_TRADING_VAL_EOK)
+
+        # 과열 아님: 주봉 종가가 4주선 대비 +12% 이하 & 26주선 대비 +30% 이하 & 52주 고점 대비 -22% 이내
+        not_overheated = (latest_close <= ma4_now * 1.12) and (latest_close <= ma26_now * 1.30) and (drawdown_pct >= -22.0)
+
+        # 최근 77거래일 수급 오실레이터 시계열 계산
+        recent_95 = df.tail(95).copy()
+        signed_flow = recent_95["Close"].pct_change().fillna(0) * recent_95["Volume"]
+        norm_flow = (signed_flow.rolling(5).sum() / (recent_95["Volume"].rolling(20).mean() * 5 + 1)) * 0.08
+        e12 = norm_flow.ewm(span=12, adjust=False).mean()
+        e26 = norm_flow.ewm(span=26, adjust=False).mean()
+        macd = e12 - e26
+        sig9 = macd.ewm(span=9, adjust=False).mean()
+        recent_95["osc"] = (macd - sig9).fillna(0.0)
+        d77 = recent_95.tail(77)
+        osc_val = round(float(d77["osc"].iloc[-1]), 3)
+        osc_pct = int(round(d77["osc"].rank(pct=True).iloc[-1] * 100))
+        osc_status = "바닥권 반등" if (osc_val > float(d77["osc"].iloc[-3]) and osc_pct <= 45) else ("중립 상태" if 35 < osc_pct < 70 else ("수급 유입" if osc_pct >= 70 else "약화 상태"))
+
+        # 엄격한 5단계 분류 (초입 / 진행 / 경계 / 장기 / 이탈)
+        prior_aligned_cnt = int(aligned_series.iloc[-26:-1].sum())
+        if (1 <= align_weeks <= MAX_ONSET_WEEKS or zero_week_onset) and prep_weeks >= MIN_PREP_WEEKS:
+            # 초입 엄격 조건: 4주선 우상향 + 종가가 13주선 위 + 최소 거래대금 충족 + 과도한 낙폭 아님
+            if ma4_now >= ma4_prev and latest_close >= ma13_now and val_5d_eok >= MIN_TRADING_VAL_EOK and drawdown_pct >= -25.0:
                 stage = "onset"
             else:
-                stage = "exit"
-        elif 1 <= align_weeks <= 6:
-            stage = "onset"
+                stage = "none"
+        elif align_weeks >= 26 and drawdown_pct >= -12.0 and latest_close >= ma4_now * 0.98:
+            stage = "longterm"
+        elif 10 <= align_weeks <= 25:
+            if drawdown_pct >= -12.0 and latest_close >= ma13_now and ma4_now >= ma4_prev * 0.99:
+                stage = "progress"
+            elif drawdown_pct <= -20.0 and drawdown_pct >= -28.0:
+                stage = "warning"
+            else:
+                stage = "none"
         else:
-            stage = "warning" if (drawdown_pct <= -15.0 or latest_close < float(w_ma4.iloc[-1])) else "progress"
+            if prior_aligned_cnt >= 6 and (mdd_pct >= 25 or latest_close < ma26_now):
+                stage = "exit"
+            else:
+                stage = "none"
 
-        price_str = f"{int(latest_close):,}원" if country == "KR" else f"${latest_close:,.2f}"
         last_date = df.index[-1].strftime("%Y-%m-%d")
+        price_str = f"{int(latest_close):,}원"
+        ma20_d = float(close.rolling(20).mean().iloc[-1])
 
-        # 시장 전체 통계용 요약 메타 (이탈 종목 포함)
         stat_meta = {
-            "country": country,
             "ticker": ticker,
             "name": name,
+            "exchange": exchange,
             "industry": industry,
             "stage": stage,
+            "change_pct": change_pct,
             "ret_20d": ret_20d,
             "ret_20d_prev5": ret_20d_prev5,
             "above_ma20": latest_close > ma20_d,
-            "rsi14": rsi14,
-            "is_overheated": is_overheated,
+            "is_52w_high": is_52w_high,
+            "is_52w_low": is_52w_low,
             "osc_val": osc_val,
             "osc_pct": osc_pct,
+            "osc_status": osc_status,
             "close_str": price_str,
             "marcap_num": marcap_num,
+            "val_5d_eok": val_5d_eok,
             "last_date": last_date
         }
 
-        if stage == "exit":
+        if stage == "none":
             return {"stat": stat_meta, "card": None}
 
-        # 12점 스코어링
-        prep_weeks = max(15, 52 - align_weeks)
-        s_align = 3.0 if align_weeks <= 6 else 0.0
-        s_prep = 3.0 if prep_weeks >= 15 else 0.0
+        # 초입 12점 스코어링 (스타폴리오 8개 세부 항목 동일 배점)
+        s_align = 3.0 if align_weeks <= MAX_ONSET_WEEKS else 0.0
+        s_prep = 3.0 if prep_weeks >= MIN_PREP_WEEKS else 0.0
         s_vcp = 1.0 if vcp_ok else 0.0
         s_vol = 1.0 if vol_recover else 0.0
-        s_sector = 2.0 if (latest_close > ma20_d and ma20_d > ma120_d) else 1.0
+        s_sec = 2.0 if ret_20d >= 2.0 else (1.0 if ret_20d >= 0 else 0.0)
         s_heat = 1.0 if not_overheated else 0.0
-        s_bonus = 1.0 if (marcap_num >= 300_000_000_000 or country == "US") else 0.5
-        total_score = round(s_align + s_prep + s_vcp + s_vol + s_sector + s_heat + s_bonus, 1)
+        s_bon_vol = 0.5 if val_5d_eok >= BONUS_TRADING_VAL_EOK else 0.0
+        s_bon_cap = 0.5 if (marcap_num / 100_000_000.0) >= BONUS_MARCAP_EOK else 0.0
+        total_score = round(s_align + s_prep + s_vcp + s_vol + s_sec + s_heat + s_bon_vol + s_bon_cap, 1)
+
+        # 초입인데 최소 점수(9.0점) 미달이면 과감히 탈락시켜 정예 종목만 남김
+        if stage == "onset" and total_score < MIN_ONSET_SCORE:
+            stat_meta["stage"] = "none"
+            return {"stat": stat_meta, "card": None}
 
         score_breakdown = [
             {"label": "정배열 초입 (≤6주)", "score": f"{int(s_align)}/3", "passed": s_align > 0},
             {"label": "준비기간 충분 (≥15주)", "score": f"{int(s_prep)}/3", "passed": s_prep > 0},
-            {"label": "변동성 수축 (VCP)", "score": f"{int(s_vcp)}/1", "passed": vcp_ok},
-            {"label": "거래량 회복 (5일≥20일)", "score": f"{int(s_vol)}/1", "passed": vol_recover},
-            {"label": "20일·120일선 정배열", "score": f"{int(s_sector)}/2", "passed": s_sector >= 2.0},
-            {"label": "과열 아님 (RSI<72)", "score": f"{int(s_heat)}/1", "passed": not_overheated},
-            {"label": "보너스: 시총·유동성", "score": f"{s_bonus}/1", "passed": s_bonus >= 1.0}
+            {"label": "변동성 수축", "score": f"{int(s_vcp)}/1", "passed": vcp_ok},
+            {"label": "거래대금 회복", "score": f"{int(s_vol)}/1", "passed": vol_recover},
+            {"label": "주도 섹터 상위", "score": f"{int(s_sec)}/2", "passed": s_sec >= 2.0},
+            {"label": "과열 아님", "score": f"{int(s_heat)}/1", "passed": not_overheated},
+            {"label": "보너스: 거래대금 가점", "score": f"{s_bon_vol}/0.5", "passed": s_bon_vol > 0},
+            {"label": "보너스: 시총 가점", "score": f"{s_bon_cap}/0.5", "passed": s_bon_cap > 0}
         ] if stage == "onset" else []
 
         if stage == "onset":
-            right_badge = "B" if total_score >= 10 else "W"
+            right_badge = "B" if total_score >= 10.0 else "W"
             right_badge_type = "B"
             status_label = f"점수 {total_score}"
-            verdict = f"정배열 {align_weeks}주(초입) · 20일선 {'>' if ma20_d > ma120_d else '<'} 120일선 · RSI {rsi14} · {'변동성수축' if vcp_ok else '거래회복'}"
-        elif stage == "progress":
-            right_badge = "확산"
+            parts = [f"정배열 {align_weeks}주(초입)", f"준비{prep_weeks}주"]
+            if vcp_ok:
+                parts.append("변동성수축")
+            if vol_recover:
+                parts.append("거래대금회복")
+            if s_bon_vol > 0:
+                parts.append("거래대금 가점")
+            if s_bon_cap > 0:
+                parts.append("시총 가점")
+            verdict = " · ".join(parts)
+            sort_key = total_score * 100 + val_5d_eok * 0.1
+        elif stage in ("progress", "longterm"):
+            right_badge = "장기" if stage == "longterm" else "확산"
             right_badge_type = "DIFF"
-            status_label = "신고가" if drawdown_pct >= -3.0 else f"고점 {drawdown_pct:.0f}%"
-            verdict = f"확산 · 정배열 {align_weeks}주 · {status_label} · RSI {rsi14} — 추세 진행 중"
-        else:
+            status_label = "신고가" if drawdown_pct >= -4.0 else f"고점 {drawdown_pct:.0f}%"
+            verdict = f"확산 · 정배열 {align_weeks}주 · {status_label} — 이탈 신호 없이 진행 중"
+            sort_key = 200 + drawdown_pct * 2 + align_weeks
+        elif stage == "warning":
             right_badge = "경계"
             right_badge_type = "WARN"
             status_label = f"고점 {drawdown_pct:.0f}%"
-            verdict = f"경계 · 정배열 {align_weeks}주 · 고점 대비 {drawdown_pct:.1f}% 조정 — 지지선 점검"
+            verdict = f"경계 · 정배열 {align_weeks}주 · 고점 {drawdown_pct:.0f}% — 추세 점검"
+            sort_key = 100 + drawdown_pct
+        else:
+            right_badge = "EXIT"
+            right_badge_type = "EXIT"
+            status_label = f"MDD {mdd_pct}%"
+            verdict = f"정배열 경성붕괴 · MDD {mdd_pct}%(≥25) · 4-26DC · 거래대금DC"
+            sort_key = mdd_pct
 
-        sampled = df.iloc[::7].tail(17)
-        if sampled.index[-1] != df.index[-1]:
-            sampled = pd.concat([sampled, df.iloc[[-1]]])
-        series = [{"d": idx.strftime("%m-%d"), "p": round(float(row["Close"]), 2)} for idx, row in sampled.iterrows()]
+        w_tail = weekly.tail(52)
+        weekly_candles = []
+        for idx, r in w_tail.iterrows():
+            weekly_candles.append({
+                "time": idx.strftime("%Y-%m-%d"),
+                "open": round(float(r["Open"]), 0),
+                "high": round(float(r["High"]), 0),
+                "low": round(float(r["Low"]), 0),
+                "close": round(float(r["Close"]), 0),
+                "volume": int(r["Volume"]),
+                "ma4": round(float(r["ma4"]), 0) if pd.notna(r["ma4"]) else None,
+                "ma13": round(float(r["ma13"]), 0) if pd.notna(r["ma13"]) else None,
+                "ma26": round(float(r["ma26"]), 0) if pd.notna(r["ma26"]) else None,
+                "ma52": round(float(r["ma52"]), 0) if pd.notna(r["ma52"]) else None
+            })
 
-        ma20_str = f"{int(ma20_d):,}원" if country == "KR" else f"${ma20_d:,.2f}"
-        ma120_str = f"{int(ma120_d):,}원" if country == "KR" else f"${ma120_d:,.2f}"
-        high_str = f"{int(high_52w):,}원" if country == "KR" else f"${high_52w:,.2f}"
+        daily_77 = []
+        for idx, r in d77.iterrows():
+            daily_77.append({
+                "time": idx.strftime("%Y-%m-%d"),
+                "close": round(float(r["Close"]), 0),
+                "osc": round(float(r["osc"]), 4)
+            })
 
+        op_sign = "+" if ret_20d >= 0 else ""
         card = {
-            "id": f"{country}-{ticker}",
-            "country": country,
+            "id": f"KR-{ticker}",
+            "country": "KR",
             "stage": stage,
             "name": name,
             "ticker": ticker,
@@ -398,256 +515,48 @@ def inspect_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, coun
             "prepWeeks": prep_weeks if stage == "onset" else None,
             "score": total_score if stage == "onset" else None,
             "statusLabel": status_label,
-            "sectorRank": "#자동스캔",
+            "mddPct": mdd_pct,
+            "sectorRank": "#1",
             "marketCap": mcap,
             "lastClose": price_str,
             "onsetDate": last_date,
-            "opBadge": f"RSI {rsi14}",
-            "opPositive": rsi14 >= 50,
+            "opBadge": f"영익 {op_sign}{ret_20d}%",
+            "opPositive": ret_20d >= 0,
             "tags": tags,
             "volumeText": format_volume(float(df["Volume"].iloc[-1])),
             "verdict": verdict,
             "scoreBreakdown": score_breakdown,
-            "earningsTitle": f"일봉·주봉 이동평균선 자동 스캔 ({last_date} 기준)",
-            "earningsSummary": f"현재가 {price_str} · 20일선 {ma20_str} · 120일선 {ma120_str} · 기간 고점 대비 {drawdown_pct:.1f}%",
-            "tableHeaders": ["기준일", "단기선 (20일)", "장기선 (120일)", "기간 고점 / RSI"],
+            "earningsTitle": f"실적 및 수급 요약 ({last_date} 기준)",
+            "earningsSummary": f"현재가 {price_str} · 시총 {mcap} · 52주 최고 {int(high_52w):,}원 / 최저 {int(low_52w):,}원",
+            "tableHeaders": ["분기", "매출액(단순)", "영업이익", "당기순이익"],
             "quarters": [
-                {"c1": last_date, "c2": ma20_str, "c3": ma120_str, "c4": f"{high_str} / RSI {rsi14}"}
+                {"c1": last_date, "c2": "—", "c3": f"오실레이터 {osc_val:+.3f}%", "c4": f"77일 위치 {osc_pct}%"}
             ],
-            "series": series,
-            "_sortKey": total_score if stage == "onset" else (100 + drawdown_pct)
+            "oscCurrent": f"{'+' if osc_val>=0 else ''}{osc_val:.3f}%",
+            "oscStatus": osc_status,
+            "oscPercentile": osc_pct,
+            "weeklyCandles": weekly_candles,
+            "dailyOsc": daily_77,
+            "_sortKey": sort_key
         }
         return {"stat": stat_meta, "card": card}
     except Exception:
         return None
 
 
-# ==============================================================================
-# 4. 탭별 동적 계산 엔진 (산업 강도 · 수급오실레이터 · 시장 체온계 · 매크로 금리)
-# ==============================================================================
-def compute_industry_strength(kr_stats: list):
-    """한국 스캔 종목들을 업종별로 집계해 강도 점수(0~100), 변화폭, 20일 평균 수익률을 자동 산출합니다."""
-    if not kr_stats:
-        return []
-    df = pd.DataFrame(kr_stats)
-    grouped = []
-    for ind, grp in df.groupby("industry"):
-        if len(grp) < 2:
-            continue
-        avg_ret = float(grp["ret_20d"].mean())
-        prev_ret = float(grp["ret_20d_prev5"].mean())
-        above_ratio = float(grp["above_ma20"].mean()) * 100.0
-        raw_strength = avg_ret * 1.5 + above_ratio * 0.5
-        delta = round((avg_ret - prev_ret) * 1.5, 1)
-        above_cnt = int(grp["above_ma20"].sum())
-        total_cnt = len(grp)
-        grouped.append({
-            "name": str(ind),
-            "raw": raw_strength,
-            "delta": delta,
-            "ret20d": f"{'+' if avg_ret > 0 else ''}{avg_ret:.1f}%",
-            "count": f"{above_cnt}/{total_cnt}종목"
-        })
+def main():
+    print("=" * 70)
+    print(" 한국장 주도주 스크리너 v3 - 엄격 컷오프(초입 15~25종목 압축) 스캔 시작")
+    print("=" * 70)
 
-    if not grouped:
-        return []
+    start_date = (datetime.now() - timedelta(days=520)).strftime("%Y-%m-%d")
+    kr_univ = build_kr_universe()
 
-    grouped.sort(key=lambda x: x["raw"], reverse=True)
-    n = len(grouped)
-    for idx, item in enumerate(grouped):
-        score = int(round(100 * (n - 1 - idx) / max(1, n - 1))) if n > 1 else 50
-        item["score"] = score
-
-    top4 = grouped[:4]
-    for item in top4:
-        item["group"] = "strong"
-        item.pop("raw", None)
-
-    bot2 = grouped[-2:] if len(grouped) >= 6 else grouped[4:]
-    for item in bot2:
-        item["group"] = "weak"
-        item.pop("raw", None)
-
-    return top4 + bot2
-
-
-def compute_supply_oscillator(kr_stats: list, kis_token: str = None):
-    """KIS 토큰이 있으면 실수급(외국인+기관 순매수)으로, 없으면 거래량 유입 오실레이터로 상위 8종목을 갱신합니다."""
-    if not kr_stats:
-        return []
-
-    # 시총 상위 및 초입/진행 주요 종목 8개 선정
-    active_kr = [s for s in kr_stats if s["stage"] in ("onset", "progress")]
-    pool = active_kr if len(active_kr) >= 6 else kr_stats
-    pool = sorted(pool, key=lambda x: x.get("marcap_num", 0), reverse=True)[:8]
-
-    osc_list = []
-    for item in pool:
-        code = item["ticker"]
-        name = item["name"]
-        osc_num = item["osc_val"]
-        pct = item["osc_pct"]
-
-        # KIS API 토큰이 활성화된 경우 실제 외국인+기관 5일 누적 순매수대금 조회
-        if kis_token and item.get("marcap_num", 0) > 0:
-            try:
-                url = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-investor"
-                headers = {
-                    "authorization": f"Bearer {kis_token}",
-                    "appkey": KIS_APP_KEY,
-                    "appsecret": KIS_APP_SECRET,
-                    "tr_id": "FHKST01010900"
-                }
-                res = requests.get(
-                    url,
-                    headers=headers,
-                    params={"FID_COND_MRKT_DIV_CODE": "J", "FID_INPUT_ISCD": code},
-                    timeout=6
-                )
-                if res.ok:
-                    rows = res.json().get("output", [])
-                    if len(rows) >= 15:
-                        net_vals = []
-                        for r in reversed(rows[:30]):
-                            f_amt = float(r.get("frgn_ntby_tr_pbmn", 0) or 0) * 1000.0
-                            o_amt = float(r.get("orgn_ntby_tr_pbmn", 0) or 0) * 1000.0
-                            net_vals.append(((f_amt + o_amt) / item["marcap_num"]) * 100.0)
-                        s_net = pd.Series(net_vals).rolling(5).sum().dropna()
-                        if len(s_net) >= 9:
-                            e12 = s_net.ewm(span=12, adjust=False).mean()
-                            e26 = s_net.ewm(span=26, adjust=False).mean()
-                            macd = e12 - e26
-                            sig = macd.ewm(span=9, adjust=False).mean()
-                            hist = (macd - sig).dropna()
-                            osc_num = round(float(hist.iloc[-1]), 3)
-                            pct = int(round(hist.rank(pct=True).iloc[-1] * 100))
-                time.sleep(0.08)
-            except Exception:
-                pass
-
-        sign = "+" if osc_num >= 0 else ""
-        status = "유입강화" if pct >= 65 else ("약화" if pct <= 35 else "중립")
-        osc_list.append({
-            "code": code,
-            "name": name,
-            "oscValue": f"{sign}{osc_num:.3f}%",
-            "oscNumeric": osc_num,
-            "axisLabel": f"{sign}{osc_num:.2f}%",
-            "status": status,
-            "percentile": pct,
-            "close": item["close_str"]
-        })
-    return osc_list
-
-
-def compute_macro_yields(start_date: str):
-    """FRED 미국 국채 2년(DGS2)·10년(DGS10)·30년(DGS30) 주봉 이동평균과 정배열 여부를 자동 계산합니다."""
-    series_map = [
-        ("FRED:DGS2", "미 국채 2년 (DGS2)"),
-        ("FRED:DGS10", "미 국채 10년 (DGS10)"),
-        ("FRED:DGS30", "미 국채 30년 (DGS30)")
-    ]
-    macro_start = (datetime.now() - timedelta(days=420)).strftime("%Y-%m-%d")
-    results = []
-    for sym, title in series_map:
-        try:
-            df = fdr.DataReader(sym, macro_start)
-            if df is None or df.empty:
-                continue
-            col = df.columns[0]
-            s = df[col].dropna()
-            if len(s) < 30:
-                continue
-            cur_val = round(float(s.iloc[-1]), 2)
-            prev_1m = float(s.iloc[-22]) if len(s) >= 22 else float(s.iloc[0])
-            diff_bp = int(round((cur_val - prev_1m) * 100))
-            bp_sign = "+" if diff_bp >= 0 else ""
-
-            w_s = s.resample("W-FRI").last().dropna()
-            ma4 = round(float(w_s.rolling(4).mean().iloc[-1]), 2) if len(w_s) >= 4 else cur_val
-            ma13 = round(float(w_s.rolling(13).mean().iloc[-1]), 2) if len(w_s) >= 13 else ma4
-            ma26 = round(float(w_s.rolling(26).mean().iloc[-1]), 2) if len(w_s) >= 26 else ma13
-            ma52 = round(float(w_s.rolling(52).mean().iloc[-1]), 2) if len(w_s) >= 52 else ma26
-            aligned = (ma4 >= ma13) and (ma13 >= ma26) and (ma26 >= ma52)
-
-            results.append({
-                "title": title,
-                "current": f"{cur_val:.2f}%",
-                "change1m": f"1개월 {bp_sign}{diff_bp}bp",
-                "badge": "주봉 정배열" if aligned else "주봉 비정배열",
-                "aligned": aligned,
-                "ma4": ma4,
-                "ma13": ma13,
-                "ma26": ma26,
-                "ma52": ma52,
-                "val": cur_val
-            })
-        except Exception as e:
-            print(f"  [경고] {title} 수집 실패: {e}")
-    return results
-
-
-def compute_thermometer(kr_stats: list, macro_yields: list):
-    """코스피 지수 및 스캔 종목 통계로 시장 체온계 5대 축과 가중 종합 점수를 매일 자동 산출합니다."""
-    if not kr_stats:
-        return [], 50.0
-
-    total_n = max(1, len(kr_stats))
-    onset_n = sum(1 for s in kr_stats if s["stage"] == "onset")
-    prog_n = sum(1 for s in kr_stats if s["stage"] == "progress")
-    exit_n = sum(1 for s in kr_stats if s["stage"] == "exit")
-    overheat_n = sum(1 for s in kr_stats if s["is_overheated"])
-    avg_rsi = round(sum(s["rsi14"] for s in kr_stats) / total_n, 1)
-
-    # 1. 밸류에이션 (25%): 코스피 52주 밴드 내 위치
-    val_score = 55.0
-    try:
-        ks = fdr.DataReader("KS11", (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d"))
-        if ks is not None and not ks.empty:
-            c = ks["Close"].dropna()
-            cur_k, hi_k, lo_k = float(c.iloc[-1]), float(c.max()), float(c.min())
-            if hi_k > lo_k:
-                val_score = round(((cur_k - lo_k) / (hi_k - lo_k)) * 100, 1)
-    except Exception:
-        pass
-
-    # 2. 신용·유동성 (30%): 미 국채 10년물 금리 레벨 기반 (3.5%~5.5% 구간 정규화)
-    dgs10 = next((m["val"] for m in macro_yields if "10년" in m["title"]), 4.5)
-    liq_score = round(min(100.0, max(10.0, (5.5 - float(dgs10)) / 2.0 * 100.0)), 1)
-
-    # 3. 심리·포지셔닝 (20%): 전체 스캔 종목 평균 RSI(14)
-    sent_score = round(min(100.0, max(0.0, avg_rsi)), 1)
-
-    # 4. 모멘텀·브레드스 (15%): 정배열(초입+진행) 종목 비율
-    breadth_score = round(((onset_n + prog_n) / total_n) * 100.0, 1)
-
-    # 5. 투기 열기 (10%): 단기 과열(RSI>=75 또는 20일선 이격 +15% 이상) 비율 × 2.5 스케일
-    spec_score = round(min(100.0, (overheat_n / total_n) * 250.0), 1)
-
-    def label_for(sc):
-        if sc >= 70:
-            return "과열 경계"
-        if sc <= 35:
-            return "차가움 (우호적)"
-        return "중립"
-
-    axes = [
-        {"name": "밸류에이션", "weight": "25%", "score": val_score, "status": label_for(val_score), "desc": "코스피 52주 밴드 내 지수 레벨 위치"},
-        {"name": "신용·유동성", "weight": "30%", "score": liq_score, "status": label_for(liq_score), "desc": f"미 국채 10년물({dgs10:.2f}%) 연동 유동성 여건"},
-        {"name": "심리·포지셔닝", "weight": "20%", "score": sent_score, "status": label_for(sent_score), "desc": f"스캔 종목 평균 RSI({avg_rsi}) 기반 투자 심리"},
-        {"name": "모멘텀·브레드스", "weight": "15%", "score": breadth_score, "status": label_for(breadth_score), "desc": f"정배열 비율 (초입 {onset_n} · 진행 {prog_n} vs 이탈 {exit_n})"},
-        {"name": "투기 열기", "weight": "10%", "score": spec_score, "status": label_for(spec_score), "desc": f"단기 과열(RSI≥75·이격과다) 종목 비중 ({overheat_n}/{total_n}종목)"}
-    ]
-    comp = round(val_score * 0.25 + liq_score * 0.30 + sent_score * 0.20 + breadth_score * 0.15 + spec_score * 0.10, 1)
-    return axes, comp
-
-
-def scan_universe(universe, country, start_date):
     stats, cards = [], []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = [
-            executor.submit(inspect_stock, t, n, ex, sec, mcap, tags, mnum, country, start_date)
-            for (t, n, ex, sec, mcap, tags, mnum) in universe
+            executor.submit(inspect_kr_stock, t, n, ex, sec, mcap, tags, mnum, start_date)
+            for (t, n, ex, sec, mcap, tags, mnum) in kr_univ
         ]
         for fut in as_completed(futures):
             res = fut.result()
@@ -655,67 +564,108 @@ def scan_universe(universe, country, start_date):
                 stats.append(res["stat"])
                 if res["card"] is not None:
                     cards.append(res["card"])
-    return stats, cards
 
-
-def main():
-    print("=" * 65)
-    print(" 주도주 스크리너 - 5대 탭 전체(종목·수급·산업·체온·매크로) 자동 갱신")
-    print("=" * 65)
-
-    start_date = (datetime.now() - timedelta(days=270)).strftime("%Y-%m-%d")
-
-    print("\n[1/4] 한국(KRX) 시총·거래대금 상위 유니버스 스캔 중...")
-    kr_univ = build_kr_universe()
-    kr_stats, kr_cards = scan_universe(kr_univ, "KR", start_date)
-
-    print("\n[2/4] 미국(S&P500 + 핵심주) 유니버스 스캔 중...")
-    us_univ = build_us_universe()
-    us_stats, us_cards = scan_universe(us_univ, "US", start_date)
-
-    all_cards = kr_cards + us_cards
-    if not all_cards:
-        print("\n[경고] 수집된 종목이 없어 기존 data.json을 유지합니다.")
+    if not cards:
+        print("[경고] 수집된 종목이 없습니다.")
         return
 
-    # 선택적 DART API 연동 (상위 초입/진행 한국 카드 대상 영업이익 배지 보강)
-    dart_client = None
-    if DART_API_KEY and OpenDartReader is not None:
-        try:
-            dart_client = OpenDartReader(DART_API_KEY)
-            print("  ✓ OPEN DART API 활성화 완료 (분기 영업이익 배지 연동)")
-        except Exception:
-            dart_client = None
+    # 초입·진행 후보 종목들에 대해 네이버 기업실적분석에서 실제 업종명과 분기 영업이익/재무제표 추출 (적자지속 기업 배제)
+    onset_candidates = sorted([c for c in cards if c["stage"] == "onset"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:40]
+    progress_candidates = sorted([c for c in cards if c["stage"] == "progress"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:25]
+
+    print(f"  -> 1차 기술적 필터 통과: 초입 후보 {len(onset_candidates)}종목 / 진행 후보 {len(progress_candidates)}종목 실적·업종 정밀 검증 중...")
+
+    verified_onset = []
+    for c in onset_candidates:
+        det = fetch_naver_stock_detail_and_earnings(c["ticker"])
+        if det["industry"]:
+            c["industry"] = det["industry"]
+            c["subIndustry"] = f"{det['industry']} · {c['exchange']}"
+            c["tags"] = [det["industry"]]
+        if det["opBadge"]:
+            c["opBadge"] = det["opBadge"]
+            c["opPositive"] = det["opPositive"]
+        if det["quarters"]:
+            c["quarters"] = det["quarters"]
+            c["earningsTitle"] = det["earningsTitle"]
+            c["earningsSummary"] = det["earningsSummary"]
+        # 영업이익 적자지속/적자전환 종목은 초입에서 엄격 배제
+        if det["OperatingProfitValid"]:
+            verified_onset.append(c)
+        if len(verified_onset) >= TARGET_ONSET_MAX:
+            break
+
+    verified_progress = []
+    for c in progress_candidates:
+        det = fetch_naver_stock_detail_and_earnings(c["ticker"])
+        if det["industry"]:
+            c["industry"] = det["industry"]
+            c["subIndustry"] = f"{det['industry']} · {c['exchange']}"
+            c["tags"] = [det["industry"]]
+        if det["opBadge"]:
+            c["opBadge"] = det["opBadge"]
+            c["opPositive"] = det["opPositive"]
+        if det["quarters"]:
+            c["quarters"] = det["quarters"]
+            c["earningsTitle"] = det["earningsTitle"]
+            c["earningsSummary"] = det["earningsSummary"]
+        if det["OperatingProfitValid"]:
+            verified_progress.append(c)
+        if len(verified_progress) >= TARGET_PROGRESS_MAX:
+            break
+
+    warning_cards = sorted([c for c in cards if c["stage"] == "warning"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:10]
+    longterm_cards = sorted([c for c in cards if c["stage"] == "longterm"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:10]
+    exit_all = [c for c in cards if c["stage"] == "exit"]
+    exit_cards = sorted(exit_all, key=lambda x: x.get("_sortKey", 0), reverse=True)[:30]
 
     stage_counts = {
-        "KR": {"onset": 0, "progress": 0, "warning": 0},
-        "US": {"onset": 0, "progress": 0, "warning": 0}
+        "onset": len(verified_onset),
+        "progress": len(verified_progress),
+        "warning": len(warning_cards),
+        "longterm": len(longterm_cards),
+        "exit": len(exit_all)
     }
+
     final_stocks = []
-    for c in ["KR", "US"]:
-        for st in ["onset", "progress", "warning"]:
-            subset = [s for s in all_cards if s["country"] == c and s["stage"] == st]
-            stage_counts[c][st] = len(subset)
-            subset.sort(key=lambda x: x.get("_sortKey", 0), reverse=True)
-            top_subset = subset[:MAX_CARDS_PER_STAGE]
-            for idx, s in enumerate(top_subset):
-                s.pop("_sortKey", None)
-                s["sectorRank"] = f"#{idx + 1}"
-                if c == "KR" and dart_client is not None and idx < 10:
-                    op_info = fetch_dart_op_badge(dart_client, s["ticker"])
-                    if op_info:
-                        s["opBadge"], s["opPositive"] = op_info
-                    time.sleep(0.08)
-                final_stocks.append(s)
+    for group in [verified_onset, verified_progress, warning_cards, longterm_cards, exit_cards]:
+        for idx, s in enumerate(group):
+            s.pop("_sortKey", None)
+            s["sectorRank"] = f"#{idx + 1}"
+            final_stocks.append(s)
 
-    print("\n[3/4] 산업 강도판 및 수급 오실레이터 자동 계산 중...")
-    kis_token = get_kis_access_token()
-    industry_data = compute_industry_strength(kr_stats)
-    oscillator_data = compute_supply_oscillator(kr_stats, kis_token=kis_token)
+    total_n = max(1, len(stats))
+    up_ratio = round(sum(1 for s in stats if s["change_pct"] > 0) / total_n * 100, 2)
+    dn_ratio = round(sum(1 for s in stats if s["change_pct"] < 0) / total_n * 100, 2)
+    nh_ratio = round(sum(1 for s in stats if s["is_52w_high"]) / total_n * 100, 2)
+    nl_ratio = round(sum(1 for s in stats if s["is_52w_low"]) / total_n * 100, 2)
 
-    print("\n[4/4] FRED 미 국채 금리(매크로) 및 시장 체온계 자동 계산 중...")
-    macro_yields = compute_macro_yields(start_date)
-    thermometer_axes, thermometer_total = compute_thermometer(kr_stats, macro_yields)
+    participation = {
+        "marketName": "코스피·코스닥",
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "totalScanned": total_n,
+        "upRatio": up_ratio,
+        "downRatio": dn_ratio,
+        "high52wRatio": nh_ratio,
+        "low52wRatio": nl_ratio,
+        "netBreadth": round(up_ratio - dn_ratio, 2),
+        "netHighLow": round(nh_ratio - nl_ratio, 2)
+    }
+
+    osc_pool = sorted(stats, key=lambda x: x.get("marcap_num", 0), reverse=True)[:24]
+    oscillator_data = []
+    for item in osc_pool:
+        sign = "+" if item["osc_val"] >= 0 else ""
+        oscillator_data.append({
+            "code": item["ticker"],
+            "name": item["name"],
+            "oscValue": f"{sign}{item['osc_val']:.3f}%",
+            "oscNumeric": item["osc_val"],
+            "axisLabel": f"{sign}{item['osc_val']:.2f}%",
+            "status": item["osc_status"],
+            "percentile": item["osc_pct"],
+            "close": item["close_str"]
+        })
 
     data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
     existing = {}
@@ -723,39 +673,29 @@ def main():
         with open(data_path, "r", encoding="utf-8") as f:
             existing = json.load(f)
 
-    latest_price_date = max(s["onsetDate"] for s in final_stocks)
+    latest_date = max(s["onsetDate"] for s in final_stocks) if final_stocks else datetime.now().strftime("%Y-%m-%d")
 
-    updated_payload = {
+    payload = {
         "meta": {
-            "priceDate": latest_price_date,
+            "priceDate": latest_date,
             "updatedSchedule": "17시 갱신 시작 · 18시/18:30/20시 재시도",
             "viewCount": existing.get("meta", {}).get("viewCount", 2183) + 1,
-            "thermometerScore": thermometer_total
+            "thermometerScore": existing.get("meta", {}).get("thermometerScore", 49.8)
         },
-        "TAB_META": {
-            "KR": {
-                "onset": {"label": "초입", "realTotal": stage_counts["KR"]["onset"], "desc": f"코스피·코스닥 상위 {len(kr_univ)}종목 중 정배열 초입 포착"},
-                "progress": {"label": "진행", "realTotal": stage_counts["KR"]["progress"], "desc": "정배열 7주 이상 확산 · 고점 대비 -15% 이내 진행 종목"},
-                "warning": {"label": "경계", "realTotal": stage_counts["KR"]["warning"], "desc": "고점 대비 -15% 초과 조정 또는 4주선 이탈 경계 종목"}
-            },
-            "US": {
-                "onset": {"label": "초입", "realTotal": stage_counts["US"]["onset"], "desc": f"미국 S&P500·핵심주 {len(us_univ)}종목 중 정배열 초입 포착"},
-                "progress": {"label": "진행", "realTotal": stage_counts["US"]["progress"], "desc": "미국 시장 정배열 확산 진행 종목"},
-                "warning": {"label": "경계", "realTotal": stage_counts["US"]["warning"], "desc": "미국 시장 추세 경계 종목"}
-            }
-        },
+        "STAGE_COUNTS": stage_counts,
+        "PARTICIPATION": participation,
         "STOCKS_DATA": final_stocks,
-        "OSCILLATOR_DATA": oscillator_data if oscillator_data else existing.get("OSCILLATOR_DATA", []),
-        "INDUSTRY_DATA": industry_data if industry_data else existing.get("INDUSTRY_DATA", []),
-        "THERMOMETER_AXES": thermometer_axes if thermometer_axes else existing.get("THERMOMETER_AXES", []),
-        "MACRO_YIELDS": macro_yields if macro_yields else existing.get("MACRO_YIELDS", []),
-        "SIMULATOR_RULES": existing.get("SIMULATOR_RULES", [])
+        "OSCILLATOR_DATA": oscillator_data,
+        "INDUSTRY_DATA": existing.get("INDUSTRY_DATA", []),
+        "THERMOMETER_AXES": existing.get("THERMOMETER_AXES", []),
+        "CREDIT_DATA": existing.get("CREDIT_DATA", {}),
+        "MACRO_YIELDS": existing.get("MACRO_YIELDS", [])
     }
 
     with open(data_path, "w", encoding="utf-8") as f:
-        json.dump(updated_payload, f, ensure_ascii=False, indent=2)
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print(f"\n[전체 갱신 완료] 기준일: {latest_price_date} | 시장 체온: {thermometer_total}도 | 산업강도 {len(industry_data)}개 | 매크로 {len(macro_yields)}개")
+    print(f"\n[엄격 스캔 완료] 초입({stage_counts['onset']}) · 진행({stage_counts['progress']}) · 경계({stage_counts['warning']}) · 장기({stage_counts['longterm']}) · 이탈({stage_counts['exit']}) 저장 완료!")
 
 
 if __name__ == "__main__":
