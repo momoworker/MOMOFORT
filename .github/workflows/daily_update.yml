@@ -1,0 +1,37 @@
+name: Daily Stock Data Update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 1-5'
+    - cron: '0 22 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 코드 내려받기
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 필요한 라이브러리 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 주가·이평선 수집 및 data.json 갱신
+        run: python update_data.py
+
+      - name: 변경된 data.json 저장소에 자동 반영
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --staged --quiet || (git commit -m "chore: auto-update data.json" && git push)
