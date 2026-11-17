@@ -771,11 +771,12 @@ def main():
         "INDUSTRY_DATA": existing.get("INDUSTRY_DATA", []),
         "THERMOMETER_AXES": existing.get("THERMOMETER_AXES", []),
         "CREDIT_DATA": existing.get("CREDIT_DATA", {}),
-        "MACRO_YIELDS": existing.get("MACRO_YIELDS", [])
+        "MACRO_YIELDS": existing.get("MACRO_YIELDS", []),
+        "MACRO_META": existing.get("MACRO_META", {})
     }
 
     with open(data_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
 
     print(f"[완료] 초입({stage_counts['onset']}) · 진행({stage_counts['progress']}) · 경계({stage_counts['warning']}) · 장기({stage_counts['longterm']}) · 이탈({stage_counts['exit']}) 저장 완료!", flush=True)
 

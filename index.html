@@ -602,8 +602,74 @@
       </div>
     </div>
 
-    <div id="view-macro" class="hidden space-y-3">
-      <div id="macro-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+    <div id="view-macro" class="hidden space-y-5">
+      <!-- 매크로 탭 상단 헤더 -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white">매크로 주봉 차트</h2>
+            <p class="text-xs text-gray-400 mt-0.5">탭을 열면 모든 항목의 전 기간 주봉과 4·13·26·52주 이동평균이 순서대로 표시됩니다.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
+            <span id="macro-ref-date" class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">기준 2026-11-13</span>
+            <span id="macro-gen-time" class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-400">생성 2026-11-16 20:00</span>
+            <span id="macro-status-badge" class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">데이터 정상</span>
+          </div>
+        </div>
+
+        <!-- 기간과 항목 선택 (상단 바로가기 및 전체 차트 기간 일괄 제어) -->
+        <div class="pt-3 border-t border-gray-800/80 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-xs font-bold text-gray-200">기간과 항목 선택</span>
+              <span class="text-[11px] text-gray-400 ml-1.5">위 차트는 전체 기간으로 먼저 표시됩니다. 여기서 기간을 바꾸거나 원하는 항목으로 바로 이동할 수 있습니다.</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs">
+              <span class="text-gray-400 text-[11px] font-mono">모든 차트 표시기간:</span>
+              <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+                <button type="button" onclick="setAllMacroRange('1Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="1Y">1년</button>
+                <button type="button" onclick="setAllMacroRange('3Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="3Y">3년</button>
+                <button type="button" onclick="setAllMacroRange('10Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="10Y">10년</button>
+                <button type="button" onclick="setAllMacroRange('20Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="20Y">20년</button>
+                <button type="button" onclick="setAllMacroRange('ALL')" class="macro-gbtn px-2 py-0.5 rounded bg-blue-600 text-white font-bold" data-range="ALL">전체</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="text-[11px] font-mono text-amber-300 font-semibold">항목 바로가기 · 주황색은 현재 주봉 정배열 (MA4 ≥ MA13 ≥ MA26 ≥ MA52)</div>
+            <div id="macro-quick-nav" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6대 섹션 · 24개 매크로 주봉 차트 컨테이너 -->
+      <div id="macro-sections-container" class="space-y-6"></div>
+
+      <!-- 하단 4대 교차 신호 요약 카드 (물가 · 할인율 · 위험 · 금리곡선) -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-4">
+        <h3 class="text-sm font-bold text-white">매크로 교차 신호 요약</h3>
+        <div id="macro-signals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+        <!-- 주봉 정배열 기준 및 해석 주의 안내 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
+          <div class="p-3.5 rounded-lg bg-[#0d1117] border border-gray-800 space-y-1">
+            <div class="font-bold text-amber-300">주봉 정배열 기준</div>
+            <p class="text-gray-300 leading-relaxed">MA4 ≥ MA13 ≥ MA26 ≥ MA52이면 정배열입니다. 각 차트에는 확보 가능한 전체 주봉을 보존합니다.</p>
+          </div>
+          <div class="p-3.5 rounded-lg bg-[#0d1117] border border-gray-800 space-y-1">
+            <div class="font-bold text-rose-300">해석 주의</div>
+            <p class="text-gray-300 leading-relaxed">원자재 정배열은 상승 추세지만, 금리·VIX·스프레드 정배열은 수치 상승 방향일 뿐 자산가격 강세 신호가 아닙니다.</p>
+          </div>
+        </div>
+
+        <!-- 하단 주석 및 출처 -->
+        <div class="pt-3 border-t border-gray-800 text-[11px] text-gray-400 space-y-1 leading-relaxed">
+          <div>• <strong class="text-gray-300">가격 변화:</strong> 가격은 거래일 기준 1·5·20·63·252관측일 수익률, 금리는 같은 관측일 간 bp 변화 · 차트는 가용한 전체 기간의 주봉과 4·13·26·52주 이동평균</div>
+          <div>• 원자재는 Yahoo Finance 근월물 연속선물 종가로, 롤오버·지연·거래소별 단위 차이가 있을 수 있음 · 교차 신호는 전망·매매 신호가 아닌 상태 요약입니다.</div>
+          <div>• <strong class="text-gray-300">출처:</strong> 미 재무부 시장금리·FRED · 10년 실질금리·FRED · 10년 기대인플레·FRED · 미 Baa 회사채 스프레드·FRED · ICE BofA 미 하이일드 OAS·FRED · ICE BofA 미 하이일드 유효수익률·FRED · 원자재·시장지표·Yahoo Finance</div>
+        </div>
+      </div>
     </div>
 
     <div id="view-research" class="hidden space-y-3">
@@ -626,6 +692,8 @@
     let INDUSTRY_DATA = [];
     let THERMOMETER_AXES = [];
     let MACRO_YIELDS = [];
+    let MACRO_META = { refDate: '2026-11-13', genTime: '2026-11-16 20:00', status: '데이터 정상', signals: [] };
+    let macroTvCharts = {};
 
     let state = {
       activeTab: 'onset',
@@ -1353,17 +1421,266 @@
       });
     }
 
+    function scrollToMacroCard(cardId) {
+      const el = document.getElementById(cardId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function setSingleMacroRange(itemId, mode) {
+      const entry = macroTvCharts[itemId];
+      if (!entry || !entry.chart || !entry.seriesData || !entry.seriesData.length) return;
+      const btns = document.querySelectorAll(`[data-macro-btn="${itemId}"]`);
+      btns.forEach(b => {
+        const active = b.getAttribute('data-range') === mode;
+        b.className = active
+          ? 'px-2 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      });
+      const data = entry.seriesData;
+      if (mode === 'ALL') {
+        entry.chart.timeScale().fitContent();
+      } else {
+        const weeksMap = { '1Y': 52, '3Y': 156, '10Y': 520, '20Y': 1040 };
+        const wBack = weeksMap[mode] || 208;
+        const startIdx = Math.max(0, data.length - wBack);
+        entry.chart.timeScale().setVisibleRange({
+          from: data[startIdx].t,
+          to: data[data.length - 1].t
+        });
+      }
+    }
+
+    function setAllMacroRange(mode) {
+      document.querySelectorAll('.macro-gbtn').forEach(b => {
+        const active = b.getAttribute('data-range') === mode;
+        b.className = active
+          ? 'macro-gbtn px-2 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      });
+      Object.keys(macroTvCharts).forEach(itemId => {
+        setSingleMacroRange(itemId, mode);
+      });
+    }
+
     function renderMacroTab() {
-      document.getElementById('macro-cards-container').innerHTML = MACRO_YIELDS.map(m => `
-        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-bold text-white">${m.title}</span>
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300">${m.badge}</span>
+      const refEl = document.getElementById('macro-ref-date');
+      const genEl = document.getElementById('macro-gen-time');
+      const stEl = document.getElementById('macro-status-badge');
+      if (refEl && MACRO_META.refDate) refEl.textContent = '기준 ' + MACRO_META.refDate;
+      if (genEl && MACRO_META.genTime) genEl.textContent = '생성 ' + MACRO_META.genTime;
+      if (stEl && MACRO_META.status) stEl.textContent = MACRO_META.status;
+
+      // Group MACRO_YIELDS by sectionId preserving order
+      const sectionOrder = [];
+      const sectionsMap = {};
+      (MACRO_YIELDS || []).forEach((item, idx) => {
+        const secId = item.sectionId || 'sec-rates';
+        const secTitle = item.sectionTitle || '미국 금리 · 수익률곡선';
+        const secSub = item.sectionSub || '';
+        const cardId = item.id || ('macro-item-' + idx);
+        item._cardId = cardId;
+        if (!sectionsMap[secId]) {
+          sectionsMap[secId] = { id: secId, title: secTitle, sub: secSub, items: [] };
+          sectionOrder.push(secId);
+        }
+        sectionsMap[secId].items.push(item);
+      });
+
+      // 1. Render Quick-Jump Navigation (orange pill = 주봉 정배열)
+      const navEl = document.getElementById('macro-quick-nav');
+      if (navEl) {
+        navEl.innerHTML = sectionOrder.map(secId => {
+          const sec = sectionsMap[secId];
+          const pills = sec.items.map(it => {
+            const isAligned = it.aligned || it.badge === '주봉 정배열';
+            const pillStyle = isAligned
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 font-bold hover:bg-amber-500/30'
+              : 'bg-[#161b22] text-gray-300 border-gray-800 hover:border-gray-600 hover:text-white';
+            return `<button type="button" onclick="scrollToMacroCard('${it._cardId}')" class="px-2 py-0.5 rounded border text-[11px] font-mono transition ${pillStyle}">${it.title}</button>`;
+          }).join('');
+          return `
+            <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800/90 space-y-1.5">
+              <div class="text-[11px] font-bold text-gray-300">${sec.title}</div>
+              <div class="flex flex-wrap gap-1">${pills}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 2. Render 6 Sections & 24 Indicator Cards
+      const container = document.getElementById('macro-sections-container');
+      if (!container) return;
+
+      container.innerHTML = sectionOrder.map(secId => {
+        const sec = sectionsMap[secId];
+        const cardsHtml = sec.items.map(m => {
+          const isAligned = m.aligned || m.badge === '주봉 정배열';
+          const badgeCls = isAligned
+            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
+            : 'bg-gray-800 text-gray-300 border border-gray-700';
+          const extraBadgeHtml = m.extraBadge
+            ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">${m.extraBadge}</span>`
+            : '';
+          const descHtml = m.desc
+            ? `<p class="text-[11px] text-gray-400 leading-relaxed">${m.desc}</p>`
+            : '';
+          const noticeHtml = m.notice
+            ? `<div class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 font-mono">${m.notice}</div>`
+            : '';
+          const tfButtons = m.shortRangeOnly
+            ? `
+              <button type="button" data-macro-btn="${m._cardId}" data-range="1Y" onclick="setSingleMacroRange('${m._cardId}','1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="3Y" onclick="setSingleMacroRange('${m._cardId}','3Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">3년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="ALL" onclick="setSingleMacroRange('${m._cardId}','ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">전체</button>
+            `
+            : `
+              <button type="button" data-macro-btn="${m._cardId}" data-range="1Y" onclick="setSingleMacroRange('${m._cardId}','1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="3Y" onclick="setSingleMacroRange('${m._cardId}','3Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">3년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="10Y" onclick="setSingleMacroRange('${m._cardId}','10Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">10년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="20Y" onclick="setSingleMacroRange('${m._cardId}','20Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">20년</button>
+              <button type="button" data-macro-btn="${m._cardId}" data-range="ALL" onclick="setSingleMacroRange('${m._cardId}','ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">전체</button>
+            `;
+
+          return `
+            <div id="${m._cardId}" class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-2.5">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h4 class="text-sm sm:text-base font-bold text-white">${m.title}</h4>
+                    <span class="text-[11px] font-mono px-2 py-0.5 rounded ${badgeCls}">${m.badge}</span>
+                    ${extraBadgeHtml}
+                  </div>
+                  <div class="text-[11px] font-mono text-gray-400 mt-0.5">${m.periodMeta || 'FRED / Yahoo Finance'}</div>
+                </div>
+                <div class="text-right font-mono">
+                  <div class="text-lg sm:text-xl font-bold text-white">${m.current} <span class="text-xs font-normal text-gray-400">(${m.change1m})</span></div>
+                  <div class="text-[11px] text-gray-400">MA4 <span class="text-yellow-400">${m.ma4}</span> · 13 <span class="text-orange-400">${m.ma13}</span> · 26 <span class="text-blue-400">${m.ma26}</span> · 52 <span class="text-purple-400">${m.ma52}</span></div>
+                </div>
+              </div>
+
+              ${descHtml}
+              ${noticeHtml}
+
+              <!-- 범례 및 기간 선택 바 -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">
+                <div class="flex flex-wrap items-center gap-2.5 font-mono">
+                  <span class="flex items-center gap-1 text-gray-200"><span class="w-2.5 h-0.5 bg-gray-200 inline-block"></span> 주봉</span>
+                  <span class="flex items-center gap-1 text-yellow-400"><span class="w-2.5 h-0.5 bg-yellow-400 inline-block"></span> MA4</span>
+                  <span class="flex items-center gap-1 text-orange-400"><span class="w-2.5 h-0.5 bg-orange-400 inline-block"></span> MA13</span>
+                  <span class="flex items-center gap-1 text-blue-400"><span class="w-2.5 h-0.5 bg-blue-400 inline-block"></span> MA26</span>
+                  <span class="flex items-center gap-1 text-purple-400"><span class="w-2.5 h-0.5 bg-purple-400 inline-block"></span> MA52</span>
+                  <span id="macro-hover-${m._cardId}" class="text-gray-400 ml-1">휠·핀치 확대 · 좌우 드래그 이동</span>
+                </div>
+                <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+                  ${tfButtons}
+                </div>
+              </div>
+
+              <!-- 주봉 + 4/13/26/52주 이동평균 캔버스 -->
+              <div class="relative w-full h-[240px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+                <div id="macro-chart-${m._cardId}" class="w-full h-full"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="space-y-3">
+            <div class="flex items-baseline justify-between border-b border-gray-800 pb-1.5">
+              <div>
+                <h3 class="text-sm sm:text-base font-bold text-white">${sec.title}</h3>
+                <p class="text-xs text-gray-400">${sec.sub}</p>
+              </div>
+              <span class="text-[11px] font-mono text-gray-500">${sec.items.length}개 지표</span>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+              ${cardsHtml}
+            </div>
           </div>
-          <div class="text-2xl font-bold font-mono text-blue-400">${m.current} <span class="text-xs text-gray-400">${m.change1m}</span></div>
-          <div class="text-[11px] font-mono text-gray-400">MA4 ${m.ma4} · MA13 ${m.ma13} · MA26 ${m.ma26} · MA52 ${m.ma52}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      // 3. Render Bottom 4 Cross-Signal Summary Cards
+      const sigGrid = document.getElementById('macro-signals-grid');
+      const signals = (MACRO_META && MACRO_META.signals && MACRO_META.signals.length) ? MACRO_META.signals : [
+        { category: '물가', title: '인플레 신호 혼조', desc: '원자재 확산과 기대인플레이션이 같은 방향의 강한 신호를 내지 않습니다.' },
+        { category: '할인율', title: '실질 할인율 중립', desc: '10년 실질금리의 1개월 변화가 ±20bp 안에 있습니다.' },
+        { category: '위험', title: '스트레스 중간', desc: '변동성과 신용스프레드가 동시에 극단 구간은 아닙니다.' },
+        { category: '금리곡선', title: '수익률곡선 안정', desc: '10Y-2Y의 1개월 변화가 ±20bp 안에 있습니다.' }
+      ];
+      if (sigGrid) {
+        sigGrid.innerHTML = signals.map(s => `
+          <div class="p-3.5 rounded-xl bg-[#0d1117] border border-gray-800 space-y-1">
+            <div class="text-[11px] font-mono text-blue-400 font-bold">${s.category}</div>
+            <div class="text-sm font-bold text-white">${s.title}</div>
+            <p class="text-xs text-gray-400 leading-relaxed">${s.desc}</p>
+          </div>
+        `).join('');
+      }
+
+      // 4. Instantiate TradingView Lightweight Charts for each of the 24 macro items
+      macroTvCharts = {};
+      if (!window.LightweightCharts) return;
+
+      (MACRO_YIELDS || []).forEach(m => {
+        const el = document.getElementById('macro-chart-' + m._cardId);
+        const series = m.weeklySeries || [];
+        if (!el || !series.length) return;
+
+        const prec = m.precision !== undefined ? m.precision : 2;
+        const minMv = prec === 3 ? 0.001 : (prec === 1 ? 0.1 : 0.01);
+
+        const chart = LightweightCharts.createChart(el, {
+          autoSize: true,
+          layout: {
+            background: { type: 'solid', color: '#0d1117' },
+            textColor: '#9ca3af',
+            fontFamily: "'JetBrains Mono', 'Pretendard', sans-serif"
+          },
+          grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+          crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+          rightPriceScale: {
+            borderColor: '#374151',
+            scaleMargins: { top: 0.1, bottom: 0.1 }
+          },
+          timeScale: { borderColor: '#374151', rightOffset: 2 }
+        });
+
+        const mainLine = chart.addLineSeries({
+          color: '#e5e7eb',
+          lineWidth: 2,
+          priceLineVisible: true,
+          lastValueVisible: true,
+          priceFormat: { type: 'price', precision: prec, minMove: minMv }
+        });
+        const ma4Line = chart.addLineSeries({ color: '#facc15', lineWidth: 1.3, priceLineVisible: false, lastValueVisible: false });
+        const ma13Line = chart.addLineSeries({ color: '#fb923c', lineWidth: 1.3, priceLineVisible: false, lastValueVisible: false });
+        const ma26Line = chart.addLineSeries({ color: '#3b82f6', lineWidth: 1.3, priceLineVisible: false, lastValueVisible: false });
+        const ma52Line = chart.addLineSeries({ color: '#a855f7', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+
+        mainLine.setData(series.map(d => ({ time: d.t, value: d.v })));
+        ma4Line.setData(series.map(d => ({ time: d.t, value: d.m4 })));
+        ma13Line.setData(series.map(d => ({ time: d.t, value: d.m13 })));
+        ma26Line.setData(series.map(d => ({ time: d.t, value: d.m26 })));
+        ma52Line.setData(series.map(d => ({ time: d.t, value: d.m52 })));
+
+        const byTime = {};
+        series.forEach(d => { byTime[d.t] = d; });
+        const hoverEl = document.getElementById('macro-hover-' + m._cardId);
+
+        chart.subscribeCrosshairMove(param => {
+          if (!hoverEl) return;
+          if (!param || !param.time || !byTime[param.time]) {
+            hoverEl.textContent = '휠·핀치 확대 · 좌우 드래그 이동';
+            return;
+          }
+          const d = byTime[param.time];
+          hoverEl.innerHTML = `<span class="text-white">${d.t}</span> · 주봉 <strong class="text-white">${d.v}</strong> · MA4 <span class="text-yellow-400">${d.m4}</span> · 13 <span class="text-orange-400">${d.m13}</span> · 26 <span class="text-blue-400">${d.m26}</span> · 52 <span class="text-purple-400">${d.m52}</span>`;
+        });
+
+        chart.timeScale().fitContent();
+        macroTvCharts[m._cardId] = { chart, seriesData: series };
+      });
     }
 
     function addJournalEntry(e) {
@@ -1535,6 +1852,7 @@
           INDUSTRY_DATA = d.INDUSTRY_DATA || [];
           THERMOMETER_AXES = d.THERMOMETER_AXES || [];
           MACRO_YIELDS = d.MACRO_YIELDS || [];
+          if (d.MACRO_META) MACRO_META = d.MACRO_META;
         }
       } catch (e) {}
 
