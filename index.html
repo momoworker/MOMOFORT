@@ -84,6 +84,10 @@
           <span>체온</span>
           <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/15 text-amber-300">49.8</span>
         </button>
+        <button id="tab-feargreed" type="button" onclick="switchTab('feargreed')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+          <span>공탐지수</span>
+          <span id="badge-fg-dual" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-indigo-500/20 text-indigo-300">韓34·美54</span>
+        </button>
         <button id="tab-participation" type="button" onclick="switchTab('participation')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>시장 참여도·신고가</span>
         </button>
@@ -385,6 +389,80 @@
           <div id="thermo-big-degree" class="text-3xl font-bold font-mono text-amber-400">49.8°</div>
         </div>
         <div id="thermometer-axes-list" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- 5-B. FEAR & GREED INDEX TAB (공포·탐욕 지수: 🇰🇷 국내장 & 🇺🇸 미국장 동시 비교) -->
+    <!-- =================================================================== -->
+    <div id="view-feargreed" class="hidden space-y-4">
+      <!-- 상단 헤더 & 한·미 디커플링 실전 진단 배너 -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-start justify-between gap-2 border-b border-gray-800 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-600 text-white">KR &amp; US FEAR AND GREED INDEX</span>
+              <h2 class="text-base sm:text-lg font-bold text-white">국내장(🇰🇷) · 미국장(🇺🇸) 공포·탐욕 지수 비교 대시보드</h2>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+              미국 CNN Fear &amp; Greed 7대 표준 지표와 한국 증시(KOSPI·KOSDAQ·VKOSPI·수급·신용잔고) 7대 체감 지표를 각각 0~100점으로 산출해 양국 시장의 투자심리와 과매도·과열 변곡점을 동시에 비교합니다.
+            </p>
+          </div>
+          <span id="fg-updated-badge" class="text-xs font-mono px-2.5 py-1 rounded bg-[#0d1117] border border-gray-800 text-gray-300">기준 2026-11-16</span>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-[#0d1117] border border-indigo-500/40 flex items-start gap-2.5 text-xs">
+          <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono font-bold shrink-0 mt-0.5">한·미 심리 진단</span>
+          <p id="fg-insight-banner" class="text-gray-200 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- 중단: 🇰🇷 국내장 vs 🇺🇸 미국장 듀얼 게이지 & 7대 세부 지표 비교 (2열 그리드) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div id="fg-kr-card" class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-4"></div>
+        <div id="fg-us-card" class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-4"></div>
+      </div>
+
+      <!-- 하단: 🇰🇷 국내장 vs 🇺🇸 미국장 공탐지수 시계열 비교 차트 (TradingView Lightweight Charts) -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">🇰🇷 한국장 vs 🇺🇸 미국장 공포·탐욕 지수 장기 추이 비교 (최근 250거래일)</h3>
+            <p class="text-xs text-gray-400">75 이상은 극단적 탐욕(단기 과열·차익실현 주의), 25 이하는 극단적 공포(투매 바닥·역발상 분할매수 구간)입니다.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-xs font-mono">
+            <span class="flex items-center gap-1.5 text-blue-400 font-bold"><span class="w-3 h-0.5 bg-blue-400 inline-block"></span> 🇰🇷 한국 공탐지수</span>
+            <span class="flex items-center gap-1.5 text-amber-400 font-bold"><span class="w-3 h-0.5 bg-amber-400 inline-block"></span> 🇺🇸 미국 공탐지수</span>
+            <span id="fg-chart-hover" class="text-gray-400 text-[11px]"></span>
+          </div>
+        </div>
+        <div class="relative w-full h-[270px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+          <div id="tv-fg-history-chart" class="w-full h-full"></div>
+        </div>
+
+        <!-- 5단계 구간별 실전 매매 기준 안내 -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 text-[11px] font-mono">
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-blue-500/40 text-center">
+            <div class="text-blue-400 font-bold">0 ~ 24 · 극단적 공포</div>
+            <div class="text-gray-400 mt-0.5">투매 클라이맥스 · 적극 분할매수</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-cyan-500/40 text-center">
+            <div class="text-cyan-300 font-bold">25 ~ 44 · 공포 (현재 韓)</div>
+            <div class="text-gray-400 mt-0.5">심리 위축 · 초입 B등급 눌림목 선별</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-700 text-center">
+            <div class="text-gray-200 font-bold">45 ~ 55 · 중립 (현재 美)</div>
+            <div class="text-gray-400 mt-0.5">수급 균형 · 실적 주도주 순환매</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-amber-500/40 text-center">
+            <div class="text-amber-300 font-bold">56 ~ 75 · 탐욕</div>
+            <div class="text-gray-400 mt-0.5">추세 확산 · 보유 이익 극대화</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-rose-500/40 text-center">
+            <div class="text-rose-400 font-bold">76 ~ 100 · 극단적 탐욕</div>
+            <div class="text-gray-400 mt-0.5">단기 과열 · 추격매수 금지·분할익절</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -790,6 +868,8 @@
     let INDUSTRY_DATA = [];
     let THERMOMETER_AXES = [];
     let MACRO_YIELDS = [];
+    let FEAR_GREED_DATA = null;
+    let tvFgChart = null;
     let MACRO_META = { refDate: '2026-11-13', genTime: '2026-11-16 20:00', status: '데이터 정상', signals: [] };
     let macroTvCharts = {};
 
@@ -807,7 +887,7 @@
       watchlist: new Set([]),
       oscSearch: '',
       viewCount: 1,
-      tabLikes: { onset: 0, progress: 0, warning: 0, longterm: 0, exit: 0, oscillator: 0, credit: 0, thermometer: 0, participation: 0, industry: 0, highlow: 0 },
+      tabLikes: { onset: 0, progress: 0, warning: 0, longterm: 0, exit: 0, oscillator: 0, credit: 0, thermometer: 0, feargreed: 0, participation: 0, industry: 0 },
       likedTabs: new Set(),
       commentsOpen: false,
       comments: [],
@@ -1448,6 +1528,154 @@
       `).join('');
     }
 
+    function getFgBadgeStyle(score) {
+      if (score <= 24) return { label: '극단적 공포 (Extreme Fear)', textCol: 'text-blue-400', bgCol: 'bg-blue-500/20 text-blue-300 border-blue-500/40', barCol: 'bg-blue-500' };
+      if (score <= 44) return { label: '공포 (Fear)', textCol: 'text-cyan-300', bgCol: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40', barCol: 'bg-cyan-400' };
+      if (score <= 55) return { label: '중립 (Neutral)', textCol: 'text-gray-200', bgCol: 'bg-gray-800 text-gray-200 border-gray-700', barCol: 'bg-gray-300' };
+      if (score <= 75) return { label: '탐욕 (Greed)', textCol: 'text-amber-300', bgCol: 'bg-amber-500/20 text-amber-300 border-amber-500/40', barCol: 'bg-amber-400' };
+      return { label: '극단적 탐욕 (Extreme Greed)', textCol: 'text-rose-400', bgCol: 'bg-rose-500/20 text-rose-300 border-rose-500/40', barCol: 'bg-rose-500' };
+    }
+
+    function buildFgMarketCardHtml(m) {
+      const st = getFgBadgeStyle(m.score);
+      const diffPrev = (m.score - (m.prevClose || m.score)).toFixed(1);
+      const diffSign = diffPrev > 0 ? `+${diffPrev}` : diffPrev;
+
+      const histPills = [
+        { lbl: '전일 종가', val: m.prevClose },
+        { lbl: '1주일 전', val: m.week1Ago },
+        { lbl: '1개월 전', val: m.month1Ago },
+        { lbl: '1년 전', val: m.year1Ago }
+      ].map(h => {
+        const hst = getFgBadgeStyle(h.val);
+        return `
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800 text-center font-mono">
+            <div class="text-[10px] text-gray-400">${h.lbl}</div>
+            <div class="text-sm font-bold ${hst.textCol} mt-0.5">${h.val}</div>
+            <div class="text-[10px] text-gray-500">${hst.label.split(' ')[0]}</div>
+          </div>
+        `;
+      }).join('');
+
+      const indsHtml = (m.indicators || []).map(ind => {
+        const ist = getFgBadgeStyle(ind.score);
+        return `
+          <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800/90 space-y-1.5 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-gray-200">${ind.name}</span>
+              <div class="flex items-center gap-1.5 font-mono shrink-0">
+                <span class="px-1.5 py-0.5 rounded text-[10px] border ${ist.bgCol}">${ind.status}</span>
+                <strong class="text-sm ${ist.textCol}">${ind.score}</strong>
+              </div>
+            </div>
+            <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+              <div class="h-full ${ist.barCol} rounded-full" style="width:${ind.score}%"></div>
+            </div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">${ind.desc}</p>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="flex items-start justify-between gap-2 pb-3 border-b border-gray-800">
+          <div>
+            <h3 class="text-base font-bold text-white">${m.marketTitle}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">${m.subTitle}</p>
+          </div>
+          <div class="text-right font-mono">
+            <div class="text-3xl font-extrabold ${st.textCol}">${m.score} <span class="text-xs font-normal text-gray-400">(${diffSign}pt)</span></div>
+            <span class="inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold border ${st.bgCol}">${m.status || st.label}</span>
+          </div>
+        </div>
+
+        <!-- 0~100 5단계 컬러 스펙트럼 게이지 바 & 현재 포인터 -->
+        <div class="space-y-1.5 pt-1">
+          <div class="flex justify-between text-[10px] font-mono text-gray-400">
+            <span class="text-blue-400">0 극단적공포</span>
+            <span class="text-cyan-300">25 공포</span>
+            <span class="text-gray-300">50 중립</span>
+            <span class="text-amber-300">75 탐욕</span>
+            <span class="text-rose-400">100 극단적탐욕</span>
+          </div>
+          <div class="relative w-full h-3.5 rounded-full overflow-hidden flex border border-gray-700" style="background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 28%, #9ca3af 50%, #f59e0b 74%, #ef4444 100%);">
+            <div class="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_8px_#fff]" style="left: calc(${m.score}% - 2px);"></div>
+          </div>
+          <p class="text-xs text-gray-300 leading-relaxed pt-1">${m.summary}</p>
+        </div>
+
+        <!-- 시점별 비교 (전일 · 1주전 · 1개월전 · 1년전) -->
+        <div class="grid grid-cols-4 gap-2">
+          ${histPills}
+        </div>
+
+        <!-- 7대 구성 지표 리스트 -->
+        <div class="space-y-2 pt-1">
+          <div class="text-xs font-bold text-gray-300 font-mono">7대 구성 지표 세부 점수 (0=극단적 공포 · 100=극단적 탐욕)</div>
+          ${indsHtml}
+        </div>
+      `;
+    }
+
+    function renderFearGreedTab() {
+      const fg = FEAR_GREED_DATA;
+      if (!fg) return;
+
+      const dualBadge = document.getElementById('badge-fg-dual');
+      if (dualBadge && fg.KR && fg.US) {
+        dualBadge.textContent = `韓${Math.round(fg.KR.score)}·美${Math.round(fg.US.score)}`;
+      }
+      const upBadge = document.getElementById('fg-updated-badge');
+      if (upBadge) upBadge.textContent = `기준 ${fg.updatedAt || DATA_META.priceDate}`;
+      const insBanner = document.getElementById('fg-insight-banner');
+      if (insBanner) insBanner.textContent = fg.insightBanner || '';
+
+      const krEl = document.getElementById('fg-kr-card');
+      const usEl = document.getElementById('fg-us-card');
+      if (krEl && fg.KR) krEl.innerHTML = buildFgMarketCardHtml(fg.KR);
+      if (usEl && fg.US) usEl.innerHTML = buildFgMarketCardHtml(fg.US);
+
+      const chartEl = document.getElementById('tv-fg-history-chart');
+      const series = fg.historySeries || [];
+      if (!chartEl || !window.LightweightCharts || !series.length) return;
+
+      chartEl.innerHTML = '';
+      tvFgChart = LightweightCharts.createChart(chartEl, {
+        autoSize: true,
+        layout: { background: { type: 'solid', color: '#0d1117' }, textColor: '#9ca3af', fontFamily: "'JetBrains Mono', sans-serif" },
+        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        rightPriceScale: { borderColor: '#374151', scaleMargins: { top: 0.08, bottom: 0.08 } },
+        timeScale: { borderColor: '#374151', rightOffset: 2 }
+      });
+
+      const krLine = tvFgChart.addLineSeries({ color: '#3b82f6', lineWidth: 2.2, title: '🇰🇷 한국 공탐' });
+      const usLine = tvFgChart.addLineSeries({ color: '#f59e0b', lineWidth: 2.2, title: '🇺🇸 미국 공탐' });
+
+      krLine.createPriceLine({ price: 75, color: '#ef4444', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '극단적 탐욕 75' });
+      krLine.createPriceLine({ price: 50, color: '#6b7280', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '중립 50' });
+      krLine.createPriceLine({ price: 25, color: '#06b6d4', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '극단적 공포 25' });
+
+      krLine.setData(series.map(d => ({ time: d.time, value: d.krScore })));
+      usLine.setData(series.map(d => ({ time: d.time, value: d.usScore })));
+
+      const byTime = {};
+      series.forEach(d => { byTime[d.time] = d; });
+      const hoverEl = document.getElementById('fg-chart-hover');
+      const lastPt = series[series.length - 1];
+      if (hoverEl && lastPt) {
+        hoverEl.innerHTML = `${lastPt.time} · 🇰🇷 <strong class="text-blue-400">${lastPt.krScore}</strong> vs 🇺🇸 <strong class="text-amber-400">${lastPt.usScore}</strong>`;
+      }
+
+      tvFgChart.subscribeCrosshairMove(param => {
+        if (!hoverEl) return;
+        const pt = (param && param.time && byTime[param.time]) ? byTime[param.time] : lastPt;
+        if (!pt) return;
+        hoverEl.innerHTML = `${pt.time} · 🇰🇷 <strong class="text-blue-400">${pt.krScore}</strong> vs 🇺🇸 <strong class="text-amber-400">${pt.usScore}</strong> (괴리 ${(pt.krScore - pt.usScore).toFixed(1)}pt)`;
+      });
+
+      tvFgChart.timeScale().fitContent();
+    }
+
     function renderThermometerTab() {
       const scoreVal = DATA_META.thermometerScore || 49.8;
       document.getElementById('badge-thermometer-score').textContent = scoreVal;
@@ -2046,14 +2274,14 @@
       // 1단 탭 표시/숨김 (상세 뷰 열릴 때는 1단 탭 숨김 — leader.starfolio.io 동일 동작)
       document.getElementById('tier1-nav-bar').classList.toggle('hidden', state.detailOpen);
       document.getElementById('feedback-bar-section').classList.toggle('hidden', state.detailOpen);
-      const tabNamesMap = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈', oscillator: '수급오실레이터', credit: '신용잔고', thermometer: '체온', participation: '시장 참여도', industry: '산업 강도', highlow: '신고가·신저가', journal: '내 기록', rules: '매수·매도 규칙', macro: '매크로', research: '리서치' };
+      const tabNamesMap = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈', oscillator: '수급오실레이터', credit: '신용잔고', thermometer: '체온', feargreed: '공탐지수(韓·美)', participation: '시장 참여도·신고가', industry: '산업 강도', journal: '내 기록', rules: '매수·매도 규칙', macro: '매크로', research: '리서치' };
       const fbLabel = document.getElementById('feedback-tab-label');
       if (fbLabel) fbLabel.textContent = (tabNamesMap[state.activeTab] || '현재') + ' 탭 메모·의견';
       const lkEl = document.getElementById('like-count-display');
       if (lkEl) lkEl.textContent = state.tabLikes[state.activeTab] || 0;
       renderCommentsList();
 
-      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'participation', 'industry'];
+      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'feargreed', 'participation', 'industry'];
       t1Tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (!el) return;
@@ -2078,6 +2306,7 @@
       document.getElementById('view-oscillator').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'oscillator');
       document.getElementById('view-credit').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'credit');
       document.getElementById('view-thermometer').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'thermometer');
+      document.getElementById('view-feargreed').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'feargreed');
       document.getElementById('view-participation').classList.toggle('hidden', state.detailOpen || !['participation', 'highlow'].includes(state.activeTab));
       document.getElementById('view-industry').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'industry');
       document.getElementById('view-journal').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'journal');
@@ -2095,6 +2324,8 @@
         renderCreditTab();
       } else if (state.activeTab === 'thermometer') {
         renderThermometerTab();
+      } else if (state.activeTab === 'feargreed') {
+        renderFearGreedTab();
       } else if (['participation', 'highlow'].includes(state.activeTab)) {
         renderParticipationTab();
       } else if (state.activeTab === 'industry') {
@@ -2122,6 +2353,7 @@
           THERMOMETER_AXES = d.THERMOMETER_AXES || [];
           MACRO_YIELDS = d.MACRO_YIELDS || [];
           if (d.MACRO_META) MACRO_META = d.MACRO_META;
+          if (d.FEAR_GREED_DATA) FEAR_GREED_DATA = d.FEAR_GREED_DATA;
         }
       } catch (e) {}
 
@@ -2136,6 +2368,10 @@
       document.getElementById('watchlist-count').textContent = state.watchlist.size;
       document.getElementById('journal-count-badge').textContent = state.journalEntries.length;
 
+      if (FEAR_GREED_DATA && FEAR_GREED_DATA.KR && FEAR_GREED_DATA.US) {
+        const db = document.getElementById('badge-fg-dual');
+        if (db) db.textContent = `韓${Math.round(FEAR_GREED_DATA.KR.score)}·美${Math.round(FEAR_GREED_DATA.US.score)}`;
+      }
       populateSectorSelect();
       renderAll();
     }

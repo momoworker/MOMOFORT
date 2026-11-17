@@ -781,7 +781,8 @@ def main():
         "THERMOMETER_AXES": existing.get("THERMOMETER_AXES", []),
         "CREDIT_DATA": existing.get("CREDIT_DATA", {}),
         "MACRO_YIELDS": existing.get("MACRO_YIELDS", []),
-        "MACRO_META": existing.get("MACRO_META", {})
+        "MACRO_META": existing.get("MACRO_META", {}),
+        "FEAR_GREED_DATA": existing.get("FEAR_GREED_DATA", {})
     }
 
     with open(data_path, "w", encoding="utf-8") as f:
