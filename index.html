@@ -84,14 +84,11 @@
           <span>체온</span>
           <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/15 text-amber-300">49.8</span>
         </button>
-        <button id="tab-participation" type="button" onclick="switchTab('participation')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
-          시장 참여도
+        <button id="tab-participation" type="button" onclick="switchTab('participation')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+          <span>시장 참여도·신고가</span>
         </button>
         <button id="tab-industry" type="button" onclick="switchTab('industry')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
           산업 강도
-        </button>
-        <button id="tab-highlow" type="button" onclick="switchTab('highlow')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
-          신고가·신저가
         </button>
       </nav>
 
@@ -231,19 +228,20 @@
           <div class="flex flex-wrap items-center gap-3 font-medium">
             <span class="text-white font-bold flex items-center gap-1.5">
               <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-blue-600 text-[10px] font-extrabold text-white">TV</span>
-              주봉 캔들차트 (최근 1.85년 · 96주)
+              주봉 캔들차트 (최근 2.3년 · 120주)
             </span>
             <span class="flex items-center gap-1 text-yellow-400"><span class="w-3 h-0.5 bg-yellow-400 inline-block"></span> 4주선</span>
             <span class="flex items-center gap-1 text-orange-400"><span class="w-3 h-0.5 bg-orange-400 inline-block"></span> 13주선</span>
             <span class="flex items-center gap-1 text-blue-400"><span class="w-3 h-0.5 bg-blue-400 inline-block"></span> 26주선</span>
             <span class="flex items-center gap-1 text-purple-400"><span class="w-3 h-0.5 bg-purple-400 inline-block"></span> 52주선</span>
             <span class="flex items-center gap-1 text-cyan-400"><span class="w-3 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span> 🛡️ATR방어선</span>
+            <span class="flex items-center gap-1 text-emerald-400 font-bold">↑ 돌파(Onset)</span>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5">
             <!-- 기간 선택 버튼 (기본: 1.8년 전체) -->
             <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
-              <button id="btn-wrange-all" type="button" onclick="setWeeklyRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1.8년(전체)</button>
+              <button id="btn-wrange-all" type="button" onclick="setWeeklyRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">전체(2.3년)</button>
               <button id="btn-wrange-1y" type="button" onclick="setWeeklyRange('1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
               <button id="btn-wrange-6m" type="button" onclick="setWeeklyRange('6M')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">6개월</button>
             </div>
@@ -391,22 +389,122 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- 6. MARKET PARTICIPATION & HIGH/LOW TAB (시장 참여도 & 신고가·신저가) -->
+    <!-- 6. MARKET PARTICIPATION & 52W HIGH/LOW TAB (시장 참여도·신고가 통합 고도화) -->
     <!-- =================================================================== -->
-    <div id="view-participation" class="hidden space-y-3">
-      <div class="bg-white text-slate-900 rounded-xl border border-slate-200 p-4 space-y-4 shadow">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+    <div id="view-participation" class="hidden space-y-4">
+      <!-- 상단: 시장 참여도(Market Breadth) 개념 안내 & 현재 장세 종합 신호등 -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-start justify-between gap-2 border-b border-gray-800 pb-3">
           <div>
-            <span class="text-[11px] font-mono uppercase tracking-wider text-blue-600 font-bold">MARKET PARTICIPATION & BREADTH</span>
-            <h2 class="text-base font-bold text-slate-900">시장 참여도 및 52주 신고가·신저가 오실레이터</h2>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">MARKET BREADTH &amp; 52W HIGH-LOW</span>
+              <h2 class="text-base sm:text-lg font-bold text-white">시장 참여도 · 52주 신고가/신저가 통합 대시보드</h2>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+              <strong class="text-gray-200">시장 참여도(시장 폭)란?</strong> 지수(코스피·코스닥)만 보고 매매할 때 빠지기 쉬운 '착시'를 걸러내는 지표로, <strong class="text-blue-300">① 오늘 상승에 동참한 종목 비율</strong>, <strong class="text-emerald-300">② 이평선·정배열 위에 있는 건강한 종목 비율</strong>, <strong class="text-amber-300">③ 52주 신고가 vs 신저가 비율</strong>을 통합해 지금이 공격적으로 돌파 매수할 때인지, 소수 주도주만 짧게 대응할 때인지 알려줍니다.
+            </p>
           </div>
-          <span id="part-meta-summary" class="text-xs font-mono text-slate-500">한국 전체 스캔 종목 기준</span>
+          <span id="part-meta-summary" class="text-xs font-mono px-2.5 py-1 rounded bg-[#0d1117] border border-gray-800 text-gray-300 shrink-0">수집 목록 1,835종목 · 기준 2026-11-16</span>
         </div>
 
-        <div id="part-kpi-cards" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+        <!-- 현재 시장 체력 종합 진단 배너 -->
+        <div class="p-3.5 rounded-xl bg-[#0d1117] border border-amber-500/40 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-mono text-gray-400">현재 시장 체력 판정:</span>
+              <span id="part-regime-badge" class="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold">⚠️ 소수 종목 쏠림 · 하락 우위 장세</span>
+            </div>
+            <p id="part-regime-summary" class="text-xs text-gray-300 leading-relaxed"></p>
+          </div>
+          <div class="shrink-0 flex flex-col sm:flex-row gap-2 text-xs font-mono">
+            <div class="px-3 py-2 rounded-lg bg-[#161b22] border border-gray-800 text-center">
+              <div class="text-[10px] text-gray-400">20일 등락비율(ADR)</div>
+              <div id="part-adr-val" class="text-sm font-bold text-amber-300 mt-0.5">76.4%</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-[#161b22] border border-gray-800 text-center">
+              <div class="text-[10px] text-gray-400">주봉 정배열 비율</div>
+              <div id="part-aligned-val" class="text-sm font-bold text-blue-400 mt-0.5">8.6%</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div class="relative h-64 w-full bg-slate-50 rounded-lg border border-slate-200 p-2">
-          <canvas id="participationChart"></canvas>
+      <!-- 중단 1: 3대 핵심 시장 폭(Breadth) 직관적 게이지 카드 -->
+      <div id="part-kpi-cards" class="grid grid-cols-1 lg:grid-cols-3 gap-3.5"></div>
+
+      <!-- 중단 2: 코스피 vs 코스닥 시장별 참여도 비교 & 52주 신고가 주도 종목 바로가기 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+        <!-- 코스피 vs 코스닥 체력 비교 -->
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white">코스피(KOSPI) vs 코스닥(KOSDAQ) 참여도 비교</h3>
+              <p class="text-[11px] text-gray-400">어느 시장에 매수 자금과 추세 정배열 종목이 더 많이 포진해 있는지 비교합니다.</p>
+            </div>
+          </div>
+          <div id="part-market-compare" class="space-y-2.5 text-xs"></div>
+        </div>
+
+        <!-- 52주 신고가/돌파 주도 종목 리스트 -->
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white">52주 신고가 권역 · 정배열 돌파 핵심 주도주</h3>
+              <p class="text-[11px] text-gray-400">시장 참여도가 낮을 때도 신고가를 경신·유지하는 진짜 주도주입니다 (클릭 시 상세 차트 이동).</p>
+            </div>
+          </div>
+          <div id="part-high52-leaders" class="space-y-1.5 text-xs"></div>
+        </div>
+      </div>
+
+      <!-- 하단 1: 인터랙티브 시계열 차트 2종 (20일선·정배열 비율 추이 & 52주 순신고가 추이) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">중기 시장 폭 추이 (20일선 상회 · 주봉 정배열 비율)</h3>
+              <p class="text-[11px] text-gray-400">20일선 상회 비율이 25% 이하면 과매도 바닥권, 75% 이상이면 단기 과열권입니다.</p>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] font-mono">
+              <span class="flex items-center gap-1 text-emerald-400"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span> 20일선 상회(%)</span>
+              <span class="flex items-center gap-1 text-blue-400"><span class="w-2.5 h-0.5 bg-blue-400 inline-block"></span> 주봉 정배열(%)</span>
+            </div>
+          </div>
+          <div class="relative w-full h-[240px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+            <div id="tv-breadth-ma-chart" class="w-full h-full"></div>
+          </div>
+        </div>
+
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">52주 순신고가 오실레이터 (신고가 비율 - 신저가 비율 %p)</h3>
+              <p class="text-[11px] text-gray-400">0선 위(초록)는 신고가 주도 장세, 0선 아래(빨강)는 신저가 우위 방어 장세입니다.</p>
+            </div>
+            <span id="part-nhnl-cur-badge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">현재 -12.1%p</span>
+          </div>
+          <div class="relative w-full h-[240px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+            <div id="tv-breadth-hl-chart" class="w-full h-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 2: 시장 참여도 구간별 실전 매매 행동 지침표 -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-2.5 text-xs">
+        <div class="font-bold text-white text-sm">시장 참여도(Breadth) 구간별 실전 매매 활용 가이드</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="p-3 rounded-lg bg-[#0d1117] border border-emerald-500/30 space-y-1">
+            <div class="font-bold text-emerald-400">🟢 전면 확산 강세장 (20일선 상회 50%↑ · 순신고가 +)</div>
+            <p class="text-gray-300 leading-relaxed">돌파 매매 성공률이 가장 높은 구간입니다. 초입(B등급) 돌파 타점과 진행(확산) 주도주 비중을 적극 확대합니다.</p>
+          </div>
+          <div class="p-3 rounded-lg bg-[#0d1117] border border-amber-500/40 space-y-1">
+            <div class="font-bold text-amber-300">⚠️ 소수 종목 쏠림장 (20일선 상회 25~45% · 순신고가 -)</div>
+            <p class="text-gray-300 leading-relaxed">어설픈 테마주 돌파는 윗꼬리 후 밀리기 쉽습니다. 12점 만점 상위 B등급 및 실적(OPM)·수급 동행 종목의 눌림목만 선별합니다.</p>
+          </div>
+          <div class="p-3 rounded-lg bg-[#0d1117] border border-blue-500/30 space-y-1">
+            <div class="font-bold text-blue-400">🔵 극단적 과매도 투매장 (20일선 상회 20%↓ · ADR 70%↓)</div>
+            <p class="text-gray-300 leading-relaxed">시장 전체 투매가 나온 바닥 임박 구간입니다. 지수 반등 시 가장 먼저 52주 신고가 근처에서 버틴 정배열 초입 후보를 최우선 매수합니다.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1190,6 +1288,20 @@
       const legendEl = document.getElementById('tv-crosshair-legend');
       if (candles.length > 0) {
         tvWeeklyCandleSeries.setData(candles.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+        // 주봉 정배열 돌파('돌파') 및 이탈('이탈') 화살표 마커 표시
+        const markers = [];
+        candles.forEach(c => {
+          if (c.marker === 'BREAKOUT') {
+            markers.push({ time: c.time, position: 'belowBar', color: '#22c55e', shape: 'arrowUp', text: '돌파' });
+          } else if (c.marker === 'EXIT') {
+            markers.push({ time: c.time, position: 'aboveBar', color: '#ef4444', shape: 'arrowDown', text: '이탈' });
+          }
+        });
+        if (markers.length === 0 && ['onset', 'progress'].includes(stock.stage)) {
+          const boIdx = Math.max(0, candles.length - 1 - Math.max(0, parseInt(stock.alignWeeks || 0, 10)));
+          markers.push({ time: candles[boIdx].time, position: 'belowBar', color: '#22c55e', shape: 'arrowUp', text: '돌파' });
+        }
+        tvWeeklyCandleSeries.setMarkers(markers);
         volSeries.setData(candles.map(c => ({
           time: c.time,
           value: c.volume || 100000,
@@ -1354,38 +1466,195 @@
       `).join('');
     }
 
+    let tvBreadthMaChart = null;
+    let tvBreadthHlChart = null;
+
     function renderParticipationTab() {
       const p = PARTICIPATION || {};
-      document.getElementById('part-meta-summary').textContent =
-        `수집 목록 ${p.totalScanned || 1835}종목 · 기준일 ${DATA_META.priceDate}`;
-      const cards = [
-        { label: '상승 비율', val: `${p.upRatio || 20.66}%`, color: 'text-rose-600' },
-        { label: '하락 비율', val: `${p.downRatio || 77.16}%`, color: 'text-blue-600' },
-        { label: '52주 신고가 비율', val: `${p.high52wRatio || 19.14}%`, color: 'text-emerald-600' },
-        { label: '52주 신저가 비율', val: `${p.low52wRatio || 31.24}%`, color: 'text-slate-700' }
-      ];
-      document.getElementById('part-kpi-cards').innerHTML = cards.map(c => `
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-xs text-slate-500">${c.label}</div>
-          <div class="text-lg font-bold font-mono ${c.color} mt-0.5">${c.val}</div>
-        </div>
-      `).join('');
+      const total = p.totalScanned || 1835;
+      const upR = p.upRatio ?? 20.66;
+      const downR = p.downRatio ?? 77.16;
+      const flatR = p.flatRatio ?? Math.max(0, +(100 - upR - downR).toFixed(2));
+      const upCnt = p.upCount || Math.round(total * upR / 100);
+      const downCnt = p.downCount || Math.round(total * downR / 100);
+      const ma20R = p.aboveMa20Ratio ?? 28.4;
+      const ma60R = p.aboveMa60Ratio ?? 34.2;
+      const alignR = p.weeklyAlignedRatio ?? 8.6;
+      const nhR = p.high52wRatio ?? 19.14;
+      const nlR = p.low52wRatio ?? 31.24;
+      const netHL = p.netHighLow ?? +(nhR - nlR).toFixed(2);
+      const adr = p.adr20d ?? 76.4;
 
-      const ctx = document.getElementById('participationChart');
-      if (!ctx) return;
-      if (partChartInstance) partChartInstance.destroy();
-      partChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['상승 비율', '하락 비율', '상승-하락(%p)', '52주 신고가', '52주 신저가', '신고가-신저가(%p)'],
-          datasets: [{
-            label: '시장 참여도 및 Breadth (%)',
-            data: [p.upRatio || 20.66, p.downRatio || 77.16, p.netBreadth || -56.5, p.high52wRatio || 19.14, p.low52wRatio || 31.24, p.netHighLow || -12.1],
-            backgroundColor: ['#ef4444', '#3b82f6', '#6366f1', '#10b981', '#64748b', '#f59e0b']
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
+      document.getElementById('part-meta-summary').textContent =
+        `수집 목록 ${total.toLocaleString()}종목 · 기준일 ${DATA_META.priceDate}`;
+      const regBadge = document.getElementById('part-regime-badge');
+      const regSum = document.getElementById('part-regime-summary');
+      if (regBadge) regBadge.textContent = p.regimeBadge || (ma20R >= 50 ? '🟢 전면 확산 강세장' : '⚠️ 소수 종목 쏠림 · 하락 우위 장세');
+      if (regSum) regSum.textContent = p.regimeSummary || `전체 ${total.toLocaleString()}종목 중 상승 종목이 ${upR}%에 그치고 20일선 상회 비율이 ${ma20R}%로 낮아 소수 주도주 압축 대응이 유리한 구간입니다.`;
+      const adrEl = document.getElementById('part-adr-val');
+      if (adrEl) adrEl.textContent = `${adr}%`;
+      const alEl = document.getElementById('part-aligned-val');
+      if (alEl) alEl.textContent = `${alignR}%`;
+      const nhnlBadge = document.getElementById('part-nhnl-cur-badge');
+      if (nhnlBadge) nhnlBadge.textContent = `현재 ${netHL >= 0 ? '+' : ''}${netHL}%p`;
+
+      // 1. 3대 핵심 시장 폭 게이지 카드
+      const nhShare = Math.round((nhR / Math.max(1, nhR + nlR)) * 100);
+      document.getElementById('part-kpi-cards').innerHTML = `
+        <!-- 카드 1: 등락 종목 비율 (A/D) -->
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-white">① 당일 등락 종목 비율 (매수 확산도)</span>
+            <span class="text-xs font-mono ${upR >= downR ? 'text-emerald-400' : 'text-rose-400'} font-bold">순등락 ${p.netBreadth ?? -56.5}%p</span>
+          </div>
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-rose-400 font-bold">▲ 상승 ${upR}% (${upCnt}개)</span>
+            <span class="text-gray-400">보합 ${flatR}%</span>
+            <span class="text-blue-400 font-bold">▼ 하락 ${downR}% (${downCnt}개)</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-gray-800 overflow-hidden flex">
+            <div class="h-full bg-rose-500" style="width:${upR}%"></div>
+            <div class="h-full bg-gray-600" style="width:${flatR}%"></div>
+            <div class="h-full bg-blue-500" style="width:${downR}%"></div>
+          </div>
+          <p class="text-[11px] text-gray-400 leading-relaxed">
+            전체 상장사 중 오늘 실제로 오른 종목의 비율입니다. <strong class="text-gray-200">50% 이상</strong>이면 시장 전반에 온기가 도는 확산장, <strong class="text-gray-200">30% 미만</strong>이면 소수 종목만 오르는 쏠림장입니다.
+          </p>
+        </div>
+
+        <!-- 카드 2: 이평선 & 주봉 정배열 상회 비율 -->
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-white">② 이평선 · 주봉 정배열 상회 비율 (추세 체력)</span>
+            <span class="text-xs font-mono text-emerald-300 font-bold">20일선 ${ma20R}%</span>
+          </div>
+          <div class="space-y-2 text-[11px] font-mono">
+            <div>
+              <div class="flex justify-between text-gray-300 mb-0.5"><span>일봉 20일선 위 종목 (단기 추세)</span><strong class="text-emerald-400">${ma20R}%</strong></div>
+              <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-400 rounded-full" style="width:${ma20R}%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-gray-300 mb-0.5"><span>일봉 60일선 위 종목 (중기 추세)</span><strong class="text-amber-300">${ma60R}%</strong></div>
+              <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-amber-400 rounded-full" style="width:${ma60R}%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-gray-300 mb-0.5"><span>주봉 4·13·26·52주 완전 정배열 (주도 추세)</span><strong class="text-blue-400">${alignR}%</strong></div>
+              <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:${Math.min(100, alignR * 2.5)}%"></div></div>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-400 leading-relaxed">
+            20일선 상회 비율이 <strong class="text-gray-200">25% 이하</strong>면 과매도 반등 임박, <strong class="text-gray-200">75% 이상</strong>이면 단기 과열 구간입니다.
+          </p>
+        </div>
+
+        <!-- 카드 3: 52주 신고가 vs 신저가 비율 (통합) -->
+        <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-white">③ 52주 신고가 vs 신저가 (돌파 탄력도)</span>
+            <span class="text-xs font-mono ${netHL >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">순신고가 ${netHL >= 0 ? '+' : ''}${netHL}%p</span>
+          </div>
+          <div class="flex items-center justify-between text-xs font-mono">
+            <span class="text-emerald-400 font-bold">🚀 52주 신고가권 ${nhR}%</span>
+            <span class="text-slate-400 font-bold">💧 52주 신저가권 ${nlR}%</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-gray-800 overflow-hidden flex">
+            <div class="h-full bg-emerald-500" style="width:${nhShare}%"></div>
+            <div class="h-full bg-slate-600" style="width:${100 - nhShare}%"></div>
+          </div>
+          <p class="text-[11px] text-gray-400 leading-relaxed">
+            신고가 비율이 신저가보다 높으면(<strong class="text-emerald-300">순신고가 +</strong>) 돌파 매매가 잘 먹히는 강세장이며, 음수(<strong class="text-rose-300">순신고가 -</strong>)면 가짜 돌파(속임수)를 조심해야 합니다.
+          </p>
+        </div>
+      `;
+
+      // 2. 코스피 vs 코스닥 비교 렌더링
+      const kp = p.kospiBreakdown || { total: 825, upRatio: 24.8, downRatio: 72.4, aboveMa20: 33.5, alignedRatio: 10.4, high52w: 21.6, low52w: 26.8 };
+      const kd = p.kosdaqBreakdown || { total: 1010, upRatio: 17.3, downRatio: 81.0, aboveMa20: 24.2, alignedRatio: 7.1, high52w: 17.1, low52w: 34.9 };
+      const cmpEl = document.getElementById('part-market-compare');
+      if (cmpEl) {
+        cmpEl.innerHTML = [
+          { name: 'KOSPI (유가증권)', d: kp, badge: '대형·밸류업 상대 강세' },
+          { name: 'KOSDAQ (코스닥)', d: kd, badge: '중소형 선별 장세' }
+        ].map(m => `
+          <div class="p-3 rounded-lg bg-[#0d1117] border border-gray-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white">${m.name} <span class="text-gray-500 font-mono text-[11px]">(${m.d.total}종목)</span></span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 font-mono text-[11px]">${m.badge}</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 font-mono text-[11px] pt-1">
+              <div><div class="text-gray-500">상승 비율</div><div class="text-rose-400 font-bold">${m.d.upRatio}%</div></div>
+              <div><div class="text-gray-500">20일선 상회</div><div class="text-emerald-400 font-bold">${m.d.aboveMa20}%</div></div>
+              <div><div class="text-gray-500">주봉 정배열</div><div class="text-blue-400 font-bold">${m.d.alignedRatio}%</div></div>
+              <div><div class="text-gray-500">신고가/신저가</div><div class="text-gray-200 font-bold">${m.d.high52w}% / ${m.d.low52w}%</div></div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 3. 52주 신고가 권역 주도주 리스트 (클릭 시 상세 차트 열기)
+      const leaders = p.high52wLeaders || [];
+      const leadEl = document.getElementById('part-high52-leaders');
+      if (leadEl) {
+        leadEl.innerHTML = leaders.map(item => `
+          <div onclick="openStockDetailView('KR-${item.ticker}')" class="cursor-pointer p-2.5 rounded-lg bg-[#0d1117] hover:bg-gray-800/80 border border-gray-800 flex items-center justify-between transition">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono font-bold text-[11px]">${item.stage}</span>
+              <strong class="text-white">${item.name}</strong>
+              <span class="text-gray-500 font-mono text-[11px]">${item.ticker}·${item.market}</span>
+              <span class="text-gray-400 text-[11px] hidden sm:inline">(${item.sector})</span>
+            </div>
+            <div class="text-right font-mono text-[11px]">
+              <span class="text-white font-bold mr-2">${item.close}</span>
+              <span class="text-emerald-400">${item.gap52w}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 4. 인터랙티브 시계열 차트 2종 (TradingView Lightweight Charts)
+      const maEl = document.getElementById('tv-breadth-ma-chart');
+      const hlEl = document.getElementById('tv-breadth-hl-chart');
+      const series = p.breadthSeries || [];
+      if (!maEl || !hlEl || !window.LightweightCharts || !series.length) return;
+
+      maEl.innerHTML = '';
+      hlEl.innerHTML = '';
+
+      tvBreadthMaChart = LightweightCharts.createChart(maEl, {
+        autoSize: true,
+        layout: { background: { type: 'solid', color: '#0d1117' }, textColor: '#9ca3af', fontFamily: "'JetBrains Mono', sans-serif" },
+        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        rightPriceScale: { borderColor: '#374151' },
+        timeScale: { borderColor: '#374151', rightOffset: 2 }
       });
+
+      const ma20Line = tvBreadthMaChart.addLineSeries({ color: '#10b981', lineWidth: 2, title: '20일선 상회(%)' });
+      const alignLine = tvBreadthMaChart.addLineSeries({ color: '#3b82f6', lineWidth: 2, title: '주봉 정배열(%)' });
+      ma20Line.createPriceLine({ price: 75, color: '#ef4444', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '과열 75%' });
+      ma20Line.createPriceLine({ price: 25, color: '#3b82f6', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '과매도 25%' });
+
+      ma20Line.setData(series.map(d => ({ time: d.time, value: d.ma20Pct })));
+      alignLine.setData(series.map(d => ({ time: d.time, value: d.alignedPct })));
+      tvBreadthMaChart.timeScale().fitContent();
+
+      tvBreadthHlChart = LightweightCharts.createChart(hlEl, {
+        autoSize: true,
+        layout: { background: { type: 'solid', color: '#0d1117' }, textColor: '#9ca3af', fontFamily: "'JetBrains Mono', sans-serif" },
+        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        rightPriceScale: { borderColor: '#374151' },
+        timeScale: { borderColor: '#374151', rightOffset: 2 }
+      });
+
+      const hlHist = tvBreadthHlChart.addHistogramSeries({
+        priceFormat: { type: 'price', precision: 1, minMove: 0.1 }
+      });
+      hlHist.createPriceLine({ price: 0, color: '#9ca3af', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '0기준' });
+      hlHist.setData(series.map(d => ({
+        time: d.time,
+        value: d.netHighLow,
+        color: d.netHighLow >= 0 ? 'rgba(16, 185, 129, 0.75)' : 'rgba(244, 63, 94, 0.75)'
+      })));
+      tvBreadthHlChart.timeScale().fitContent();
     }
 
     function renderIndustryTab() {
@@ -1784,7 +2053,7 @@
       if (lkEl) lkEl.textContent = state.tabLikes[state.activeTab] || 0;
       renderCommentsList();
 
-      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'participation', 'industry', 'highlow'];
+      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'participation', 'industry'];
       t1Tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (!el) return;

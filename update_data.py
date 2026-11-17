@@ -29,7 +29,7 @@ MAX_ONSET_WEEKS = 8
 MIN_ONSET_SCORE = 6.0
 MAX_WORKERS = 18
 
-WEEKLY_CHART_WEEKS = 92     # 주봉 캔들차트 표시 기간: 92주 (약 1.77년)
+WEEKLY_CHART_WEEKS = 120     # 주봉 캔들차트 표시 기간: 92주 (약 1.77년)
 DAILY_OSC_DAYS = 400        # 수급 오실레이터 차트 표시 기간: 400거래일 (약 1.65년)
 
 FALLBACK_KR = [
@@ -483,6 +483,11 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
                 "ma52": round(float(r["ma52"]), 0) if pd.notna(r["ma52"]) else None,
                 "tstop": round(running_peak - 2.2 * atr_w, 0)
             })
+        if weekly_candles and stage in ("onset", "progress"):
+            bo_idx = max(0, len(weekly_candles) - 1 - max(0, int(align_weeks)))
+            weekly_candles[bo_idx]["marker"] = "BREAKOUT"
+        elif weekly_candles and stage == "exit":
+            weekly_candles[-1]["marker"] = "EXIT" 
 
         disparity_20d = round((latest_close / ma20_d) * 100, 1) if ma20_d > 0 else 100.0
         delta_c = close.diff()
@@ -731,11 +736,15 @@ def main():
     nh_ratio = round(sum(1 for s in stats if s["is_52w_high"]) / total_n * 100, 2)
     nl_ratio = round(sum(1 for s in stats if s["is_52w_low"]) / total_n * 100, 2)
 
+    ma20_above_ratio = round(sum(1 for s in stats if s.get("above_ma20")) / total_n * 100, 1)
+    aligned_ratio = round(sum(1 for s in stats if s.get("stage") in ("onset", "progress", "longterm")) / total_n * 100, 1)
     participation = {
-        "marketName": "코스피·코스닥",
+        "marketName": "코스피·코스닥 통합",
         "date": datetime.now().strftime("%Y-%m-%d"),
         "totalScanned": total_n,
         "upRatio": up_ratio, "downRatio": dn_ratio,
+        "aboveMa20Ratio": ma20_above_ratio,
+        "weeklyAlignedRatio": aligned_ratio,
         "high52wRatio": nh_ratio, "low52wRatio": nl_ratio,
         "netBreadth": round(up_ratio - dn_ratio, 2),
         "netHighLow": round(nh_ratio - nl_ratio, 2)
@@ -765,7 +774,7 @@ def main():
             "thermometerScore": existing.get("meta", {}).get("thermometerScore", 49.8)
         },
         "STAGE_COUNTS": stage_counts,
-        "PARTICIPATION": participation,
+        "PARTICIPATION": {**existing.get("PARTICIPATION", {}), **participation},
         "STOCKS_DATA": final_stocks,
         "OSCILLATOR_DATA": oscillator_data,
         "INDUSTRY_DATA": existing.get("INDUSTRY_DATA", []),
