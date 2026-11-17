@@ -1,5 +1,5 @@
 """
-한국장 주도주 스크리너 v5
+한국장 주도주 탐색기 v5
 - 차트 및 수급 오실레이터 기간 대폭 확대:
   * 일봉 750거래일(약 3년) 수집 -> 52주 이동평균선 계산 후 최근 92주(약 1.8년) 주봉 캔들차트 저장
   * 하단 수급 오실레이터 차트도 최근 400거래일(약 1.65년) 전체 시계열 저장
@@ -563,7 +563,7 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
 
 def main():
     print("=" * 65, flush=True)
-    print(" 한국장 주도주 스크리너 v5 - 1.8년 주봉 & 1.65년 오실레이터 수집", flush=True)
+    print(" 한국장 주도주 탐색기 v5 - 1.8년 주봉 & 1.65년 오실레이터 수집", flush=True)
     print("=" * 65, flush=True)
 
     start_date = (datetime.now() - timedelta(days=1100)).strftime("%Y-%m-%d")

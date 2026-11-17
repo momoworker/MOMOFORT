@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>주도주 스크리너 · 한국장</title>
+  <title>주도주 탐색기 · 한국장</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,10 +11,14 @@
   <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
+    html {
+      font-size: 17.5px; /* 기본 16px 대비 +1pt 이상 확대로 가독성 강화 */
+    }
     body {
       background-color: #0d1117;
       color: #e6edf3;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      line-height: 1.55;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -33,16 +37,21 @@
               🇰🇷 한국
             </button>
           </div>
-          <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">주도주 스크리너</h1>
-          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono text-[11px]">
+          <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">주도주 탐색기</h1>
+          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono text-[13px]">
             가격 2026-11-16
           </span>
-          <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-400 text-[11px]">
+          <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-400 text-[13px]">
             17시 갱신 시작 · 18시/18:30/20시 재시도
           </span>
         </div>
 
-        <div class="flex items-center gap-2 text-[11px]">
+        <div class="flex flex-wrap items-center gap-2 text-[13px]">
+          <div class="inline-flex items-center rounded bg-[#161b22] border border-gray-800 p-0.5 font-mono text-[12px]" title="글자 크기 조절">
+            <button type="button" onclick="adjustRootFontSize(-1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-400 hover:text-white">가-</button>
+            <button type="button" onclick="adjustRootFontSize(0)" id="font-size-label" class="px-1.5 py-0.2 rounded text-blue-300 font-bold">기본(+1pt)</button>
+            <button type="button" onclick="adjustRootFontSize(1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-300 hover:text-white font-bold">가+</button>
+          </div>
           <span id="view-counter-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono">
             조회 1
           </span>
@@ -56,23 +65,23 @@
       <nav id="tier1-nav-bar" class="mt-2 flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 border-b border-gray-800/70" aria-label="한국장 1단 탭">
         <button id="tab-onset" type="button" onclick="switchTab('onset')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>초입</span>
-          <span id="cnt-onset" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-blue-500/20 text-blue-300">20</span>
+          <span id="cnt-onset" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-blue-500/20 text-blue-300">20</span>
         </button>
         <button id="tab-progress" type="button" onclick="switchTab('progress')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>진행</span>
-          <span id="cnt-progress" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-gray-800 text-gray-400">5</span>
+          <span id="cnt-progress" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">5</span>
         </button>
         <button id="tab-warning" type="button" onclick="switchTab('warning')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>경계</span>
-          <span id="cnt-warning" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-gray-800 text-gray-400">0</span>
+          <span id="cnt-warning" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">0</span>
         </button>
         <button id="tab-longterm" type="button" onclick="switchTab('longterm')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>장기</span>
-          <span id="cnt-longterm" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-gray-800 text-gray-400">0</span>
+          <span id="cnt-longterm" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">0</span>
         </button>
         <button id="tab-exit" type="button" onclick="switchTab('exit')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>이탈</span>
-          <span id="cnt-exit" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-rose-500/20 text-rose-300">388</span>
+          <span id="cnt-exit" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-rose-500/20 text-rose-300">388</span>
         </button>
         <button id="tab-oscillator" type="button" onclick="switchTab('oscillator')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
           수급오실레이터
@@ -82,11 +91,11 @@
         </button>
         <button id="tab-thermometer" type="button" onclick="switchTab('thermometer')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>체온</span>
-          <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/15 text-amber-300">49.8</span>
+          <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-amber-500/15 text-amber-300">49.8</span>
         </button>
         <button id="tab-feargreed" type="button" onclick="switchTab('feargreed')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>공탐지수</span>
-          <span id="badge-fg-dual" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-indigo-500/20 text-indigo-300">韓34·美54</span>
+          <span id="badge-fg-dual" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-indigo-500/20 text-indigo-300">韓34·美54</span>
         </button>
         <button id="tab-participation" type="button" onclick="switchTab('participation')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>시장 참여도·신고가</span>
@@ -98,24 +107,93 @@
 
       <!-- 2nd Tier Global Navigation Bar (상시 유지) -->
       <nav class="mt-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5" aria-label="2단 글로벌 탭">
-        <button id="tab-journal" type="button" onclick="switchTab('journal')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1">
+        <button id="tab-journal" type="button" onclick="switchTab('journal')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1">
           <span>내 기록</span>
-          <span id="journal-count-badge" class="text-[10px] font-mono px-1 rounded bg-gray-800 text-gray-300">0</span>
+          <span id="journal-count-badge" class="text-[12px] font-mono px-1 rounded bg-gray-800 text-gray-300">0</span>
         </button>
-        <button id="tab-rules" type="button" onclick="switchTab('rules')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1">
+        <button id="tab-rules" type="button" onclick="switchTab('rules')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1">
           <span>매수·매도 규칙</span>
-          <span class="text-[10px] px-1 rounded bg-indigo-500/20 text-indigo-300">글로벌</span>
+          <span class="text-[12px] px-1 rounded bg-indigo-500/20 text-indigo-300">글로벌</span>
         </button>
-        <button id="tab-macro" type="button" onclick="switchTab('macro')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition">
+        <button id="tab-macro" type="button" onclick="switchTab('macro')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition">
           매크로
         </button>
-        <button id="tab-research" type="button" onclick="switchTab('research')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1">
+        <button id="tab-research" type="button" onclick="switchTab('research')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1">
           <span>🔒 리서치</span>
-          <span class="text-[10px] px-1 rounded bg-rose-500/20 text-rose-300">UPDATE</span>
+          <span class="text-[12px] px-1 rounded bg-rose-500/20 text-rose-300">UPDATE</span>
         </button>
       </nav>
     </div>
   </header>
+
+  <!-- ===================================================================== -->
+  <!-- 🌙 상단 1줄 나이트워치 전광판 (야간선물 · 필라델피아 반도체 SOX · 나스닥 · 환율) -->
+  <!-- 평소엔 1줄 요약만 표시되며, 각 지수 배지를 클릭하면 미니 주봉차트가 펼쳐집니다 -->
+  <!-- ===================================================================== -->
+  <section id="night-watch-section" class="bg-[#0f1520] border-b border-gray-800/90">
+    <div class="w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-1.5">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <span class="shrink-0 px-2 py-0.5 rounded bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-bold text-xs flex items-center gap-1">
+            <span>🌙 나이트워치</span>
+            <span class="text-[11px] font-normal text-indigo-200/80 hidden sm:inline">(배지 클릭 시 차트)</span>
+          </span>
+          <div id="night-watch-pills" class="flex items-center gap-1.5"></div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="toggleNightWatchChart('sox_index')" id="nw-overall-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
+            ⚠️ 국장 시초 경계 · 반도체 눌림 확인
+          </button>
+        </div>
+      </div>
+
+      <!-- 클릭 시 펼쳐지는 아코디언 미니 차트 드로어 (기본 숨김) -->
+      <div id="night-watch-drawer" class="hidden mt-2 pt-2.5 pb-2 border-t border-gray-800/90 space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="nw-det-title" class="text-sm font-bold text-white">💾 필라델피아 반도체 (SOX)</span>
+            <span id="nw-det-price" class="text-sm font-mono font-bold text-blue-400">9,610.65 (▼ 5.28%)</span>
+            <span id="nw-det-extra" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-xs font-mono text-gray-300">SOXX $141.22</span>
+            <span class="text-xs font-mono text-gray-400 flex items-center gap-2 ml-1">
+              <span class="text-yellow-400">— 4주선</span>
+              <span class="text-orange-400">— 13주선</span>
+              <span class="text-blue-400">— 26주선</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-xs font-mono">
+              <button type="button" onclick="setNightWatchRange('ALL')" id="btn-nw-all" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1년</button>
+              <button type="button" onclick="setNightWatchRange('6M')" id="btn-nw-6m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">6개월</button>
+              <button type="button" onclick="setNightWatchRange('3M')" id="btn-nw-3m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">3개월</button>
+            </div>
+            <button type="button" onclick="closeNightWatchDrawer()" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold transition">
+              ✕ 차트 닫기
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 items-stretch">
+          <div class="lg:col-span-2 relative h-[245px] bg-[#0d1117] rounded-xl border border-gray-800 overflow-hidden">
+            <div id="nw-crosshair-legend" class="absolute top-2 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/90 border border-gray-800 text-xs font-mono text-gray-300 pointer-events-none"></div>
+            <div id="tv-nightwatch-chart" class="w-full h-full"></div>
+          </div>
+          <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3.5 flex flex-col justify-between space-y-2 text-xs">
+            <div class="space-y-1.5">
+              <div class="font-bold text-indigo-300 flex items-center justify-between">
+                <span>📌 한국장 시초 연동 핵심 포인트</span>
+                <span id="nw-updated-at" class="text-[11px] font-mono text-gray-400"></span>
+              </div>
+              <p id="nw-det-guide" class="text-gray-200 leading-relaxed"></p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800 space-y-1">
+              <div class="font-bold text-amber-300">🧭 금일 장전 대응 요약</div>
+              <p id="nw-det-overall-comment" class="text-gray-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Community Feedback Bar -->
   <section id="feedback-bar-section" class="bg-[#121721] border-b border-gray-800/80">
@@ -154,15 +232,19 @@
     <!-- 1. SCREENER 1-COLUMN CARD LIST VIEW (초입 / 진행 / 경계 / 장기 / 이탈) -->
     <!-- =================================================================== -->
     <div id="view-screener-list" class="space-y-2.5">
-      <!-- Search & Sector Filter Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-2 bg-[#161b22] px-3 py-2 rounded-xl border border-gray-800">
-        <div class="flex items-center gap-2 flex-1 min-w-[240px]">
-          <input id="stock-search-input" type="text" oninput="handleSearchInput(this.value)" placeholder="종목명, 6자리 코드(251970), 테마 검색..." class="w-full max-w-sm bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500" />
+      <!-- Search, Sector & Breakout-Imminent Filter Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-[#161b22] px-3.5 py-2.5 rounded-xl border border-gray-800">
+        <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+          <input id="stock-search-input" type="text" oninput="handleSearchInput(this.value)" placeholder="종목명, 6자리 코드(251970), 테마 검색..." class="w-full sm:w-64 bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-blue-500" />
           <select id="sector-filter-select" onchange="handleSectorFilter(this.value)" aria-label="업종 필터" class="bg-[#0d1117] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300">
             <option value="ALL">전체 업종</option>
           </select>
+          <button id="btn-breakout-imminent" type="button" onclick="toggleBreakoutImminentFilter()" class="px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-amber-500/40 text-amber-300 text-xs font-semibold transition flex items-center gap-1.5" title="52주 신고가 근접(또는 돌파 3주 이내) + 외인·기관 오실레이터 양수(>0) 종목만 압축">
+            <span>🔥 돌파 임박·수급 유입</span>
+            <span id="cnt-breakout-imminent" class="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-200 font-mono text-[12px]">0</span>
+          </button>
         </div>
-        <div class="text-[11px] text-gray-400 font-mono">
+        <div class="text-[13px] text-gray-400 font-mono">
           표시 <strong id="filtered-stock-count" class="text-white">0</strong>종목
         </div>
       </div>
@@ -199,7 +281,7 @@
               화학 · 플라스틱제품 제조업 · KOSDAQ · 시총 9,164억 · 금일 ▼4.5%
             </p>
             <div id="det-tags" class="flex flex-wrap gap-1 mt-1.5"></div>
-            <div id="det-shields-strip" class="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-gray-800/80 text-[11px] font-mono"></div>
+            <div id="det-shields-strip" class="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-gray-800/80 text-[13px] font-mono"></div>
           </div>
 
           <div class="flex items-center gap-1.5">
@@ -231,7 +313,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
           <div class="flex flex-wrap items-center gap-3 font-medium">
             <span class="text-white font-bold flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-blue-600 text-[10px] font-extrabold text-white">TV</span>
+              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-blue-600 text-[12px] font-extrabold text-white">TV</span>
               주봉 캔들차트 (최근 2.3년 · 120주)
             </span>
             <span class="flex items-center gap-1 text-yellow-400"><span class="w-3 h-0.5 bg-yellow-400 inline-block"></span> 4주선</span>
@@ -244,18 +326,18 @@
 
           <div class="flex flex-wrap items-center gap-1.5">
             <!-- 기간 선택 버튼 (기본: 1.8년 전체) -->
-            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[13px] font-mono">
               <button id="btn-wrange-all" type="button" onclick="setWeeklyRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">전체(2.3년)</button>
               <button id="btn-wrange-1y" type="button" onclick="setWeeklyRange('1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
               <button id="btn-wrange-6m" type="button" onclick="setWeeklyRange('6M')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">6개월</button>
             </div>
-            <button id="btn-tv-widget-mode" type="button" onclick="toggleTvWidgetMode()" class="px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-semibold text-blue-300 transition">
+            <button id="btn-tv-widget-mode" type="button" onclick="toggleTvWidgetMode()" class="px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[13px] font-semibold text-blue-300 transition">
               📈 TradingView 고급위젯 전환
             </button>
-            <a id="link-tv-external" href="https://kr.tradingview.com/chart/?symbol=KRX:251970" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] text-gray-300 transition">
+            <a id="link-tv-external" href="https://kr.tradingview.com/chart/?symbol=KRX:251970" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[13px] text-gray-300 transition">
               트레이딩뷰 ↗
             </a>
-            <span id="det-volume-label" class="text-[11px] font-mono text-gray-400 ml-1">거래량 489.92K</span>
+            <span id="det-volume-label" class="text-[13px] font-mono text-gray-400 ml-1">거래량 489.92K</span>
           </div>
         </div>
 
@@ -265,13 +347,13 @@
             <button id="btn-tv-log" type="button" onclick="toggleTvLogScale()" class="pointer-events-auto px-2.5 py-1 rounded bg-[#161b22]/90 hover:bg-gray-800 border border-gray-700 text-xs font-mono font-semibold text-gray-200 shadow">
               로그
             </button>
-            <div id="tv-crosshair-legend" class="px-2.5 py-1 rounded bg-[#161b22]/85 border border-gray-800/90 text-[11px] font-mono text-gray-300 flex flex-wrap items-center gap-2">
+            <div id="tv-crosshair-legend" class="px-2.5 py-1 rounded bg-[#161b22]/85 border border-gray-800/90 text-[13px] font-mono text-gray-300 flex flex-wrap items-center gap-2">
               <span>마우스를 차트에 올리면 주봉 시·고·저·종가 및 4·13·26·52주 이평선 수치가 표시됩니다</span>
             </div>
           </div>
 
           <!-- TradingView Bottom-Left Attribution Badge -->
-          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[10px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
+          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[12px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
             <span class="font-extrabold text-blue-400">TV</span>
             <span>TradingView Lightweight Charts™</span>
           </a>
@@ -294,13 +376,13 @@
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-rose-600 text-[10px] font-extrabold text-white">TV</span>
+              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-rose-600 text-[12px] font-extrabold text-white">TV</span>
               외국인·기관 수급 오실레이터 (최근 1.7년 · 420거래일)
             </h3>
             <p class="text-xs text-gray-400">주가 일봉(왼쪽 축)과 외국인·기관 수급 강도 파동(오른쪽 축)을 1.7년 장기 시계열로 비교 · KIS Open API</p>
           </div>
           <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono mr-1">
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[13px] font-mono mr-1">
               <button id="btn-orange-all" type="button" onclick="setOscRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1.7년(전체)</button>
               <button id="btn-orange-1y" type="button" onclick="setOscRange('1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
               <button id="btn-orange-77d" type="button" onclick="setOscRange('77D')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">77거래일</button>
@@ -317,11 +399,11 @@
             <span class="flex items-center gap-1 text-rose-400"><span class="w-3 h-0.5 bg-rose-500 inline-block"></span> 수급 오실레이터 파동 (우축 · %)</span>
             <span class="flex items-center gap-1 text-gray-500"><span class="w-3 h-0.5 border-b border-dashed border-gray-500 inline-block"></span> 0.000% 기준선</span>
           </div>
-          <div id="tv-osc-crosshair-legend" class="font-mono text-[11px] text-gray-400"></div>
+          <div id="tv-osc-crosshair-legend" class="font-mono text-[13px] text-gray-400"></div>
         </div>
 
         <div class="relative w-full h-[280px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
-          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[10px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
+          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[12px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
             <span class="font-extrabold text-blue-400">TV</span>
             <span>TradingView Lightweight Charts™</span>
           </a>
@@ -401,7 +483,7 @@
         <div class="flex flex-wrap items-start justify-between gap-2 border-b border-gray-800 pb-3">
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-600 text-white">KR &amp; US FEAR AND GREED INDEX</span>
+              <span class="px-2 py-0.5 rounded text-[12px] font-mono font-bold bg-indigo-600 text-white">KR &amp; US FEAR AND GREED INDEX</span>
               <h2 class="text-base sm:text-lg font-bold text-white">국내장(🇰🇷) · 미국장(🇺🇸) 공포·탐욕 지수 비교 대시보드</h2>
             </div>
             <p class="text-xs text-gray-400 mt-1">
@@ -433,7 +515,7 @@
           <div class="flex flex-wrap items-center gap-3 text-xs font-mono">
             <span class="flex items-center gap-1.5 text-blue-400 font-bold"><span class="w-3 h-0.5 bg-blue-400 inline-block"></span> 🇰🇷 한국 공탐지수</span>
             <span class="flex items-center gap-1.5 text-amber-400 font-bold"><span class="w-3 h-0.5 bg-amber-400 inline-block"></span> 🇺🇸 미국 공탐지수</span>
-            <span id="fg-chart-hover" class="text-gray-400 text-[11px]"></span>
+            <span id="fg-chart-hover" class="text-gray-400 text-[13px]"></span>
           </div>
         </div>
         <div class="relative w-full h-[270px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
@@ -441,7 +523,7 @@
         </div>
 
         <!-- 5단계 구간별 실전 매매 기준 안내 -->
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 text-[11px] font-mono">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 text-[13px] font-mono">
           <div class="p-2.5 rounded-lg bg-[#0d1117] border border-blue-500/40 text-center">
             <div class="text-blue-400 font-bold">0 ~ 24 · 극단적 공포</div>
             <div class="text-gray-400 mt-0.5">투매 클라이맥스 · 적극 분할매수</div>
@@ -475,7 +557,7 @@
         <div class="flex flex-wrap items-start justify-between gap-2 border-b border-gray-800 pb-3">
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">MARKET BREADTH &amp; 52W HIGH-LOW</span>
+              <span class="px-2 py-0.5 rounded text-[12px] font-mono font-bold bg-blue-600 text-white">MARKET BREADTH &amp; 52W HIGH-LOW</span>
               <h2 class="text-base sm:text-lg font-bold text-white">시장 참여도 · 52주 신고가/신저가 통합 대시보드</h2>
             </div>
             <p class="text-xs text-gray-400 mt-1">
@@ -496,11 +578,11 @@
           </div>
           <div class="shrink-0 flex flex-col sm:flex-row gap-2 text-xs font-mono">
             <div class="px-3 py-2 rounded-lg bg-[#161b22] border border-gray-800 text-center">
-              <div class="text-[10px] text-gray-400">20일 등락비율(ADR)</div>
+              <div class="text-[12px] text-gray-400">20일 등락비율(ADR)</div>
               <div id="part-adr-val" class="text-sm font-bold text-amber-300 mt-0.5">76.4%</div>
             </div>
             <div class="px-3 py-2 rounded-lg bg-[#161b22] border border-gray-800 text-center">
-              <div class="text-[10px] text-gray-400">주봉 정배열 비율</div>
+              <div class="text-[12px] text-gray-400">주봉 정배열 비율</div>
               <div id="part-aligned-val" class="text-sm font-bold text-blue-400 mt-0.5">8.6%</div>
             </div>
           </div>
@@ -517,7 +599,7 @@
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white">코스피(KOSPI) vs 코스닥(KOSDAQ) 참여도 비교</h3>
-              <p class="text-[11px] text-gray-400">어느 시장에 매수 자금과 추세 정배열 종목이 더 많이 포진해 있는지 비교합니다.</p>
+              <p class="text-[13px] text-gray-400">어느 시장에 매수 자금과 추세 정배열 종목이 더 많이 포진해 있는지 비교합니다.</p>
             </div>
           </div>
           <div id="part-market-compare" class="space-y-2.5 text-xs"></div>
@@ -528,7 +610,7 @@
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white">52주 신고가 권역 · 정배열 돌파 핵심 주도주</h3>
-              <p class="text-[11px] text-gray-400">시장 참여도가 낮을 때도 신고가를 경신·유지하는 진짜 주도주입니다 (클릭 시 상세 차트 이동).</p>
+              <p class="text-[13px] text-gray-400">시장 참여도가 낮을 때도 신고가를 경신·유지하는 진짜 주도주입니다 (클릭 시 상세 차트 이동).</p>
             </div>
           </div>
           <div id="part-high52-leaders" class="space-y-1.5 text-xs"></div>
@@ -541,9 +623,9 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 class="text-sm font-bold text-white">중기 시장 폭 추이 (20일선 상회 · 주봉 정배열 비율)</h3>
-              <p class="text-[11px] text-gray-400">20일선 상회 비율이 25% 이하면 과매도 바닥권, 75% 이상이면 단기 과열권입니다.</p>
+              <p class="text-[13px] text-gray-400">20일선 상회 비율이 25% 이하면 과매도 바닥권, 75% 이상이면 단기 과열권입니다.</p>
             </div>
-            <div class="flex items-center gap-3 text-[11px] font-mono">
+            <div class="flex items-center gap-3 text-[13px] font-mono">
               <span class="flex items-center gap-1 text-emerald-400"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span> 20일선 상회(%)</span>
               <span class="flex items-center gap-1 text-blue-400"><span class="w-2.5 h-0.5 bg-blue-400 inline-block"></span> 주봉 정배열(%)</span>
             </div>
@@ -557,9 +639,9 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 class="text-sm font-bold text-white">52주 순신고가 오실레이터 (신고가 비율 - 신저가 비율 %p)</h3>
-              <p class="text-[11px] text-gray-400">0선 위(초록)는 신고가 주도 장세, 0선 아래(빨강)는 신저가 우위 방어 장세입니다.</p>
+              <p class="text-[13px] text-gray-400">0선 위(초록)는 신고가 주도 장세, 0선 아래(빨강)는 신저가 우위 방어 장세입니다.</p>
             </div>
-            <span id="part-nhnl-cur-badge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">현재 -12.1%p</span>
+            <span id="part-nhnl-cur-badge" class="text-[13px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">현재 -12.1%p</span>
           </div>
           <div class="relative w-full h-[240px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
             <div id="tv-breadth-hl-chart" class="w-full h-full"></div>
@@ -594,13 +676,13 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <div class="bg-[#161b22] rounded-xl border border-emerald-500/30 p-3.5 flex items-center justify-between">
           <div>
-            <span class="text-[11px] font-semibold text-emerald-400">힘이 강해진 산업 (20일 기준)</span>
+            <span class="text-[13px] font-semibold text-emerald-400">힘이 강해진 산업 (20일 기준)</span>
             <p id="ind-strong-summary" class="text-sm font-bold text-white mt-0.5">운송/물류 (100) · 부동산 (95) · 서비스 (91) · 통신 (86)</p>
           </div>
         </div>
         <div class="bg-[#161b22] rounded-xl border border-rose-500/30 p-3.5 flex items-center justify-between">
           <div>
-            <span class="text-[11px] font-semibold text-rose-400">힘이 약해진 산업 (20일 기준)</span>
+            <span class="text-[13px] font-semibold text-rose-400">힘이 약해진 산업 (20일 기준)</span>
             <p id="ind-weak-summary" class="text-sm font-bold text-white mt-0.5">항공우주/방산 (0) · 조선 (5)</p>
           </div>
         </div>
@@ -645,7 +727,7 @@
       <div class="bg-[#161b22] rounded-xl border border-blue-500/40 p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-800 pb-3">
           <div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-blue-600 text-white mr-2">CORE ENGINE v6</span>
+            <span class="px-2 py-0.5 rounded text-[13px] font-mono font-bold bg-blue-600 text-white mr-2">CORE ENGINE v6</span>
             <h2 class="inline text-base sm:text-lg font-bold text-white">150개 세부 섹터 · 시장 상대강도(RS) · 분기 영업이익 결합 12점 가중치 & B/W 등급 기준표</h2>
           </div>
           <span class="text-xs font-mono text-gray-400">코스피·코스닥 1,400종목 자동 스캔 적용</span>
@@ -655,7 +737,7 @@
           <!-- 좌측: 8개 항목 12점 만점 세부 배점표 -->
           <div class="bg-[#0d1117] rounded-lg border border-gray-800 p-3.5 space-y-2">
             <div class="font-bold text-blue-300 text-sm mb-1">1. 초입(Onset) 12점 만점 세부 가중치 (8개 항목)</div>
-            <table class="w-full text-left font-mono text-[11px]">
+            <table class="w-full text-left font-mono text-[13px]">
               <thead>
                 <tr class="border-b border-gray-800 text-gray-400">
                   <th class="py-1">평가 항목</th>
@@ -680,7 +762,7 @@
           <div class="bg-[#0d1117] rounded-lg border border-gray-800 p-3.5 space-y-3">
             <div>
               <div class="font-bold text-emerald-300 text-sm mb-1">2. 150개 세부 섹터 순위(#) &amp; 개별 상대강도(RS) 산출식</div>
-              <ul class="space-y-1 text-gray-300 text-[11px] leading-relaxed">
+              <ul class="space-y-1 text-gray-300 text-[13px] leading-relaxed">
                 <li>• <strong class="text-white">세부 섹터 강도(#1~#155)</strong> = 네이버 세세분류 업종(79개)+테마(75개) 기준 20일 수익률(40%) + 60일 중기수익률(30%) + 섹터 내 주봉 정배열 비율(30%) 합산 서열화</li>
                 <li>• <strong class="text-white">개별종목 시장 RS(1~99)</strong> = 3개월 수익률(40%) + 6개월(20%) + 9개월(20%) + 12개월(20%) 가중합산 후 전 종목 백분위 산출</li>
               </ul>
@@ -688,7 +770,7 @@
 
             <div class="pt-2 border-t border-gray-800">
               <div class="font-bold text-amber-300 text-sm mb-1">3. 분기 영업이익(OP) 결합 등급 B(Buy) vs W(Watch) 판정 기준</div>
-              <ul class="space-y-1 text-gray-300 text-[11px] leading-relaxed">
+              <ul class="space-y-1 text-gray-300 text-[13px] leading-relaxed">
                 <li>• <strong class="text-blue-400">등급 B (매수 검토)</strong>: 총점 <strong class="text-white">8.0점 이상</strong> &amp; 정배열 <strong class="text-white">0~6주 이내</strong>이면서 아래 리스크에 해당하지 않는 종목</li>
                 <li>• <strong class="text-amber-400">등급 W (관찰 강등 4대 조건)</strong>: 총점이 8~9점이어도 다음 중 하나에 해당하면 <strong class="text-amber-300">W 등급</strong>으로 분류:
                   <div class="pl-3 mt-1 text-gray-400 font-mono space-y-0.5">
@@ -706,7 +788,7 @@
       <!-- 1. MY INVESTMENT PLAYBOOK (trading-rules.html 원문 그대로 재현) -->
       <div class="bg-[#161b22] rounded-xl border border-gray-800 p-5 space-y-4 text-xs text-gray-300">
         <div class="border-b border-gray-800 pb-3">
-          <span class="text-[11px] font-mono text-blue-400">MY INVESTMENT PLAYBOOK · 2026.10.25</span>
+          <span class="text-[13px] font-mono text-blue-400">MY INVESTMENT PLAYBOOK · 2026.10.25</span>
           <h2 class="text-lg font-bold text-white mt-0.5">많이 읽고, 비교하고. 내 판단을 남기기.</h2>
           <p class="text-gray-400 mt-0.5">나의 매수·매도 규칙과 사이클 관찰 노트. 결과를 알기 전, 왜 그렇게 생각했는지 기록합니다.</p>
         </div>
@@ -786,7 +868,7 @@
             <h2 class="text-base sm:text-lg font-bold text-white">매크로 주봉 차트</h2>
             <p class="text-xs text-gray-400 mt-0.5">탭을 열면 모든 항목의 전 기간 주봉과 4·13·26·52주 이동평균이 순서대로 표시됩니다.</p>
           </div>
-          <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
+          <div class="flex flex-wrap items-center gap-1.5 text-[13px] font-mono">
             <span id="macro-ref-date" class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">기준 2026-11-13</span>
             <span id="macro-gen-time" class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-400">생성 2026-11-16 20:00</span>
             <span id="macro-status-badge" class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">데이터 정상</span>
@@ -798,11 +880,11 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <span class="text-xs font-bold text-gray-200">기간과 항목 선택</span>
-              <span class="text-[11px] text-gray-400 ml-1.5">위 차트는 전체 기간으로 먼저 표시됩니다. 여기서 기간을 바꾸거나 원하는 항목으로 바로 이동할 수 있습니다.</span>
+              <span class="text-[13px] text-gray-400 ml-1.5">위 차트는 전체 기간으로 먼저 표시됩니다. 여기서 기간을 바꾸거나 원하는 항목으로 바로 이동할 수 있습니다.</span>
             </div>
             <div class="flex items-center gap-1.5 text-xs">
-              <span class="text-gray-400 text-[11px] font-mono">모든 차트 표시기간:</span>
-              <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+              <span class="text-gray-400 text-[13px] font-mono">모든 차트 표시기간:</span>
+              <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[13px] font-mono">
                 <button type="button" onclick="setAllMacroRange('1Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="1Y">1년</button>
                 <button type="button" onclick="setAllMacroRange('3Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="3Y">3년</button>
                 <button type="button" onclick="setAllMacroRange('10Y')" class="macro-gbtn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-range="10Y">10년</button>
@@ -813,7 +895,7 @@
           </div>
 
           <div class="space-y-1.5">
-            <div class="text-[11px] font-mono text-amber-300 font-semibold">항목 바로가기 · 주황색은 현재 주봉 정배열 (MA4 ≥ MA13 ≥ MA26 ≥ MA52)</div>
+            <div class="text-[13px] font-mono text-amber-300 font-semibold">항목 바로가기 · 주황색은 현재 주봉 정배열 (MA4 ≥ MA13 ≥ MA26 ≥ MA52)</div>
             <div id="macro-quick-nav" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs"></div>
           </div>
         </div>
@@ -840,7 +922,7 @@
         </div>
 
         <!-- 하단 주석 및 출처 -->
-        <div class="pt-3 border-t border-gray-800 text-[11px] text-gray-400 space-y-1 leading-relaxed">
+        <div class="pt-3 border-t border-gray-800 text-[13px] text-gray-400 space-y-1 leading-relaxed">
           <div>• <strong class="text-gray-300">가격 변화:</strong> 가격은 거래일 기준 1·5·20·63·252관측일 수익률, 금리는 같은 관측일 간 bp 변화 · 차트는 가용한 전체 기간의 주봉과 4·13·26·52주 이동평균</div>
           <div>• 원자재는 Yahoo Finance 근월물 연속선물 종가로, 롤오버·지연·거래소별 단위 차이가 있을 수 있음 · 교차 신호는 전망·매매 신호가 아닌 상태 요약입니다.</div>
           <div>• <strong class="text-gray-300">출처:</strong> 미 재무부 시장금리·FRED · 10년 실질금리·FRED · 10년 기대인플레·FRED · 미 Baa 회사채 스프레드·FRED · ICE BofA 미 하이일드 OAS·FRED · ICE BofA 미 하이일드 유효수익률·FRED · 원자재·시장지표·Yahoo Finance</div>
@@ -869,7 +951,9 @@
     let THERMOMETER_AXES = [];
     let MACRO_YIELDS = [];
     let FEAR_GREED_DATA = null;
+    let NIGHT_WATCH_DATA = null;
     let tvFgChart = null;
+    let tvNwChart = null;
     let MACRO_META = { refDate: '2026-11-13', genTime: '2026-11-16 20:00', status: '데이터 정상', signals: [] };
     let macroTvCharts = {};
 
@@ -884,6 +968,10 @@
       searchQuery: '',
       sectorFilter: 'ALL',
       watchlistOnly: false,
+      breakoutImminentOnly: false,
+      activeNwId: null,
+      nwRange: 'ALL',
+      rootFontStep: 0,
       watchlist: new Set([]),
       oscSearch: '',
       viewCount: 1,
@@ -966,11 +1054,195 @@
     // =========================================================================
     // 1열 세로 카드 리스트 렌더링 (초입 / 진행 / 경계 / 장기 / 이탈)
     // =========================================================================
+
+    function applyRootFontStep() {
+      const basePx = 17.5 + (state.rootFontStep || 0) * 1.25;
+      document.documentElement.style.fontSize = basePx + 'px';
+      const lbl = document.getElementById('font-size-label');
+      if (lbl) {
+        if (state.rootFontStep === 0) lbl.textContent = '기본(+1pt)';
+        else if (state.rootFontStep > 0) lbl.textContent = `확대(+${state.rootFontStep + 1}pt)`;
+        else lbl.textContent = '축소(0pt)';
+      }
+    }
+
+    function adjustRootFontSize(delta) {
+      if (delta === 0) state.rootFontStep = 0;
+      else state.rootFontStep = Math.max(-1, Math.min(3, (state.rootFontStep || 0) + delta));
+      applyRootFontStep();
+      try { localStorage.setItem('kr_explorer_font_step', String(state.rootFontStep)); } catch (e) {}
+    }
+
+    function toggleBreakoutImminentFilter() {
+      state.breakoutImminentOnly = !state.breakoutImminentOnly;
+      renderScreenerList();
+    }
+
+    function renderNightWatchStrip() {
+      if (!NIGHT_WATCH_DATA || !NIGHT_WATCH_DATA.items) return;
+      const pillsEl = document.getElementById('night-watch-pills');
+      const badgeEl = document.getElementById('nw-overall-badge');
+      if (!pillsEl) return;
+
+      if (badgeEl && NIGHT_WATCH_DATA.overallBadge) {
+        badgeEl.textContent = NIGHT_WATCH_DATA.overallBadge;
+        const sig = NIGHT_WATCH_DATA.overallSignal || 'CAUTION';
+        badgeEl.className = sig === 'BULL'
+          ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/25 transition'
+          : sig === 'CAUTION'
+            ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 transition'
+            : 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/40 hover:bg-blue-500/25 transition';
+      }
+
+      pillsEl.innerHTML = NIGHT_WATCH_DATA.items.map(item => {
+        const isUp = item.changePct > 0;
+        const isDown = item.changePct < 0;
+        const cCol = isUp ? 'text-red-400' : (isDown ? 'text-blue-400' : 'text-gray-300');
+        const active = state.activeNwId === item.id;
+        const boxCls = active
+          ? 'bg-blue-600/25 border-blue-400 text-white shadow'
+          : 'bg-[#161b22] hover:bg-gray-800 border-gray-800 text-gray-200';
+        return `
+          <button type="button" onclick="toggleNightWatchChart('${item.id}')" class="shrink-0 px-2.5 py-1 rounded-lg border ${boxCls} text-xs flex items-center gap-1.5 transition">
+            <span>${item.icon}</span>
+            <span class="font-semibold">${item.name}</span>
+            <span class="font-mono font-bold text-white">${item.priceText}</span>
+            <span class="font-mono font-bold ${cCol}">${item.changeText}</span>
+            <span class="text-[11px] text-gray-400">${active ? '▴' : '▾'}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleNightWatchChart(itemId) {
+      const drawer = document.getElementById('night-watch-drawer');
+      if (!drawer || !NIGHT_WATCH_DATA) return;
+      if (state.activeNwId === itemId && !drawer.classList.contains('hidden')) {
+        closeNightWatchDrawer();
+        return;
+      }
+      state.activeNwId = itemId;
+      drawer.classList.remove('hidden');
+      renderNightWatchStrip();
+      renderNightWatchChartCanvas();
+    }
+
+    function closeNightWatchDrawer() {
+      state.activeNwId = null;
+      const drawer = document.getElementById('night-watch-drawer');
+      if (drawer) drawer.classList.add('hidden');
+      renderNightWatchStrip();
+    }
+
+    function setNightWatchRange(mode) {
+      state.nwRange = mode;
+      ['all', '6m', '3m'].forEach(k => {
+        const b = document.getElementById('btn-nw-' + k);
+        if (!b) return;
+        b.className = (k.toUpperCase() === mode)
+          ? 'px-2 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      });
+      if (!tvNwChart || !NIGHT_WATCH_DATA) return;
+      const item = NIGHT_WATCH_DATA.items.find(x => x.id === state.activeNwId) || NIGHT_WATCH_DATA.items[0];
+      if (!item || !item.series.length) return;
+      if (mode === 'ALL') {
+        tvNwChart.timeScale().fitContent();
+      } else {
+        const wBack = mode === '6M' ? 26 : 13;
+        const stIdx = Math.max(0, item.series.length - wBack);
+        tvNwChart.timeScale().setVisibleRange({
+          from: item.series[stIdx].time,
+          to: item.series[item.series.length - 1].time
+        });
+      }
+    }
+
+    function renderNightWatchChartCanvas() {
+      if (!NIGHT_WATCH_DATA || !window.LightweightCharts) return;
+      const item = NIGHT_WATCH_DATA.items.find(x => x.id === state.activeNwId) || NIGHT_WATCH_DATA.items[0];
+      if (!item) return;
+
+      const isUp = item.changePct > 0;
+      const cCol = isUp ? 'text-red-400' : (item.changePct < 0 ? 'text-blue-400' : 'text-gray-300');
+      document.getElementById('nw-det-title').textContent = `${item.icon} ${item.name} (${item.subName})`;
+      const pEl = document.getElementById('nw-det-price');
+      pEl.textContent = `${item.priceText} (${item.changeText})`;
+      pEl.className = `text-sm font-mono font-bold ${cCol}`;
+      document.getElementById('nw-det-extra').textContent = item.extraTag || item.symbol;
+      document.getElementById('nw-det-guide').textContent = item.guide || '';
+      document.getElementById('nw-det-overall-comment').textContent = NIGHT_WATCH_DATA.overallComment || '';
+      document.getElementById('nw-updated-at').textContent = NIGHT_WATCH_DATA.updatedAt || '';
+
+      const chartEl = document.getElementById('tv-nightwatch-chart');
+      const legendEl = document.getElementById('nw-crosshair-legend');
+      if (!chartEl) return;
+      chartEl.innerHTML = '';
+
+      tvNwChart = LightweightCharts.createChart(chartEl, {
+        autoSize: true,
+        layout: {
+          background: { type: 'solid', color: '#0d1117' },
+          textColor: '#9ca3af',
+          fontSize: 12,
+          fontFamily: "'JetBrains Mono', 'Pretendard', sans-serif"
+        },
+        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        rightPriceScale: { borderColor: '#374151', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        timeScale: { borderColor: '#374151', rightOffset: 2 }
+      });
+
+      const candleSeries = tvNwChart.addCandlestickSeries({
+        upColor: '#22c55e',
+        downColor: '#ef4444',
+        borderVisible: false,
+        wickUpColor: '#22c55e',
+        wickDownColor: '#ef4444'
+      });
+      const ma4S = tvNwChart.addLineSeries({ color: '#facc15', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+      const ma13S = tvNwChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+      const ma26S = tvNwChart.addLineSeries({ color: '#3b82f6', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+
+      const series = item.series || [];
+      const byTime = {};
+      series.forEach(s => { byTime[s.time] = s; });
+
+      candleSeries.setData(series.map(s => ({ time: s.time, open: s.open, high: s.high, low: s.low, close: s.close })));
+      ma4S.setData(series.map(s => ({ time: s.time, value: s.ma4 })));
+      ma13S.setData(series.map(s => ({ time: s.time, value: s.ma13 })));
+      ma26S.setData(series.map(s => ({ time: s.time, value: s.ma26 })));
+
+      const fmtNwLegend = d => {
+        if (!d) return '';
+        return `${d.time} · 종가 <strong class="text-white">${Number(d.close).toLocaleString()}</strong> · 4주 <span class="text-yellow-400">${Number(d.ma4).toLocaleString()}</span> · 13주 <span class="text-orange-400">${Number(d.ma13).toLocaleString()}</span> · 26주 <span class="text-blue-400">${Number(d.ma26).toLocaleString()}</span>`;
+      };
+      if (legendEl && series.length) legendEl.innerHTML = fmtNwLegend(series[series.length - 1]);
+
+      tvNwChart.subscribeCrosshairMove(param => {
+        if (!legendEl || !series.length) return;
+        const d = (param && param.time && byTime[param.time]) ? byTime[param.time] : series[series.length - 1];
+        legendEl.innerHTML = fmtNwLegend(d);
+      });
+
+      setNightWatchRange(state.nwRange || 'ALL');
+    }
+
     function renderScreenerList() {
       const st = state.activeTab;
-      const list = STOCKS_DATA.filter(s => {
-        if (s.stage !== st) return false;
+      const stageAll = STOCKS_DATA.filter(s => s.stage === st);
+      const immCount = stageAll.filter(s => s.breakoutImminent).length;
+      const immCntEl = document.getElementById('cnt-breakout-imminent');
+      if (immCntEl) immCntEl.textContent = immCount;
+      const immBtn = document.getElementById('btn-breakout-imminent');
+      if (immBtn) {
+        immBtn.className = state.breakoutImminentOnly
+          ? 'px-3 py-1.5 rounded-lg bg-amber-500/25 border-2 border-amber-400 text-amber-200 text-xs font-bold shadow transition flex items-center gap-1.5'
+          : 'px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-amber-500/40 text-amber-300 text-xs font-semibold transition flex items-center gap-1.5';
+      }
+
+      const list = stageAll.filter(s => {
         if (state.watchlistOnly && !state.watchlist.has(s.id)) return false;
+        if (state.breakoutImminentOnly && !s.breakoutImminent) return false;
         if (state.sectorFilter !== 'ALL' && s.industry !== state.sectorFilter) return false;
         if (state.searchQuery.trim() !== '') {
           const q = state.searchQuery.trim().toLowerCase();
@@ -1025,7 +1297,7 @@
                   <span class="text-sm sm:text-base font-bold text-white">${stock.name}</span>
                   <span class="text-xs font-mono text-gray-400">${stock.ticker}·${stock.exchange}</span>
                   <span class="text-xs font-mono font-bold ${chgColor}">${stock.changeText}</span>
-                  <span class="text-[11px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${stock.industry}</span>
+                  <span class="text-[13px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${stock.industry}</span>
                   ${state.watchlist.has(stock.id) ? '<span class="text-amber-400 text-xs">★</span>' : ''}
                 </div>
                 <div class="text-xs font-mono text-gray-300">${midLine}</div>
@@ -1035,8 +1307,9 @@
               </span>
             </div>
 
-            <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300 font-mono">시총 ${stock.marketCap}</span>
+            <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[13px]">
+              <span class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300 font-mono">현재가 ${stock.lastClose || '—'} · 시총 ${stock.marketCap}</span>
+              ${stock.pivotBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${stock.breakoutImminent ? 'bg-amber-500/15 text-amber-200 border-amber-500/40 font-semibold' : 'bg-[#0d1117] text-gray-400 border-gray-800'}">${stock.pivotBadge}</span>` : ''}
               <span class="px-2 py-0.5 rounded border font-mono ${opStyle}">${stock.opBadge}${stock.opmBadge ? ' · ' + stock.opmBadge : ''}</span>
               ${stock.entrySignalBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${
                 stock.entrySignalType === 'PULLBACK' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' :
@@ -1163,7 +1436,7 @@
 
       if (state.tvWidgetMode) {
         btn.textContent = '📊 주봉 정배열·ATR 차트로 돌아가기';
-        btn.className = 'px-2.5 py-1 rounded-lg bg-blue-600 text-white border border-blue-400 text-[11px] font-bold transition';
+        btn.className = 'px-2.5 py-1 rounded-lg bg-blue-600 text-white border border-blue-400 text-[13px] font-bold transition';
         customBox.classList.add('hidden');
         overlayBar.classList.add('hidden');
         widgetBox.classList.remove('hidden');
@@ -1186,7 +1459,7 @@
         }
       } else {
         btn.textContent = '📈 TradingView 고급위젯 전환';
-        btn.className = 'px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-semibold text-blue-300 transition';
+        btn.className = 'px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[13px] font-semibold text-blue-300 transition';
         widgetBox.classList.add('hidden');
         widgetBox.innerHTML = '';
         customBox.classList.remove('hidden');
@@ -1208,7 +1481,7 @@
         `${stock.subIndustry} · 시총 ${stock.marketCap} · 최근가 ${stock.lastClose} · 금일 ${stock.changeText}`;
 
       document.getElementById('det-tags').innerHTML = (stock.tags || [])
-        .map(t => `<span class="text-[11px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">${t}</span>`)
+        .map(t => `<span class="text-[13px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">${t}</span>`)
         .join('');
 
       const shieldEl = document.getElementById('det-shields-strip');
@@ -1243,7 +1516,7 @@
       const headers = stock.tableHeaders || ['분기', '매출액', '영업이익', '순이익'];
       document.getElementById('det-earnings-box').innerHTML = `
         <div class="text-gray-300">${stock.earningsSummary || ''}</div>
-        <table class="w-full text-left font-mono text-[11px] mt-1">
+        <table class="w-full text-left font-mono text-[13px] mt-1">
           <thead>
             <tr class="border-b border-gray-800 text-gray-400">
               <th class="py-1">${headers[0]}</th>
@@ -1607,7 +1880,7 @@
       ];
       document.getElementById('credit-kpi-grid').innerHTML = kpis.map(k => `
         <div class="p-3 rounded-xl bg-[#0d1117] border border-gray-800">
-          <div class="text-[11px] text-gray-400">${k.label}</div>
+          <div class="text-[13px] text-gray-400">${k.label}</div>
           <div class="text-base font-bold font-mono text-white mt-0.5">${k.val}</div>
         </div>
       `).join('');
@@ -1645,9 +1918,9 @@
         const hst = getFgBadgeStyle(h.val);
         return `
           <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800 text-center font-mono">
-            <div class="text-[10px] text-gray-400">${h.lbl}</div>
+            <div class="text-[12px] text-gray-400">${h.lbl}</div>
             <div class="text-sm font-bold ${hst.textCol} mt-0.5">${h.val}</div>
-            <div class="text-[10px] text-gray-500">${hst.label.split(' ')[0]}</div>
+            <div class="text-[12px] text-gray-500">${hst.label.split(' ')[0]}</div>
           </div>
         `;
       }).join('');
@@ -1659,14 +1932,14 @@
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-gray-200">${ind.name}</span>
               <div class="flex items-center gap-1.5 font-mono shrink-0">
-                <span class="px-1.5 py-0.5 rounded text-[10px] border ${ist.bgCol}">${ind.status}</span>
+                <span class="px-1.5 py-0.5 rounded text-[12px] border ${ist.bgCol}">${ind.status}</span>
                 <strong class="text-sm ${ist.textCol}">${ind.score}</strong>
               </div>
             </div>
             <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <div class="h-full ${ist.barCol} rounded-full" style="width:${ind.score}%"></div>
             </div>
-            <p class="text-[11px] text-gray-400 leading-relaxed">${ind.desc}</p>
+            <p class="text-[13px] text-gray-400 leading-relaxed">${ind.desc}</p>
           </div>
         `;
       }).join('');
@@ -1685,7 +1958,7 @@
 
         <!-- 0~100 5단계 컬러 스펙트럼 게이지 바 & 현재 포인터 -->
         <div class="space-y-1.5 pt-1">
-          <div class="flex justify-between text-[10px] font-mono text-gray-400">
+          <div class="flex justify-between text-[12px] font-mono text-gray-400">
             <span class="text-blue-400">0 극단적공포</span>
             <span class="text-cyan-300">25 공포</span>
             <span class="text-gray-300">50 중립</span>
@@ -1840,7 +2113,7 @@
             <div class="h-full bg-gray-600" style="width:${flatR}%"></div>
             <div class="h-full bg-blue-500" style="width:${downR}%"></div>
           </div>
-          <p class="text-[11px] text-gray-400 leading-relaxed">
+          <p class="text-[13px] text-gray-400 leading-relaxed">
             전체 상장사 중 오늘 실제로 오른 종목의 비율입니다. <strong class="text-gray-200">50% 이상</strong>이면 시장 전반에 온기가 도는 확산장, <strong class="text-gray-200">30% 미만</strong>이면 소수 종목만 오르는 쏠림장입니다.
           </p>
         </div>
@@ -1851,7 +2124,7 @@
             <span class="text-xs font-bold text-white">② 이평선 · 주봉 정배열 상회 비율 (추세 체력)</span>
             <span class="text-xs font-mono text-emerald-300 font-bold">20일선 ${ma20R}%</span>
           </div>
-          <div class="space-y-2 text-[11px] font-mono">
+          <div class="space-y-2 text-[13px] font-mono">
             <div>
               <div class="flex justify-between text-gray-300 mb-0.5"><span>일봉 20일선 위 종목 (단기 추세)</span><strong class="text-emerald-400">${ma20R}%</strong></div>
               <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-400 rounded-full" style="width:${ma20R}%"></div></div>
@@ -1865,7 +2138,7 @@
               <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:${Math.min(100, alignR * 2.5)}%"></div></div>
             </div>
           </div>
-          <p class="text-[11px] text-gray-400 leading-relaxed">
+          <p class="text-[13px] text-gray-400 leading-relaxed">
             20일선 상회 비율이 <strong class="text-gray-200">25% 이하</strong>면 과매도 반등 임박, <strong class="text-gray-200">75% 이상</strong>이면 단기 과열 구간입니다.
           </p>
         </div>
@@ -1884,7 +2157,7 @@
             <div class="h-full bg-emerald-500" style="width:${nhShare}%"></div>
             <div class="h-full bg-slate-600" style="width:${100 - nhShare}%"></div>
           </div>
-          <p class="text-[11px] text-gray-400 leading-relaxed">
+          <p class="text-[13px] text-gray-400 leading-relaxed">
             신고가 비율이 신저가보다 높으면(<strong class="text-emerald-300">순신고가 +</strong>) 돌파 매매가 잘 먹히는 강세장이며, 음수(<strong class="text-rose-300">순신고가 -</strong>)면 가짜 돌파(속임수)를 조심해야 합니다.
           </p>
         </div>
@@ -1901,10 +2174,10 @@
         ].map(m => `
           <div class="p-3 rounded-lg bg-[#0d1117] border border-gray-800 space-y-2">
             <div class="flex items-center justify-between">
-              <span class="font-bold text-white">${m.name} <span class="text-gray-500 font-mono text-[11px]">(${m.d.total}종목)</span></span>
-              <span class="px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 font-mono text-[11px]">${m.badge}</span>
+              <span class="font-bold text-white">${m.name} <span class="text-gray-500 font-mono text-[13px]">(${m.d.total}종목)</span></span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 font-mono text-[13px]">${m.badge}</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 font-mono text-[11px] pt-1">
+            <div class="grid grid-cols-4 gap-2 font-mono text-[13px] pt-1">
               <div><div class="text-gray-500">상승 비율</div><div class="text-rose-400 font-bold">${m.d.upRatio}%</div></div>
               <div><div class="text-gray-500">20일선 상회</div><div class="text-emerald-400 font-bold">${m.d.aboveMa20}%</div></div>
               <div><div class="text-gray-500">주봉 정배열</div><div class="text-blue-400 font-bold">${m.d.alignedRatio}%</div></div>
@@ -1921,12 +2194,12 @@
         leadEl.innerHTML = leaders.map(item => `
           <div onclick="openStockDetailView('KR-${item.ticker}')" class="cursor-pointer p-2.5 rounded-lg bg-[#0d1117] hover:bg-gray-800/80 border border-gray-800 flex items-center justify-between transition">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono font-bold text-[11px]">${item.stage}</span>
+              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono font-bold text-[13px]">${item.stage}</span>
               <strong class="text-white">${item.name}</strong>
-              <span class="text-gray-500 font-mono text-[11px]">${item.ticker}·${item.market}</span>
-              <span class="text-gray-400 text-[11px] hidden sm:inline">(${item.sector})</span>
+              <span class="text-gray-500 font-mono text-[13px]">${item.ticker}·${item.market}</span>
+              <span class="text-gray-400 text-[13px] hidden sm:inline">(${item.sector})</span>
             </div>
-            <div class="text-right font-mono text-[11px]">
+            <div class="text-right font-mono text-[13px]">
               <span class="text-white font-bold mr-2">${item.close}</span>
               <span class="text-emerald-400">${item.gap52w}</span>
             </div>
@@ -2088,11 +2361,11 @@
             const pillStyle = isAligned
               ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 font-bold hover:bg-amber-500/30'
               : 'bg-[#161b22] text-gray-300 border-gray-800 hover:border-gray-600 hover:text-white';
-            return `<button type="button" onclick="scrollToMacroCard('${it._cardId}')" class="px-2 py-0.5 rounded border text-[11px] font-mono transition ${pillStyle}">${it.title}</button>`;
+            return `<button type="button" onclick="scrollToMacroCard('${it._cardId}')" class="px-2 py-0.5 rounded border text-[13px] font-mono transition ${pillStyle}">${it.title}</button>`;
           }).join('');
           return `
             <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800/90 space-y-1.5">
-              <div class="text-[11px] font-bold text-gray-300">${sec.title}</div>
+              <div class="text-[13px] font-bold text-gray-300">${sec.title}</div>
               <div class="flex flex-wrap gap-1">${pills}</div>
             </div>
           `;
@@ -2111,13 +2384,13 @@
             ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
             : 'bg-gray-800 text-gray-300 border border-gray-700';
           const extraBadgeHtml = m.extraBadge
-            ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">${m.extraBadge}</span>`
+            ? `<span class="text-[13px] font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">${m.extraBadge}</span>`
             : '';
           const descHtml = m.desc
-            ? `<p class="text-[11px] text-gray-400 leading-relaxed">${m.desc}</p>`
+            ? `<p class="text-[13px] text-gray-400 leading-relaxed">${m.desc}</p>`
             : '';
           const noticeHtml = m.notice
-            ? `<div class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 font-mono">${m.notice}</div>`
+            ? `<div class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-[13px] text-amber-300 font-mono">${m.notice}</div>`
             : '';
           const tfButtons = m.shortRangeOnly
             ? `
@@ -2139,14 +2412,14 @@
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
                     <h4 class="text-sm sm:text-base font-bold text-white">${m.title}</h4>
-                    <span class="text-[11px] font-mono px-2 py-0.5 rounded ${badgeCls}">${m.badge}</span>
+                    <span class="text-[13px] font-mono px-2 py-0.5 rounded ${badgeCls}">${m.badge}</span>
                     ${extraBadgeHtml}
                   </div>
-                  <div class="text-[11px] font-mono text-gray-400 mt-0.5">${m.periodMeta || 'FRED / Yahoo Finance'}</div>
+                  <div class="text-[13px] font-mono text-gray-400 mt-0.5">${m.periodMeta || 'FRED / Yahoo Finance'}</div>
                 </div>
                 <div class="text-right font-mono">
                   <div class="text-lg sm:text-xl font-bold text-white">${m.current} <span class="text-xs font-normal text-gray-400">(${m.change1m})</span></div>
-                  <div class="text-[11px] text-gray-400">MA4 <span class="text-yellow-400">${m.ma4}</span> · 13 <span class="text-orange-400">${m.ma13}</span> · 26 <span class="text-blue-400">${m.ma26}</span> · 52 <span class="text-purple-400">${m.ma52}</span></div>
+                  <div class="text-[13px] text-gray-400">MA4 <span class="text-yellow-400">${m.ma4}</span> · 13 <span class="text-orange-400">${m.ma13}</span> · 26 <span class="text-blue-400">${m.ma26}</span> · 52 <span class="text-purple-400">${m.ma52}</span></div>
                 </div>
               </div>
 
@@ -2154,7 +2427,7 @@
               ${noticeHtml}
 
               <!-- 범례 및 기간 선택 바 -->
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[13px]">
                 <div class="flex flex-wrap items-center gap-2.5 font-mono">
                   <span class="flex items-center gap-1 text-gray-200"><span class="w-2.5 h-0.5 bg-gray-200 inline-block"></span> 주봉</span>
                   <span class="flex items-center gap-1 text-yellow-400"><span class="w-2.5 h-0.5 bg-yellow-400 inline-block"></span> MA4</span>
@@ -2163,7 +2436,7 @@
                   <span class="flex items-center gap-1 text-purple-400"><span class="w-2.5 h-0.5 bg-purple-400 inline-block"></span> MA52</span>
                   <span id="macro-hover-${m._cardId}" class="text-gray-400 ml-1">휠·핀치 확대 · 좌우 드래그 이동</span>
                 </div>
-                <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+                <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[13px] font-mono">
                   ${tfButtons}
                 </div>
               </div>
@@ -2183,7 +2456,7 @@
                 <h3 class="text-sm sm:text-base font-bold text-white">${sec.title}</h3>
                 <p class="text-xs text-gray-400">${sec.sub}</p>
               </div>
-              <span class="text-[11px] font-mono text-gray-500">${sec.items.length}개 지표</span>
+              <span class="text-[13px] font-mono text-gray-500">${sec.items.length}개 지표</span>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
               ${cardsHtml}
@@ -2203,7 +2476,7 @@
       if (sigGrid) {
         sigGrid.innerHTML = signals.map(s => `
           <div class="p-3.5 rounded-xl bg-[#0d1117] border border-gray-800 space-y-1">
-            <div class="text-[11px] font-mono text-blue-400 font-bold">${s.category}</div>
+            <div class="text-[13px] font-mono text-blue-400 font-bold">${s.category}</div>
             <div class="text-sm font-bold text-white">${s.title}</div>
             <p class="text-xs text-gray-400 leading-relaxed">${s.desc}</p>
           </div>
@@ -2358,8 +2631,8 @@
         <div class="p-2 rounded bg-[#0d1117] border border-gray-800 flex items-center justify-between gap-2">
           <span><strong class="text-blue-400 mr-1.5">${c.author}</strong>${c.text}</span>
           <div class="flex items-center gap-2 shrink-0">
-            <span class="text-gray-500 font-mono text-[11px]">${c.time}</span>
-            <button type="button" onclick="deleteTabComment(${c.id})" class="text-gray-500 hover:text-rose-400 text-[11px]">삭제</button>
+            <span class="text-gray-500 font-mono text-[13px]">${c.time}</span>
+            <button type="button" onclick="deleteTabComment(${c.id})" class="text-gray-500 hover:text-rose-400 text-[13px]">삭제</button>
           </div>
         </div>
       `).join('');
@@ -2390,8 +2663,8 @@
         const el = document.getElementById(`tab-${t}`);
         if (!el) return;
         el.className = state.activeTab === t
-          ? 't2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold transition flex items-center gap-1 bg-blue-600/20 text-blue-300 border border-blue-500/40'
-          : 't2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 border border-transparent';
+          ? 't2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-bold transition flex items-center gap-1 bg-blue-600/20 text-blue-300 border border-blue-500/40'
+          : 't2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1 text-gray-400 hover:text-gray-200 border border-transparent';
       });
 
       const isScreenerStage = ['onset', 'progress', 'warning', 'longterm', 'exit'].includes(state.activeTab);
@@ -2435,7 +2708,7 @@
     async function loadDataAndInit() {
       loadSavedLocalState();
       try {
-        const res = await fetch('./data.json?v=v10_' + Date.now(), { cache: 'no-store' });
+        const res = await fetch('./data.json?v=v11_' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const d = await res.json();
           DATA_META = d.meta || DATA_META;
@@ -2449,8 +2722,15 @@
           MACRO_YIELDS = d.MACRO_YIELDS || [];
           if (d.MACRO_META) MACRO_META = d.MACRO_META;
           if (d.FEAR_GREED_DATA) FEAR_GREED_DATA = d.FEAR_GREED_DATA;
+          if (d.NIGHT_WATCH_DATA) NIGHT_WATCH_DATA = d.NIGHT_WATCH_DATA;
         }
       } catch (e) {}
+      try {
+        const fs = parseInt(localStorage.getItem('kr_explorer_font_step') || '0', 10);
+        if (!isNaN(fs)) state.rootFontStep = fs;
+      } catch (e) {}
+      applyRootFontStep();
+      renderNightWatchStrip();
 
       document.getElementById('price-date-badge').textContent = '가격 ' + (DATA_META.priceDate || '2026-11-16');
       const vCount = (DATA_META.viewCount && DATA_META.viewCount > 0) ? DATA_META.viewCount : state.viewCount;
