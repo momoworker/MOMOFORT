@@ -304,7 +304,9 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
         mdd_pct = int(round(abs(((latest_close - high_52w) / high_52w) * 100))) if high_52w > 0 else 0
         drawdown_pct = round(((latest_close - high_52w) / high_52w) * 100, 1)
 
-        weekly = df.resample("W-FRI").agg({
+        df_w = df.copy()
+        df_w["WeekMonday"] = df_w.index.to_series().apply(lambda d: (d - pd.Timedelta(days=d.weekday())))
+        weekly = df_w.groupby("WeekMonday").agg({
             "Open": "first", "High": "max", "Low": "min",
             "Close": "last", "Volume": "sum"
         }).dropna()
