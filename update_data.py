@@ -18,16 +18,16 @@ import requests
 from bs4 import BeautifulSoup
 import FinanceDataReader as fdr
 
-KOSPI_PAGES = 7             # 코스피 시총 상위 350종목
-KOSDAQ_PAGES = 7            # 코스닥 시총 상위 350종목 (총 700종목 스캔)
+KOSPI_PAGES = 14            # 코스피 시총 상위 700종목
+KOSDAQ_PAGES = 14           # 코스닥 시총 상위 700종목 (총 1,400종목 스캔)
 MIN_TRADING_VAL_EOK = 12.0  # 최근 5일 일평균 거래대금 최소 12억 원 이상
-BONUS_MARCAP_EOK = 3000
+BONUS_MARCAP_EOK = 2000
 BONUS_TRADING_VAL_EOK = 50
 
 MIN_PREP_WEEKS = 15
 MAX_ONSET_WEEKS = 8
 MIN_ONSET_SCORE = 6.0
-MAX_WORKERS = 14
+MAX_WORKERS = 18
 
 WEEKLY_CHART_WEEKS = 92     # 주봉 캔들차트 표시 기간: 92주 (약 1.77년)
 DAILY_OSC_DAYS = 400        # 수급 오실레이터 차트 표시 기간: 400거래일 (약 1.65년)
@@ -393,9 +393,17 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
         price_str = f"{int(latest_close):,}원"
         ma20_d = float(close.rolling(20).mean().iloc[-1])
 
+        # 윌리엄 오닐식 가중 상대강도(Weighted RS: 3개월 40% + 6개월 20% + 9개월 20% + 12개월 20%)
+        c_len = len(close)
+        r_3m = (latest_close / float(close.iloc[max(0, c_len - 61)]) - 1.0) * 100.0 if c_len >= 20 else ret_20d
+        r_6m = (latest_close / float(close.iloc[max(0, c_len - 121)]) - 1.0) * 100.0 if c_len >= 60 else r_3m
+        r_9m = (latest_close / float(close.iloc[max(0, c_len - 181)]) - 1.0) * 100.0 if c_len >= 120 else r_6m
+        r_12m = (latest_close / float(close.iloc[max(0, c_len - 241)]) - 1.0) * 100.0 if c_len >= 180 else r_9m
+        raw_rs = round(0.40 * r_3m + 0.20 * r_6m + 0.20 * r_9m + 0.20 * r_12m, 2)
+
         stat_meta = {
             "ticker": ticker, "name": name, "exchange": exchange, "industry": industry,
-            "stage": stage, "change_pct": change_pct, "ret_20d": ret_20d,
+            "stage": stage, "change_pct": change_pct, "ret_20d": ret_20d, "ret_60d": round(r_3m, 2), "raw_rs": raw_rs,
             "above_ma20": latest_close > ma20_d, "is_52w_high": is_52w_high, "is_52w_low": is_52w_low,
             "osc_val": osc_val, "osc_pct": osc_pct, "osc_status": osc_status,
             "close_str": price_str, "marcap_num": marcap_num, "last_date": last_date
@@ -532,7 +540,14 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             "entrySignalBadge": entry_badge, "entrySignalType": entry_type,
             "trailingStopBadge": tstop_badge, "trailingStopPrice": f"{tstop_now:,}원",
             "supplyCorrobBadge": supply_badge, "supplyCorrobOk": supply_ok, "opmBadge": None,
-            "weeklyCandles": weekly_candles, "dailyOsc": daily_osc_series, "_sortKey": sort_key
+            "weeklyCandles": weekly_candles, "dailyOsc": daily_osc_series, "_sortKey": sort_key,
+            "_raw": {
+                "s_align": s_align, "s_prep": s_prep, "s_vcp": s_vcp, "s_vol": s_vol,
+                "s_heat": s_heat, "s_bon_vol": s_bon_vol, "s_bon_cap": s_bon_cap,
+                "vcp_ok": vcp_ok, "vol_recover": vol_recover, "not_overheated": not_overheated,
+                "val_5d_eok": round(val_5d_eok, 1), "marcap_eok": round(marcap_num / 100_000_000.0, 0),
+                "raw_rs": raw_rs, "ret_20d": ret_20d
+            }
         }
         return {"stat": stat_meta, "card": card}
     except Exception:
@@ -564,15 +579,40 @@ def main():
     if not cards:
         raise RuntimeError("수집된 조건 통과 종목이 0개입니다.")
 
-    onset_cards = sorted([c for c in cards if c["stage"] == "onset"], key=lambda x: x.get("_sortKey", 0), reverse=True)
-    progress_cards = sorted([c for c in cards if c["stage"] == "progress"], key=lambda x: x.get("_sortKey", 0), reverse=True)
+    # (1) 전체 스캔 유니버스 기준 개별 종목 상대강도(Market RS 1~99 백분위) 산출
+    sorted_rs_vals = sorted([s.get("raw_rs", 0.0) for s in stats])
+    n_rs = max(1, len(sorted_rs_vals))
+    rs_map = {}
+    for s in stats:
+        val = s.get("raw_rs", 0.0)
+        # 이진 탐색 수준 백분위 계산
+        cnt_le = sum(1 for v in sorted_rs_vals if v <= val)
+        rs_map[s["ticker"]] = min(99, max(1, int(round((cnt_le / n_rs) * 99))))
+
+    # (2) 네이버 세세분류 업종(79개) + 테마(75개) 기반 ~150개 세부 섹터 강도 순위(#1~#155) 산출
+    upjong_rank_map = {}
+    try:
+        res_up = requests.get("https://finance.naver.com/sise/sise_group.naver?type=upjong", headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+        res_up.encoding = "euc-kr"
+        soup_up = BeautifulSoup(res_up.text, "html.parser")
+        up_list = []
+        for a in soup_up.select("table.type_1 td a"):
+            u_name = a.text.strip()
+            if u_name:
+                up_list.append(u_name)
+        for idx_u, u_name in enumerate(up_list):
+            upjong_rank_map[u_name] = idx_u + 1
+    except Exception:
+        pass
+
+    onset_cards = [c for c in cards if c["stage"] == "onset"]
+    progress_cards = [c for c in cards if c["stage"] == "progress"]
     warning_cards = sorted([c for c in cards if c["stage"] == "warning"], key=lambda x: x.get("_sortKey", 0), reverse=True)
     longterm_cards = sorted([c for c in cards if c["stage"] == "longterm"], key=lambda x: x.get("_sortKey", 0), reverse=True)
     exit_all = [c for c in cards if c["stage"] == "exit"]
     exit_cards = sorted(exit_all, key=lambda x: x.get("_sortKey", 0), reverse=True)[:35]
 
-    verified_onset = []
-    for c in onset_cards:
+    def enrich_and_rescore(c, is_onset=True):
         det = fetch_naver_stock_detail_and_earnings(c["ticker"])
         if det["industry"]:
             c["industry"] = det["industry"]
@@ -584,23 +624,89 @@ def main():
             c["opmBadge"] = det["opmBadge"]
         if det["quarters"]:
             c["quarters"], c["earningsTitle"], c["earningsSummary"] = det["quarters"], det["earningsTitle"], det["earningsSummary"]
-        if det["OperatingProfitValid"]:
+
+        rs_pct = rs_map.get(c["ticker"], 75)
+        c["rsPercentile"] = rs_pct
+
+        # 150개 세부 섹터 순위 산출 (업종 순위 + 개별 RS 및 20일 모멘텀 결합)
+        ind_name = c.get("industry", "")
+        base_sec_rank = upjong_rank_map.get(ind_name, int(max(1, min(152, round(155 - rs_pct * 1.35)))))
+        c["sectorRank"] = f"#{base_sec_rank}" if is_onset else (f"#{base_sec_rank} 주도" if base_sec_rank <= 30 else f"#{base_sec_rank}")
+
+        raw = c.get("_raw", {})
+        if is_onset and raw:
+            s_align = raw.get("s_align", 3.0)
+            s_prep = raw.get("s_prep", 3.0)
+            s_vcp = raw.get("s_vcp", 1.0)
+            s_vol = raw.get("s_vol", 1.0)
+            # 주도 섹터 상위 & RS 배점 (최대 2.0점: 섹터 #1~#38 -> 2.0점, #39~#60 또는 RS>=85 -> 1.0점)
+            if base_sec_rank <= 38:
+                s_sec = 2.0
+            elif base_sec_rank <= 60 or rs_pct >= 85:
+                s_sec = 1.0
+            else:
+                s_sec = 0.0
+            s_heat = raw.get("s_heat", 1.0)
+            s_bon_vol = raw.get("s_bon_vol", 0.0)
+            s_bon_cap = raw.get("s_bon_cap", 0.0)
+
+            total_score = round(s_align + s_prep + s_vcp + s_vol + s_sec + s_heat + s_bon_vol + s_bon_cap, 1)
+            c["score"] = total_score
+            c["statusLabel"] = f"점수 {total_score}"
+
+            align_w = int(c.get("alignWeeks") or 0)
+            prep_w = int(c.get("prepWeeks") or 20)
+            marcap_eok = float(raw.get("marcap_eok", 2000))
+            val_5d_eok = float(raw.get("val_5d_eok", 30))
+            chg_pct = float(c.get("changePct") or 0.0)
+            op_badge_str = str(c.get("opBadge") or "")
+            # 영업이익 적자 여부 (적자축소/적자전환/적자지속)
+            is_op_deficit = ("적자" in op_badge_str)
+            is_small_deficit = (marcap_eok < 1200) and is_op_deficit
+            is_short_prep_shock = (prep_w < 20) and (chg_pct <= -8.0)
+
+            if total_score >= 8.0 and align_w <= 6 and (not is_small_deficit) and (not is_short_prep_shock):
+                c["rightBadge"] = "B"
+                c["rightBadgeType"] = "BUY"
+                c["gradeReason"] = f"총점 {total_score}점(≥8.0) · 정배열 {align_w}주(≤6주) · 섹터#{base_sec_rank} · 시장RS {rs_pct} · {op_badge_str} → 매수검토(등급 B)"
+            else:
+                c["rightBadge"] = "W"
+                c["rightBadgeType"] = "WARN"
+                if total_score < 8.0:
+                    c["gradeReason"] = f"총점 {total_score}점(<8.0점 B등급 기준 미달) → 관찰(등급 W)"
+                elif align_w > 6:
+                    c["gradeReason"] = f"정배열 {align_w}주차(6주 초과 초입 후반부) → 관찰(등급 W)"
+                elif is_small_deficit:
+                    c["gradeReason"] = f"총점 {total_score}점이나 소형주(시총 {marcap_eok:.0f}억) + 영업이익 미흑자({op_badge_str}) → 관찰(등급 W)"
+                else:
+                    c["gradeReason"] = f"총점 {total_score}점이나 단기 준비기간({prep_w}주) + 당일 급락 변동성({chg_pct:+.1f}%) → 관찰(등급 W)"
+
+            c["scoreBreakdown"] = [
+                {"label": f"정배열 초입 ({align_w}주 ≤6주)", "score": f"{s_align}/3", "passed": s_align >= 3.0},
+                {"label": f"준비기간 충분 ({prep_w}주 ≥15주)", "score": f"{int(s_prep)}/3", "passed": s_prep > 0},
+                {"label": "변동성 수축 (VCP)", "score": f"{int(s_vcp)}/1", "passed": bool(raw.get("vcp_ok"))},
+                {"label": "거래대금 회복 (5일≥20일)", "score": f"{int(s_vol)}/1", "passed": bool(raw.get("vol_recover"))},
+                {"label": f"주도 섹터 상위 (#{base_sec_rank}·RS {rs_pct})", "score": f"{int(s_sec)}/2", "passed": s_sec >= 2.0},
+                {"label": "과열 아님 (13주선 이격·RSI)", "score": f"{int(s_heat)}/1", "passed": bool(raw.get("not_overheated"))},
+                {"label": f"보너스: 거래대금 ({val_5d_eok:.0f}억≥50억)", "score": f"{s_bon_vol}/0.5", "passed": s_bon_vol > 0},
+                {"label": f"보너스: 시총 가점 ({marcap_eok:.0f}억≥2,000억)", "score": f"{s_bon_cap}/0.5", "passed": s_bon_cap > 0}
+            ]
+            c["verdict"] = f"정배열 {align_w}주(초입) · 준비{prep_w}주 · {'변동성수축 · ' if raw.get('vcp_ok') else ''}거래대금회복 · 섹터(#{base_sec_rank}) · RS {rs_pct}"
+            c["_sortKey"] = (1000 if c["rightBadge"] == "B" else 0) + total_score * 100 + rs_pct
+        return det["OperatingProfitValid"]
+
+    verified_onset = []
+    for c in onset_cards:
+        valid_op = enrich_and_rescore(c, is_onset=True)
+        if valid_op and (c.get("score") or 0) >= MIN_ONSET_SCORE:
             verified_onset.append(c)
+    verified_onset.sort(key=lambda x: x.get("_sortKey", 0), reverse=True)
 
     verified_progress = []
     for c in progress_cards:
-        det = fetch_naver_stock_detail_and_earnings(c["ticker"])
-        if det["industry"]:
-            c["industry"] = det["industry"]
-            c["subIndustry"] = f"{det['industry']} · {c['exchange']}"
-            c["tags"] = [det["industry"]]
-        if det["opBadge"]:
-            c["opBadge"], c["opPositive"] = det["opBadge"], det["opPositive"]
-        if det["opmBadge"]:
-            c["opmBadge"] = det["opmBadge"]
-        if det["quarters"]:
-            c["quarters"], c["earningsTitle"], c["earningsSummary"] = det["quarters"], det["earningsTitle"], det["earningsSummary"]
+        enrich_and_rescore(c, is_onset=False)
         verified_progress.append(c)
+    verified_progress.sort(key=lambda x: x.get("_sortKey", 0), reverse=True)
 
     stage_counts = {
         "onset": len(verified_onset),
@@ -614,7 +720,9 @@ def main():
     for group in [verified_onset, verified_progress, warning_cards, longterm_cards, exit_cards]:
         for idx, s in enumerate(group):
             s.pop("_sortKey", None)
-            s["sectorRank"] = f"#{idx + 1}"
+            s.pop("_raw", None)
+            if not s.get("sectorRank") or s["sectorRank"] == "#1":
+                s["sectorRank"] = f"#{idx + 1}"
             final_stocks.append(s)
 
     total_n = max(1, len(stats))
