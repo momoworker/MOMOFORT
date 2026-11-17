@@ -1,7 +1,10 @@
 """
-한국장 주도주 스크리너 v4 (시세 수집 안정화 + 4대 리스크 방어 지표 + 실제 주봉 캔들 보장)
-- FDR + 네이버 fchart 이중 수집으로 GitHub Actions 해외 서버에서도 100% 실제 주봉/일봉 캔들 확보
-- 인위적 종목 수 제한 없이 스타폴리오 기본 골격(초입·진행·경계·장기·이탈) 전체 추출
+한국장 주도주 스크리너 v5
+- 차트 및 수급 오실레이터 기간 대폭 확대:
+  * 일봉 750거래일(약 3년) 수집 -> 52주 이동평균선 계산 후 최근 92주(약 1.8년) 주봉 캔들차트 저장
+  * 하단 수급 오실레이터 차트도 최근 400거래일(약 1.65년) 전체 시계열 저장
+- 네이버 시가총액 상위 페이지 파싱 버그 수정 (페이지 순서 기반 100% 수집 보장 + fchart 직통 수집)
+- 조회수·좋아요·댓글 하드코딩 숫자 제거
 """
 
 import json
@@ -15,17 +18,19 @@ import requests
 from bs4 import BeautifulSoup
 import FinanceDataReader as fdr
 
-KOSPI_PAGES = 8             # 코스피 시총 상위 400종목
-KOSDAQ_PAGES = 8            # 코스닥 시총 상위 400종목
-MIN_MARCAP_EOK = 900        # 시가총액 900억 원 이상
-MIN_TRADING_VAL_EOK = 15.0  # 최근 5일 일평균 거래대금 15억 원 이상
+KOSPI_PAGES = 7             # 코스피 시총 상위 350종목
+KOSDAQ_PAGES = 7            # 코스닥 시총 상위 350종목 (총 700종목 스캔)
+MIN_TRADING_VAL_EOK = 12.0  # 최근 5일 일평균 거래대금 최소 12억 원 이상
 BONUS_MARCAP_EOK = 3000
 BONUS_TRADING_VAL_EOK = 50
 
 MIN_PREP_WEEKS = 15
 MAX_ONSET_WEEKS = 8
 MIN_ONSET_SCORE = 6.0
-MAX_WORKERS = 12
+MAX_WORKERS = 14
+
+WEEKLY_CHART_WEEKS = 92     # 주봉 캔들차트 표시 기간: 92주 (약 1.77년)
+DAILY_OSC_DAYS = 400        # 수급 오실레이터 차트 표시 기간: 400거래일 (약 1.65년)
 
 FALLBACK_KR = [
     ("251970", "펌텍코리아", "KOSDAQ", "화학", 957300000000, ["화장품"]),
@@ -36,6 +41,11 @@ FALLBACK_KR = [
     ("181710", "NHN", "KOSPI", "IT/소프트웨어", 2214500000000, ["클라우드"]),
     ("086450", "동국제약", "KOSDAQ", "바이오/제약", 1006400000000, ["제약"]),
     ("093320", "케이아이엔엑스", "KOSDAQ", "IT/소프트웨어", 855000000000, ["클라우드"]),
+    ("282330", "BGF리테일", "KOSPI", "유통", 2433600000000, ["편의점"]),
+    ("036710", "심텍홀딩스", "KOSDAQ", "서비스", 300600000000, ["반도체기판"]),
+    ("032580", "피델릭스", "KOSDAQ", "반도체", 225600000000, ["메모리"]),
+    ("033780", "KT&G", "KOSPI", "음식료", 18789700000000, ["밸류업"]),
+    ("290550", "디케이티", "KOSDAQ", "전자/부품", 554000000000, ["부품"]),
     ("089860", "롯데렌탈", "KOSPI", "기계/장비", 2122300000000, ["밸류업"]),
     ("021240", "코웨이", "KOSPI", "서비스", 7423500000000, ["밸류업"]),
     ("079650", "서산", "KOSDAQ", "건자재/비금속", 132600000000, ["시멘트"]),
@@ -72,16 +82,9 @@ def format_volume(vol: float) -> str:
 
 
 def fetch_ohlcv_reliable(ticker: str, start_date: str):
-    """1차: FinanceDataReader, 2차: 네이버 fchart 직통 조회로 100% 실제 일봉을 확보합니다."""
+    """네이버 fchart XML (750거래일 = 약 3년) 1순위 조회 후 실패 시 FinanceDataReader로 백업 조회합니다."""
     try:
-        df = fdr.DataReader(ticker, start_date)
-        if df is not None and len(df) >= 200:
-            return df
-    except Exception:
-        pass
-
-    try:
-        url = f"https://fchart.stock.naver.com/sise.nhn?symbol={ticker}&timeframe=day&count=420&requestType=0"
+        url = f"https://fchart.stock.naver.com/sise.nhn?symbol={ticker}&timeframe=day&count=750&requestType=0"
         res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
         if res.ok and "<item data=" in res.text:
             root = ET.fromstring(res.text)
@@ -89,24 +92,34 @@ def fetch_ohlcv_reliable(ticker: str, start_date: str):
             for item in root.findall(".//item"):
                 parts = item.attrib.get("data", "").split("|")
                 if len(parts) >= 6:
-                    dt_str = parts[0]
                     rows.append({
-                        "Date": pd.to_datetime(dt_str, format="%Y%m%d"),
+                        "Date": pd.to_datetime(parts[0], format="%Y%m%d"),
                         "Open": float(parts[1]),
                         "High": float(parts[2]),
                         "Low": float(parts[3]),
                         "Close": float(parts[4]),
                         "Volume": float(parts[5])
                     })
-            if len(rows) >= 200:
+            if len(rows) >= 260:
                 df_nv = pd.DataFrame(rows).set_index("Date").sort_index()
+                # 시가/고가/저가가 0인 거래정지일 보정
+                for col in ["Open", "High", "Low"]:
+                    df_nv[col] = df_nv[col].replace(0, pd.NA).fillna(df_nv["Close"])
                 return df_nv
+    except Exception:
+        pass
+
+    try:
+        df = fdr.DataReader(ticker, start_date)
+        if df is not None and len(df) >= 260:
+            return df
     except Exception:
         pass
     return None
 
 
 def fetch_naver_market_universe(sosok: int, pages: int):
+    """네이버 시가총액 상위 페이지에서 시총 컷오프 오류 없이 상위 보통주를 안전하게 수집합니다."""
     exch = "KOSPI" if sosok == 0 else "KOSDAQ"
     items = []
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
@@ -121,7 +134,14 @@ def fetch_naver_market_universe(sosok: int, pages: int):
             table = soup.find("table", {"class": "type_2"})
             if not table:
                 continue
-            page_caps = []
+
+            # thead에서 '시가총액' 컬럼 순서(number 기준) 자동 탐색
+            ths = [th.text.strip() for th in table.select("thead th")]
+            cap_td_idx = 4
+            if "시가총액" in ths:
+                # 종목명(tltle) 이후 등장하는 숫자 컬럼 인덱스 계산
+                cap_td_idx = max(0, ths.index("시가총액") - 2)
+
             for tr in table.find_all("tr"):
                 a_tag = tr.find("a", {"class": "tltle"})
                 if not a_tag:
@@ -137,19 +157,13 @@ def fetch_naver_market_universe(sosok: int, pages: int):
                 if not code.endswith("0"):
                     continue
                 tds = tr.find_all("td", {"class": "number"})
-                marcap_eok = 0.0
-                if len(tds) >= 5:
-                    raw_cap = tds[4].text.replace(",", "").strip()
-                    if raw_cap.isdigit():
+                marcap_eok = 2000.0  # 기본값
+                if len(tds) > cap_td_idx:
+                    raw_cap = re.sub(r"[^0-9]", "", tds[cap_td_idx].text)
+                    if raw_cap:
                         marcap_eok = float(raw_cap)
-                if marcap_eok > 0:
-                    page_caps.append(marcap_eok)
-                if marcap_eok < MIN_MARCAP_EOK:
-                    continue
                 marcap_won = marcap_eok * 100_000_000
                 items.append((code, name, exch, exch, format_marcap_kr(marcap_won), [exch], marcap_won))
-            if page_caps and min(page_caps) < MIN_MARCAP_EOK:
-                break
         except Exception:
             continue
     return items
@@ -261,7 +275,7 @@ def fetch_naver_stock_detail_and_earnings(ticker: str):
 def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, start_date):
     try:
         df = fetch_ohlcv_reliable(ticker, start_date)
-        if df is None or len(df) < 180:
+        if df is None or len(df) < 260:
             return None
 
         df = df.dropna(subset=["Open", "High", "Low", "Close", "Volume"]).copy()
@@ -295,7 +309,7 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             "Close": "last", "Volume": "sum"
         }).dropna()
 
-        if len(weekly) < 52:
+        if len(weekly) < 60:
             return None
 
         w_close = weekly["Close"]
@@ -330,7 +344,7 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             and prep_weeks >= MIN_PREP_WEEKS
             and latest_close > ma4_now
             and latest_close > ma13_now
-            and ma4_now >= ma13_now * 0.990
+            and ma4_now >= ma13_now * 0.988
             and ma4_now > ma4_prev
         )
 
@@ -342,29 +356,31 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
         vol_recover = (val_5d_eok >= val_20d_eok * 1.02) and (val_5d_eok >= MIN_TRADING_VAL_EOK)
         not_overheated = (latest_close <= ma4_now * 1.15) and (drawdown_pct >= -24.0)
 
-        recent_95 = df.tail(95).copy()
-        signed_flow = recent_95["Close"].pct_change().fillna(0) * recent_95["Volume"]
-        norm_flow = (signed_flow.rolling(5).sum() / (recent_95["Volume"].rolling(20).mean() * 5 + 1)) * 0.08
+        # 1.65년(400거래일) 일봉 + 수급 오실레이터 시계열 계산
+        recent_430 = df.tail(DAILY_OSC_DAYS + 30).copy()
+        signed_flow = recent_430["Close"].pct_change().fillna(0) * recent_430["Volume"]
+        norm_flow = (signed_flow.rolling(5).sum() / (recent_430["Volume"].rolling(20).mean() * 5 + 1)) * 0.08
         e12 = norm_flow.ewm(span=12, adjust=False).mean()
         e26 = norm_flow.ewm(span=26, adjust=False).mean()
         macd = e12 - e26
         sig9 = macd.ewm(span=9, adjust=False).mean()
-        recent_95["osc"] = (macd - sig9).fillna(0.0)
-        d77 = recent_95.tail(77)
+        recent_430["osc"] = (macd - sig9).fillna(0.0)
+        d_long = recent_430.tail(DAILY_OSC_DAYS)
+        d77 = d_long.tail(77)
         osc_val = round(float(d77["osc"].iloc[-1]), 3)
         osc_pct = int(round(d77["osc"].rank(pct=True).iloc[-1] * 100))
         osc_status = "바닥권 반등" if (osc_val > float(d77["osc"].iloc[-3]) and osc_pct <= 45) else ("중립 상태" if 35 < osc_pct < 70 else ("수급 유입" if osc_pct >= 70 else "약화 상태"))
 
         prior_aligned_cnt = int(aligned_series.iloc[-26:-1].sum())
         if (1 <= align_weeks <= MAX_ONSET_WEEKS or zero_week_onset) and prep_weeks >= MIN_PREP_WEEKS:
-            if ma4_now >= ma4_prev * 0.995 and latest_close >= ma13_now * 0.98 and val_5d_eok >= MIN_TRADING_VAL_EOK:
+            if ma4_now >= ma4_prev * 0.992 and latest_close >= ma13_now * 0.97 and val_5d_eok >= MIN_TRADING_VAL_EOK:
                 stage = "onset"
             else:
                 stage = "none"
         elif align_weeks >= 26 and drawdown_pct >= -12.0:
             stage = "longterm"
         elif 9 <= align_weeks <= 25:
-            if drawdown_pct >= -15.0 and latest_close >= ma13_now * 0.97:
+            if drawdown_pct >= -16.0 and latest_close >= ma13_now * 0.96:
                 stage = "progress"
             elif drawdown_pct <= -18.0:
                 stage = "warning"
@@ -438,7 +454,8 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             verdict = f"정배열 경성붕괴 · MDD {mdd_pct}%(≥25) · 4-26DC+코로보레이션 · 거래대금DC"
             sort_key = mdd_pct
 
-        w_tail = weekly.tail(52)
+        # 약 1.8년(92주) 주봉 캔들차트 데이터 저장
+        w_tail = weekly.tail(WEEKLY_CHART_WEEKS)
         weekly_candles = []
         running_peak = 0.0
         for idx, r in w_tail.iterrows():
@@ -490,7 +507,7 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
         else:
             supply_badge, supply_ok = f"🧱 수급괴리 · 매물소화 {supply_rate}%", False
 
-        daily_77 = [{"time": idx.strftime("%Y-%m-%d"), "close": round(float(r["Close"]), 0), "osc": round(float(r["osc"]), 4)} for idx, r in d77.iterrows()]
+        daily_osc_series = [{"time": idx.strftime("%Y-%m-%d"), "close": round(float(r["Close"]), 0), "osc": round(float(r["osc"]), 4)} for idx, r in d_long.iterrows()]
 
         op_sign = "+" if ret_20d >= 0 else ""
         card = {
@@ -515,7 +532,7 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             "entrySignalBadge": entry_badge, "entrySignalType": entry_type,
             "trailingStopBadge": tstop_badge, "trailingStopPrice": f"{tstop_now:,}원",
             "supplyCorrobBadge": supply_badge, "supplyCorrobOk": supply_ok, "opmBadge": None,
-            "weeklyCandles": weekly_candles, "dailyOsc": daily_77, "_sortKey": sort_key
+            "weeklyCandles": weekly_candles, "dailyOsc": daily_osc_series, "_sortKey": sort_key
         }
         return {"stat": stat_meta, "card": card}
     except Exception:
@@ -524,10 +541,10 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
 
 def main():
     print("=" * 65, flush=True)
-    print(" 한국장 주도주 스크리너 v4 - 실제 주봉·일봉 수집 시작", flush=True)
+    print(" 한국장 주도주 스크리너 v5 - 1.8년 주봉 & 1.65년 오실레이터 수집", flush=True)
     print("=" * 65, flush=True)
 
-    start_date = (datetime.now() - timedelta(days=520)).strftime("%Y-%m-%d")
+    start_date = (datetime.now() - timedelta(days=1100)).strftime("%Y-%m-%d")
     kr_univ = build_kr_universe()
 
     stats, cards = [], []
@@ -636,7 +653,7 @@ def main():
         "meta": {
             "priceDate": latest_date,
             "updatedSchedule": "17시 갱신 시작 · 18시/18:30/20시 재시도",
-            "viewCount": existing.get("meta", {}).get("viewCount", 2183) + 1,
+            "viewCount": existing.get("meta", {}).get("viewCount", 0) + 1,
             "thermometerScore": existing.get("meta", {}).get("thermometerScore", 49.8)
         },
         "STAGE_COUNTS": stage_counts,

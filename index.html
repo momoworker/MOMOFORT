@@ -44,10 +44,10 @@
 
         <div class="flex items-center gap-2 text-[11px]">
           <span id="view-counter-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono">
-            조회 2,183
+            조회 1
           </span>
           <button id="btn-watchlist-only" type="button" onclick="toggleWatchlistFilter()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-amber-400 font-semibold transition">
-            ★ 관심 <span id="watchlist-count">2</span>
+            ★ 관심 <span id="watchlist-count">0</span>
           </button>
         </div>
       </div>
@@ -99,7 +99,7 @@
       <nav class="mt-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5" aria-label="2단 글로벌 탭">
         <button id="tab-journal" type="button" onclick="switchTab('journal')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1">
           <span>내 기록</span>
-          <span id="journal-count-badge" class="text-[10px] font-mono px-1 rounded bg-gray-800 text-gray-300">2</span>
+          <span id="journal-count-badge" class="text-[10px] font-mono px-1 rounded bg-gray-800 text-gray-300">0</span>
         </button>
         <button id="tab-rules" type="button" onclick="switchTab('rules')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[11px] font-medium transition flex items-center gap-1">
           <span>매수·매도 규칙</span>
@@ -126,11 +126,11 @@
         <div class="flex items-center gap-2">
           <button type="button" onclick="toggleTabLike()" class="px-2.5 py-1 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-gray-200 flex items-center gap-1 text-xs">
             <span>좋아요</span>
-            <span id="like-count-display" class="font-mono text-blue-400 font-bold">42</span>
+            <span id="like-count-display" class="font-mono text-blue-400 font-bold">0</span>
           </button>
           <button type="button" onclick="toggleCommentsDrawer()" class="px-2.5 py-1 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-gray-300 flex items-center gap-1 text-xs">
             <span>댓글</span>
-            <span id="comment-count-display" class="font-mono text-gray-400">3</span>
+            <span id="comment-count-display" class="font-mono text-gray-400">0</span>
             <span id="comment-caret">▾</span>
           </button>
         </div>
@@ -224,56 +224,105 @@
         </div>
       </div>
 
-      <!-- TradingView Weekly Candlestick Chart Card -->
-      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3 sm:p-4 space-y-2">
-        <!-- MA Legend Row: 4주선(노랑) · 13주선(주황) · 26주선(파랑) · 52주선(보라) -->
+      <!-- TradingView Weekly Candlestick Chart Card (96주 · 약 1.85년) -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3 sm:p-4 space-y-2.5">
+        <!-- Top Controls & MA Legend Row -->
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
           <div class="flex flex-wrap items-center gap-3 font-medium">
-            <span class="text-gray-300 font-semibold">주봉 캔들차트</span>
+            <span class="text-white font-bold flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-blue-600 text-[10px] font-extrabold text-white">TV</span>
+              주봉 캔들차트 (최근 1.85년 · 96주)
+            </span>
             <span class="flex items-center gap-1 text-yellow-400"><span class="w-3 h-0.5 bg-yellow-400 inline-block"></span> 4주선</span>
             <span class="flex items-center gap-1 text-orange-400"><span class="w-3 h-0.5 bg-orange-400 inline-block"></span> 13주선</span>
             <span class="flex items-center gap-1 text-blue-400"><span class="w-3 h-0.5 bg-blue-400 inline-block"></span> 26주선</span>
             <span class="flex items-center gap-1 text-purple-400"><span class="w-3 h-0.5 bg-purple-400 inline-block"></span> 52주선</span>
             <span class="flex items-center gap-1 text-cyan-400"><span class="w-3 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span> 🛡️ATR방어선</span>
           </div>
-          <span id="det-volume-label" class="text-[11px] font-mono text-gray-400">거래량 489.92K</span>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <!-- 기간 선택 버튼 (기본: 1.8년 전체) -->
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono">
+              <button id="btn-wrange-all" type="button" onclick="setWeeklyRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1.8년(전체)</button>
+              <button id="btn-wrange-1y" type="button" onclick="setWeeklyRange('1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
+              <button id="btn-wrange-6m" type="button" onclick="setWeeklyRange('6M')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">6개월</button>
+            </div>
+            <button id="btn-tv-widget-mode" type="button" onclick="toggleTvWidgetMode()" class="px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-semibold text-blue-300 transition">
+              📈 TradingView 고급위젯 전환
+            </button>
+            <a id="link-tv-external" href="https://kr.tradingview.com/chart/?symbol=KRX:251970" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] text-gray-300 transition">
+              트레이딩뷰 ↗
+            </a>
+            <span id="det-volume-label" class="text-[11px] font-mono text-gray-400 ml-1">거래량 489.92K</span>
+          </div>
         </div>
 
-        <!-- Chart Canvas Wrapper with Top-Left '로그' Toggle Button -->
-        <div class="relative w-full h-[380px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
-          <button id="btn-tv-log" type="button" onclick="toggleTvLogScale()" class="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded bg-[#161b22]/90 hover:bg-gray-800 border border-gray-700 text-xs font-mono font-semibold text-gray-200 shadow">
-            로그
-          </button>
+        <!-- Chart Canvas Wrapper with Top-Left '로그' Toggle + Real-Time Crosshair OHLC/MA Legend + Bottom-Left TradingView Badge -->
+        <div class="relative w-full h-[420px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+          <div id="tv-custom-overlay-bar" class="absolute top-2.5 left-2.5 right-2.5 z-20 flex flex-wrap items-center gap-2 pointer-events-none">
+            <button id="btn-tv-log" type="button" onclick="toggleTvLogScale()" class="pointer-events-auto px-2.5 py-1 rounded bg-[#161b22]/90 hover:bg-gray-800 border border-gray-700 text-xs font-mono font-semibold text-gray-200 shadow">
+              로그
+            </button>
+            <div id="tv-crosshair-legend" class="px-2.5 py-1 rounded bg-[#161b22]/85 border border-gray-800/90 text-[11px] font-mono text-gray-300 flex flex-wrap items-center gap-2">
+              <span>마우스를 차트에 올리면 주봉 시·고·저·종가 및 4·13·26·52주 이평선 수치가 표시됩니다</span>
+            </div>
+          </div>
+
+          <!-- TradingView Bottom-Left Attribution Badge -->
+          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[10px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
+            <span class="font-extrabold text-blue-400">TV</span>
+            <span>TradingView Lightweight Charts™</span>
+          </a>
+
+          <!-- Custom Weekly Screener Candlestick Canvas (4/13/26/52W MA + ATR Stop) -->
           <div id="tv-weekly-chart" class="w-full h-full"></div>
+          <!-- Official TradingView Advanced Widget Container (Toggled on demand) -->
+          <div id="tv-advanced-widget-box" class="hidden w-full h-full"></div>
         </div>
 
         <!-- Verdict Bar Below Chart -->
         <div class="px-3 py-2.5 rounded-lg bg-[#0d1117] border border-gray-800 text-xs font-mono text-gray-200">
           <span class="text-blue-400 font-bold mr-1.5">판정</span>
-          <span id="det-verdict-line">정배열 0주(초입) · 준비20주 · 변동성수축 · 거래대금회복 · 섹터상위(#23) · 거래대금 가점 · 시총 가점</span>
+          <span id="det-verdict-line">정배열 1주(초입) · 준비20주 · 변동성수축 · 거래대금회복 · 섹터상위(#23) · 거래대금 가점 · 시총 가점</span>
         </div>
       </div>
 
-      <!-- Bottom Section: 외국인·기관 수급 오실레이터 (77거래일 이중축 비교) -->
+      <!-- Bottom Section: 외국인·기관 수급 오실레이터 (420거래일 · 약 1.7년 이중축 파동 비교) -->
       <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3 sm:p-4 space-y-2.5">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 class="text-sm font-bold text-white">외국인·기관 수급 오실레이터</h3>
-            <p class="text-xs text-gray-400">주가 일봉(왼쪽 축)과 수급 강도(오른쪽 축)를 같은 높이에서 비교 · 최근 77거래일 · KIS Open API</p>
+            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center w-4 h-4 rounded bg-rose-600 text-[10px] font-extrabold text-white">TV</span>
+              외국인·기관 수급 오실레이터 (최근 1.7년 · 420거래일)
+            </h3>
+            <p class="text-xs text-gray-400">주가 일봉(왼쪽 축)과 외국인·기관 수급 강도 파동(오른쪽 축)을 1.7년 장기 시계열로 비교 · KIS Open API</p>
           </div>
           <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-[11px] font-mono mr-1">
+              <button id="btn-orange-all" type="button" onclick="setOscRange('ALL')" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1.7년(전체)</button>
+              <button id="btn-orange-1y" type="button" onclick="setOscRange('1Y')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">1년</button>
+              <button id="btn-orange-77d" type="button" onclick="setOscRange('77D')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">77거래일</button>
+            </div>
             <span id="det-osc-cur" class="px-2.5 py-1 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">+0.014% 현재</span>
             <span id="det-osc-status" class="px-2.5 py-1 rounded bg-[#0d1117] text-gray-200 border border-gray-800">중립 상태</span>
             <span id="det-osc-pct" class="px-2.5 py-1 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">53% 77일 위치</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-4 text-xs">
-          <span class="flex items-center gap-1 text-gray-300"><span class="w-3 h-0.5 bg-gray-300 inline-block"></span> 주가 일봉 (좌축)</span>
-          <span class="flex items-center gap-1 text-rose-400"><span class="w-3 h-0.5 bg-rose-500 inline-block"></span> 수급 오실레이터 (우축)</span>
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1 text-gray-300"><span class="w-3 h-0.5 bg-gray-300 inline-block"></span> 주가 일봉 (좌축 · 원)</span>
+            <span class="flex items-center gap-1 text-rose-400"><span class="w-3 h-0.5 bg-rose-500 inline-block"></span> 수급 오실레이터 파동 (우축 · %)</span>
+            <span class="flex items-center gap-1 text-gray-500"><span class="w-3 h-0.5 border-b border-dashed border-gray-500 inline-block"></span> 0.000% 기준선</span>
+          </div>
+          <div id="tv-osc-crosshair-legend" class="font-mono text-[11px] text-gray-400"></div>
         </div>
 
-        <div class="relative w-full h-[250px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+        <div class="relative w-full h-[280px] bg-[#0d1117] rounded-lg border border-gray-800 overflow-hidden">
+          <a href="https://kr.tradingview.com/" target="_blank" rel="noopener noreferrer" class="absolute bottom-8 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/85 hover:bg-[#161b22] border border-gray-800 text-[10px] font-mono text-gray-400 hover:text-white flex items-center gap-1 shadow">
+            <span class="font-extrabold text-blue-400">TV</span>
+            <span>TradingView Lightweight Charts™</span>
+          </a>
           <div id="tv-osc-chart" class="w-full h-full"></div>
         </div>
       </div>
@@ -521,21 +570,20 @@
       detailOpen: false,
       selectedStockId: null,
       tvLogScale: false,
+      tvWidgetMode: false,
+      weeklyRange: 'ALL',
+      oscRange: 'ALL',
       searchQuery: '',
       sectorFilter: 'ALL',
       watchlistOnly: false,
-      watchlist: new Set(['KR-251970', 'KR-028050']),
+      watchlist: new Set([]),
       oscSearch: '',
-      tabLikes: { onset: 42, progress: 29, warning: 11, longterm: 8, exit: 34, oscillator: 35, credit: 22, thermometer: 51, participation: 19, industry: 38, highlow: 17 },
+      viewCount: 1,
+      tabLikes: { onset: 0, progress: 0, warning: 0, longterm: 0, exit: 0, oscillator: 0, credit: 0, thermometer: 0, participation: 0, industry: 0, highlow: 0 },
       likedTabs: new Set(),
       commentsOpen: false,
-      comments: [
-        { author: '한국장트레이더', time: '방금 전', text: '펌텍코리아 주봉 정배열 초입 + 수급 오실레이터 반등 흐름 좋네요.' },
-        { author: '밸류업헌터', time: '30분 전', text: '롯데렌탈 정배열 14주 확산 구간에서 신고가 유지 중입니다.' }
-      ],
-      journalEntries: [
-        { id: 1, date: '2026-11-16', stock: '펌텍코리아 (251970)', stage: '초입', note: '주봉 정배열 초입 12점 · 변동성 수축 돌파' }
-      ]
+      comments: [],
+      journalEntries: []
     };
 
     let tvWeeklyChart = null;
@@ -546,17 +594,29 @@
 
     function loadSavedLocalState() {
       try {
-        const wl = localStorage.getItem('kr_screener_wl_v2');
+        const wl = localStorage.getItem('kr_screener_wl_v5');
         if (wl) state.watchlist = new Set(JSON.parse(wl));
-        const jl = localStorage.getItem('kr_screener_jl_v2');
+        const jl = localStorage.getItem('kr_screener_jl_v5');
         if (jl) state.journalEntries = JSON.parse(jl);
+        const lk = localStorage.getItem('kr_screener_likes_v5');
+        if (lk) state.tabLikes = Object.assign(state.tabLikes, JSON.parse(lk));
+        const lt = localStorage.getItem('kr_screener_liked_tabs_v5');
+        if (lt) state.likedTabs = new Set(JSON.parse(lt));
+        const cm = localStorage.getItem('kr_screener_comments_v5');
+        if (cm) state.comments = JSON.parse(cm);
+        const vc = parseInt(localStorage.getItem('kr_screener_views_v5') || '0', 10) + 1;
+        state.viewCount = vc;
+        localStorage.setItem('kr_screener_views_v5', String(vc));
       } catch (e) {}
     }
 
     function saveLocalState() {
       try {
-        localStorage.setItem('kr_screener_wl_v2', JSON.stringify(Array.from(state.watchlist)));
-        localStorage.setItem('kr_screener_jl_v2', JSON.stringify(state.journalEntries));
+        localStorage.setItem('kr_screener_wl_v5', JSON.stringify(Array.from(state.watchlist)));
+        localStorage.setItem('kr_screener_jl_v5', JSON.stringify(state.journalEntries));
+        localStorage.setItem('kr_screener_likes_v5', JSON.stringify(state.tabLikes));
+        localStorage.setItem('kr_screener_liked_tabs_v5', JSON.stringify(Array.from(state.likedTabs)));
+        localStorage.setItem('kr_screener_comments_v5', JSON.stringify(state.comments));
       } catch (e) {}
     }
 
@@ -722,13 +782,108 @@
       const btn = document.getElementById('btn-tv-log');
       if (btn) {
         btn.className = state.tvLogScale
-          ? 'absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded bg-blue-600 text-white border border-blue-400 text-xs font-mono font-bold shadow'
-          : 'absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded bg-[#161b22]/90 hover:bg-gray-800 border border-gray-700 text-xs font-mono font-semibold text-gray-200 shadow';
+          ? 'pointer-events-auto px-2.5 py-1 rounded bg-blue-600 text-white border border-blue-400 text-xs font-mono font-bold shadow'
+          : 'pointer-events-auto px-2.5 py-1 rounded bg-[#161b22]/90 hover:bg-gray-800 border border-gray-700 text-xs font-mono font-semibold text-gray-200 shadow';
       }
       if (tvWeeklyChart && window.LightweightCharts) {
         tvWeeklyChart.priceScale('right').applyOptions({
           mode: state.tvLogScale ? LightweightCharts.PriceScaleMode.Logarithmic : LightweightCharts.PriceScaleMode.Normal
         });
+      }
+    }
+
+    function setWeeklyRange(mode) {
+      state.weeklyRange = mode;
+      ['all', '1y', '6m'].forEach(k => {
+        const el = document.getElementById('btn-wrange-' + k);
+        if (!el) return;
+        const active = k.toUpperCase() === mode;
+        el.className = active
+          ? 'px-2 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      });
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (!stock || !tvWeeklyChart) return;
+      const candles = stock.weeklyCandles || [];
+      if (!candles.length) return;
+      if (mode === 'ALL') {
+        tvWeeklyChart.timeScale().fitContent();
+      } else {
+        const weeksBack = mode === '1Y' ? 52 : 26;
+        const startIdx = Math.max(0, candles.length - weeksBack);
+        tvWeeklyChart.timeScale().setVisibleRange({
+          from: candles[startIdx].time,
+          to: candles[candles.length - 1].time
+        });
+      }
+    }
+
+    function setOscRange(mode) {
+      state.oscRange = mode;
+      ['all', '1y', '77d'].forEach(k => {
+        const el = document.getElementById('btn-orange-' + k);
+        if (!el) return;
+        const active = k.toUpperCase() === mode;
+        el.className = active
+          ? 'px-2 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      });
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (!stock || !tvOscChart) return;
+      const dailyOsc = stock.dailyOsc || [];
+      if (!dailyOsc.length) return;
+      if (mode === 'ALL') {
+        tvOscChart.timeScale().fitContent();
+      } else {
+        const daysBack = mode === '1Y' ? 250 : 77;
+        const startIdx = Math.max(0, dailyOsc.length - daysBack);
+        tvOscChart.timeScale().setVisibleRange({
+          from: dailyOsc[startIdx].time,
+          to: dailyOsc[dailyOsc.length - 1].time
+        });
+      }
+    }
+
+    function toggleTvWidgetMode() {
+      state.tvWidgetMode = !state.tvWidgetMode;
+      const btn = document.getElementById('btn-tv-widget-mode');
+      const customBox = document.getElementById('tv-weekly-chart');
+      const overlayBar = document.getElementById('tv-custom-overlay-bar');
+      const widgetBox = document.getElementById('tv-advanced-widget-box');
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId) || STOCKS_DATA[0];
+      if (!stock) return;
+
+      if (state.tvWidgetMode) {
+        btn.textContent = '📊 주봉 정배열·ATR 차트로 돌아가기';
+        btn.className = 'px-2.5 py-1 rounded-lg bg-blue-600 text-white border border-blue-400 text-[11px] font-bold transition';
+        customBox.classList.add('hidden');
+        overlayBar.classList.add('hidden');
+        widgetBox.classList.remove('hidden');
+        widgetBox.innerHTML = '<div id="tv_advanced_container" class="w-full h-full"></div>';
+        if (window.TradingView && window.TradingView.widget) {
+          new window.TradingView.widget({
+            autosize: true,
+            symbol: 'KRX:' + stock.ticker,
+            interval: 'W',
+            timezone: 'Asia/Seoul',
+            theme: 'dark',
+            style: '1',
+            locale: 'kr',
+            toolbar_bg: '#0d1117',
+            enable_publishing: false,
+            hide_side_toolbar: false,
+            studies: ['MASimple@tv-basicstudies'],
+            container_id: 'tv_advanced_container'
+          });
+        }
+      } else {
+        btn.textContent = '📈 TradingView 고급위젯 전환';
+        btn.className = 'px-2.5 py-1 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-semibold text-blue-300 transition';
+        widgetBox.classList.add('hidden');
+        widgetBox.innerHTML = '';
+        customBox.classList.remove('hidden');
+        overlayBar.classList.remove('hidden');
+        renderTradingViewCharts(stock);
       }
     }
 
@@ -812,7 +967,35 @@
       renderTradingViewCharts(stock);
     }
 
+    function formatWeeklyLegendHtml(c) {
+      if (!c) return '';
+      const isUp = c.close >= c.open;
+      const col = isUp ? 'text-emerald-400' : 'text-rose-400';
+      const fmt = n => (n !== null && n !== undefined) ? Number(n).toLocaleString() : '—';
+      return `
+        <span class="text-gray-400">${c.time}</span>
+        <span>시 <strong class="${col}">${fmt(c.open)}</strong></span>
+        <span>고 <strong class="${col}">${fmt(c.high)}</strong></span>
+        <span>저 <strong class="${col}">${fmt(c.low)}</strong></span>
+        <span>종 <strong class="${col}">${fmt(c.close)}</strong></span>
+        <span class="text-yellow-400">4주 ${fmt(c.ma4)}</span>
+        <span class="text-orange-400">13주 ${fmt(c.ma13)}</span>
+        <span class="text-blue-400">26주 ${fmt(c.ma26)}</span>
+        <span class="text-purple-400">52주 ${fmt(c.ma52)}</span>
+      `;
+    }
+
     function renderTradingViewCharts(stock) {
+      const extLink = document.getElementById('link-tv-external');
+      if (extLink && stock.ticker) {
+        extLink.href = 'https://kr.tradingview.com/chart/?symbol=KRX:' + stock.ticker;
+      }
+
+      if (state.tvWidgetMode) {
+        state.tvWidgetMode = false;
+        toggleTvWidgetMode();
+      }
+
       const weeklyEl = document.getElementById('tv-weekly-chart');
       const oscEl = document.getElementById('tv-osc-chart');
       if (!weeklyEl || !oscEl || !window.LightweightCharts) return;
@@ -820,16 +1003,27 @@
       weeklyEl.innerHTML = '';
       oscEl.innerHTML = '';
 
-      // 1. 주봉 캔들차트 (양봉 초록 #22c55e, 음봉 빨강 #ef4444 + 4/13/26/52주 이평선 + 거래량)
+      // 1. 주봉 캔들차트 (최근 96주 ≈ 1.85년 · 양봉 초록 #22c55e, 음봉 빨강 #ef4444 + 4/13/26/52주 이평선 + 거래량)
       tvWeeklyChart = LightweightCharts.createChart(weeklyEl, {
         autoSize: true,
-        layout: { background: { type: 'solid', color: '#0d1117' }, textColor: '#9ca3af' },
+        layout: {
+          background: { type: 'solid', color: '#0d1117' },
+          textColor: '#9ca3af',
+          fontFamily: "'JetBrains Mono', 'Pretendard', sans-serif"
+        },
         grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
         rightPriceScale: {
           borderColor: '#374151',
+          scaleMargins: { top: 0.08, bottom: 0.22 },
           mode: state.tvLogScale ? LightweightCharts.PriceScaleMode.Logarithmic : LightweightCharts.PriceScaleMode.Normal
         },
-        timeScale: { borderColor: '#374151' }
+        timeScale: {
+          borderColor: '#374151',
+          rightOffset: 3,
+          barSpacing: 8,
+          minBarSpacing: 3
+        }
       });
 
       tvWeeklyCandleSeries = tvWeeklyChart.addCandlestickSeries({
@@ -847,16 +1041,20 @@
         priceLineVisible: false
       });
       tvWeeklyChart.priceScale('').applyOptions({
-        scaleMargins: { top: 0.8, bottom: 0 }
+        scaleMargins: { top: 0.80, bottom: 0 }
       });
 
-      const ma4Series = tvWeeklyChart.addLineSeries({ color: '#facc15', lineWidth: 1.5, priceLineVisible: false });
-      const ma13Series = tvWeeklyChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, priceLineVisible: false });
-      const ma26Series = tvWeeklyChart.addLineSeries({ color: '#3b82f6', lineWidth: 1.5, priceLineVisible: false });
-      const ma52Series = tvWeeklyChart.addLineSeries({ color: '#a855f7', lineWidth: 1.5, priceLineVisible: false });
+      const ma4Series = tvWeeklyChart.addLineSeries({ color: '#facc15', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true });
+      const ma13Series = tvWeeklyChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true });
+      const ma26Series = tvWeeklyChart.addLineSeries({ color: '#3b82f6', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true });
+      const ma52Series = tvWeeklyChart.addLineSeries({ color: '#a855f7', lineWidth: 1.8, priceLineVisible: false, lastValueVisible: true });
       const tstopSeries = tvWeeklyChart.addLineSeries({ color: '#06b6d4', lineWidth: 1.5, lineStyle: 2, priceLineVisible: true, title: 'ATR방어' });
 
       const candles = stock.weeklyCandles || [];
+      const candleByTime = {};
+      candles.forEach(c => { candleByTime[c.time] = c; });
+
+      const legendEl = document.getElementById('tv-crosshair-legend');
       if (candles.length > 0) {
         tvWeeklyCandleSeries.setData(candles.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
         volSeries.setData(candles.map(c => ({
@@ -869,17 +1067,36 @@
         ma26Series.setData(candles.filter(c => c.ma26 !== null).map(c => ({ time: c.time, value: c.ma26 })));
         ma52Series.setData(candles.filter(c => c.ma52 !== null).map(c => ({ time: c.time, value: c.ma52 })));
         tstopSeries.setData(candles.filter(c => c.tstop !== undefined && c.tstop !== null).map(c => ({ time: c.time, value: c.tstop })));
-        tvWeeklyChart.timeScale().fitContent();
+
+        if (legendEl) {
+          legendEl.innerHTML = formatWeeklyLegendHtml(candles[candles.length - 1]);
+        }
+
+        tvWeeklyChart.subscribeCrosshairMove(param => {
+          if (!legendEl) return;
+          if (!param || !param.time || !candleByTime[param.time]) {
+            legendEl.innerHTML = formatWeeklyLegendHtml(candles[candles.length - 1]);
+            return;
+          }
+          legendEl.innerHTML = formatWeeklyLegendHtml(candleByTime[param.time]);
+        });
+
+        setWeeklyRange(state.weeklyRange || 'ALL');
       }
 
-      // 2. 최근 77거래일 주가 일봉(좌축) + 외국인·기관 수급 오실레이터(우축) 이중 축 차트
+      // 2. 최근 420거래일(약 1.7년) 주가 일봉(좌축) + 외국인·기관 수급 오실레이터(우축) 이중 축 차트
       tvOscChart = LightweightCharts.createChart(oscEl, {
         autoSize: true,
-        layout: { background: { type: 'solid', color: '#0d1117' }, textColor: '#9ca3af' },
+        layout: {
+          background: { type: 'solid', color: '#0d1117' },
+          textColor: '#9ca3af',
+          fontFamily: "'JetBrains Mono', 'Pretendard', sans-serif"
+        },
         grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
-        leftPriceScale: { visible: true, borderColor: '#374151' },
-        rightPriceScale: { visible: true, borderColor: '#374151' },
-        timeScale: { borderColor: '#374151' }
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        leftPriceScale: { visible: true, borderColor: '#374151', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        rightPriceScale: { visible: true, borderColor: '#374151', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        timeScale: { borderColor: '#374151', rightOffset: 3 }
       });
 
       const priceLine = tvOscChart.addLineSeries({
@@ -893,14 +1110,42 @@
         color: '#f43f5e',
         lineWidth: 2,
         priceScaleId: 'right',
-        priceLineVisible: false
+        priceLineVisible: false,
+        priceFormat: { type: 'price', precision: 4, minMove: 0.0001 }
+      });
+
+      // 0.000% 기준선 추가
+      oscLine.createPriceLine({
+        price: 0.0,
+        color: '#6b7280',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: '0기준'
       });
 
       const dailyOsc = stock.dailyOsc || [];
+      const oscByTime = {};
+      dailyOsc.forEach(d => { oscByTime[d.time] = d; });
+      const oscLegendEl = document.getElementById('tv-osc-crosshair-legend');
+
       if (dailyOsc.length > 0) {
         priceLine.setData(dailyOsc.map(d => ({ time: d.time, value: d.close })));
         oscLine.setData(dailyOsc.map(d => ({ time: d.time, value: d.osc })));
-        tvOscChart.timeScale().fitContent();
+
+        const lastD = dailyOsc[dailyOsc.length - 1];
+        if (oscLegendEl && lastD) {
+          oscLegendEl.innerHTML = `${lastD.time} · 종가 <strong class="text-gray-200">${Number(lastD.close).toLocaleString()}원</strong> · 수급오실레이터 <strong class="${lastD.osc >= 0 ? 'text-rose-400' : 'text-blue-400'}">${lastD.osc >= 0 ? '+' : ''}${lastD.osc.toFixed(4)}%</strong>`;
+        }
+
+        tvOscChart.subscribeCrosshairMove(param => {
+          if (!oscLegendEl) return;
+          const item = (param && param.time && oscByTime[param.time]) ? oscByTime[param.time] : lastD;
+          if (!item) return;
+          oscLegendEl.innerHTML = `${item.time} · 종가 <strong class="text-gray-200">${Number(item.close).toLocaleString()}원</strong> · 수급오실레이터 <strong class="${item.osc >= 0 ? 'text-rose-400' : 'text-blue-400'}">${item.osc >= 0 ? '+' : ''}${item.osc.toFixed(4)}%</strong>`;
+        });
+
+        setOscRange(state.oscRange || 'ALL');
       }
     }
 
@@ -1092,14 +1337,16 @@
 
     function toggleTabLike() {
       const k = state.activeTab;
+      const cur = state.tabLikes[k] || 0;
       if (state.likedTabs.has(k)) {
         state.likedTabs.delete(k);
-        state.tabLikes[k] = (state.tabLikes[k] || 10) - 1;
+        state.tabLikes[k] = Math.max(0, cur - 1);
       } else {
         state.likedTabs.add(k);
-        state.tabLikes[k] = (state.tabLikes[k] || 10) + 1;
+        state.tabLikes[k] = cur + 1;
       }
       document.getElementById('like-count-display').textContent = state.tabLikes[k];
+      saveLocalState();
     }
 
     function toggleCommentsDrawer() {
@@ -1112,17 +1359,34 @@
       e.preventDefault();
       const inp = document.getElementById('comment-input');
       if (!inp.value.trim()) return;
-      state.comments.unshift({ author: '투자자', time: '방금 전', text: inp.value.trim() });
+      const nowStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      state.comments.unshift({ id: Date.now(), tab: state.activeTab, author: '내 메모', time: nowStr, text: inp.value.trim() });
       inp.value = '';
-      document.getElementById('comment-count-display').textContent = state.comments.length;
+      saveLocalState();
+      renderCommentsList();
+    }
+
+    function deleteTabComment(id) {
+      state.comments = state.comments.filter(c => c.id !== id);
+      saveLocalState();
       renderCommentsList();
     }
 
     function renderCommentsList() {
-      document.getElementById('comments-list').innerHTML = state.comments.map(c => `
-        <div class="p-2 rounded bg-[#0d1117] border border-gray-800 flex justify-between">
+      const tabComments = state.comments.filter(c => !c.tab || c.tab === state.activeTab);
+      document.getElementById('comment-count-display').textContent = tabComments.length;
+      const listEl = document.getElementById('comments-list');
+      if (!tabComments.length) {
+        listEl.innerHTML = '<div class="p-2.5 rounded bg-[#0d1117] border border-gray-800 text-gray-500 text-center">등록된 댓글이나 메모가 없습니다. 첫 메모를 남겨보세요.</div>';
+        return;
+      }
+      listEl.innerHTML = tabComments.map(c => `
+        <div class="p-2 rounded bg-[#0d1117] border border-gray-800 flex items-center justify-between gap-2">
           <span><strong class="text-blue-400 mr-1.5">${c.author}</strong>${c.text}</span>
-          <span class="text-gray-500 font-mono">${c.time}</span>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-gray-500 font-mono text-[11px]">${c.time}</span>
+            <button type="button" onclick="deleteTabComment(${c.id})" class="text-gray-500 hover:text-rose-400 text-[11px]">삭제</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1131,6 +1395,12 @@
       // 1단 탭 표시/숨김 (상세 뷰 열릴 때는 1단 탭 숨김 — leader.starfolio.io 동일 동작)
       document.getElementById('tier1-nav-bar').classList.toggle('hidden', state.detailOpen);
       document.getElementById('feedback-bar-section').classList.toggle('hidden', state.detailOpen);
+      const tabNamesMap = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈', oscillator: '수급오실레이터', credit: '신용잔고', thermometer: '체온', participation: '시장 참여도', industry: '산업 강도', highlow: '신고가·신저가', journal: '내 기록', rules: '매수·매도 규칙', macro: '매크로', research: '리서치' };
+      const fbLabel = document.getElementById('feedback-tab-label');
+      if (fbLabel) fbLabel.textContent = (tabNamesMap[state.activeTab] || '현재') + ' 탭 메모·의견';
+      const lkEl = document.getElementById('like-count-display');
+      if (lkEl) lkEl.textContent = state.tabLikes[state.activeTab] || 0;
+      renderCommentsList();
 
       const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'participation', 'industry', 'highlow'];
       t1Tabs.forEach(t => {
@@ -1204,6 +1474,8 @@
       } catch (e) {}
 
       document.getElementById('price-date-badge').textContent = '가격 ' + (DATA_META.priceDate || '2026-11-16');
+      const vCount = (DATA_META.viewCount && DATA_META.viewCount > 0) ? DATA_META.viewCount : state.viewCount;
+      document.getElementById('view-counter-badge').textContent = '조회 ' + Number(vCount).toLocaleString();
       document.getElementById('cnt-onset').textContent = STAGE_COUNTS.onset ?? STOCKS_DATA.filter(s => s.stage === 'onset').length;
       document.getElementById('cnt-progress').textContent = STAGE_COUNTS.progress ?? STOCKS_DATA.filter(s => s.stage === 'progress').length;
       document.getElementById('cnt-warning').textContent = STAGE_COUNTS.warning ?? STOCKS_DATA.filter(s => s.stage === 'warning').length;
