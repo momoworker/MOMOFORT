@@ -43,8 +43,8 @@ BONUS_TRADING_VAL_EOK = 50  # 거래대금 가점(+0.5점) 기준: 일평균 50�
 MIN_PREP_WEEKS = 15         # 초입 최소 준비기간: 15주 이상
 MAX_ONSET_WEEKS = 8         # 초입 최대 정배열 주차: 6주 이하
 MIN_ONSET_SCORE = 6.0       # 초입 최소 통과 점수 (12점 만점 중 9.0점 이상)
-TARGET_ONSET_MAX = 999       # 초입 탭 최대 표시 종목 수 (15~25개 내외 유지)
-TARGET_PROGRESS_MAX = 999    # 진행 탭 최대 표시 종목 수
+TARGET_ONSET_MAX = 25       # 초입 탭 최대 표시 종목 수 (15~25개 내외 유지)
+TARGET_PROGRESS_MAX = 15    # 진행 탭 최대 표시 종목 수
 MAX_WORKERS = 14            # 병렬 스캔 워커 수
 
 
@@ -136,7 +136,6 @@ def fetch_naver_stock_detail_and_earnings(ticker: str):
     info = {
         "industry": None,
         "opBadge": None,
-        "opmBadge": None,
         "opPositive": True,
         "earningsTitle": None,
         "earningsSummary": None,
@@ -192,11 +191,6 @@ def fetch_naver_stock_detail_and_earnings(ticker: str):
                     last_i = valid_q_indices[-1]
                     q_label = q_cols[last_i].replace(".0", ".")
                     cur_op = float(op_vals[last_i])
-                    if last_i < len(rev_vals) and rev_vals[last_i].lstrip("-").isdigit():
-                        cur_rev = float(rev_vals[last_i])
-                        if cur_rev > 0:
-                            opm_pct = round((cur_op / cur_rev) * 100, 1)
-                            info["opmBadge"] = f"OPM {opm_pct}%" 
                     # 전분기 또는 비교 가능 분기 대비 증감률 계산
                     prev_i = valid_q_indices[-2] if len(valid_q_indices) >= 2 else None
                     if prev_i is not None:
@@ -481,67 +475,19 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
 
         w_tail = weekly.tail(52)
         weekly_candles = []
-        running_peak = 0.0
         for idx, r in w_tail.iterrows():
-            hi_v = float(r["High"])
-            lo_v = float(r["Low"])
-            cl_v = float(r["Close"])
-            running_peak = max(running_peak, hi_v)
-            atr_w = max(hi_v - lo_v, cl_v * 0.032)
-            tstop_v = round(running_peak - 2.2 * atr_w, 0)
             weekly_candles.append({
                 "time": idx.strftime("%Y-%m-%d"),
                 "open": round(float(r["Open"]), 0),
-                "high": round(hi_v, 0),
-                "low": round(lo_v, 0),
-                "close": round(cl_v, 0),
+                "high": round(float(r["High"]), 0),
+                "low": round(float(r["Low"]), 0),
+                "close": round(float(r["Close"]), 0),
                 "volume": int(r["Volume"]),
                 "ma4": round(float(r["ma4"]), 0) if pd.notna(r["ma4"]) else None,
                 "ma13": round(float(r["ma13"]), 0) if pd.notna(r["ma13"]) else None,
                 "ma26": round(float(r["ma26"]), 0) if pd.notna(r["ma26"]) else None,
-                "ma52": round(float(r["ma52"]), 0) if pd.notna(r["ma52"]) else None,
-                "tstop": tstop_v
+                "ma52": round(float(r["ma52"]), 0) if pd.notna(r["ma52"]) else None
             })
-
-        # 4대 실전 리스크 방패 지표 계산
-        disparity_20d = round((latest_close / ma20_d) * 100, 1) if ma20_d > 0 else 100.0
-        delta_c = close.diff()
-        gain_c = delta_c.clip(lower=0).rolling(14).mean()
-        loss_c = (-delta_c.clip(upper=0)).rolling(14).mean()
-        rs_c = gain_c / loss_c.replace(0, pd.NA)
-        rsi_14 = round(float((100 - (100 / (1 + rs_c))).iloc[-1]), 1) if pd.notna(rs_c.iloc[-1]) else 50.0
-
-        if stage == "exit":
-            entry_badge = "🚫 추세이탈 (진입금지)"
-            entry_type = "WARN"
-        elif change_pct <= -7.0 or disparity_20d < 97.5:
-            entry_badge = f"⚡ 단기급락 (20일선 이격 {disparity_20d:.0f}% · 지지확인)"
-            entry_type = "CAUTION"
-        elif disparity_20d >= 111.0 or rsi_14 >= 72.0:
-            entry_badge = f"⚠️ 단기과열 (이격 {disparity_20d:.0f}% · RSI {rsi_14:.0f})"
-            entry_type = "WARN"
-        elif disparity_20d <= 104.5 and 45.0 <= rsi_14 <= 64.0:
-            entry_badge = f"🎯 눌림목 적기 (20일선 이격 {disparity_20d:.0f}% · RSI {rsi_14:.0f})"
-            entry_type = "PULLBACK"
-        else:
-            entry_badge = f"🚀 돌파확산 (20일선 이격 {disparity_20d:.0f}% · RSI {rsi_14:.0f})"
-            entry_type = "BREAKOUT"
-
-        tstop_now = int(weekly_candles[-1]["tstop"]) if weekly_candles else int(latest_close * 0.92)
-        tstop_gap = round(((tstop_now - latest_close) / latest_close) * 100, 1)
-        tstop_badge = f"🛡️ ATR방어선 {tstop_now:,}원 ({tstop_gap:+.1f}%)"
-
-        supply_rate = int(round((latest_close / high_52w) * 100)) if high_52w > 0 else 90
-        osc_pos = osc_val >= 0
-        if osc_pos and supply_rate >= 88:
-            supply_badge = f"🤝 수급동행 · 매물소화 {supply_rate}%"
-            supply_ok = True
-        elif osc_pos:
-            supply_badge = f"📈 수급유입 · 매물소화 {supply_rate}%"
-            supply_ok = True
-        else:
-            supply_badge = f"🧱 수급괴리 · 매물소화 {supply_rate}%"
-            supply_ok = False
 
         daily_77 = []
         for idx, r in d77.iterrows():
@@ -589,13 +535,6 @@ def inspect_kr_stock(ticker, name, exchange, industry, mcap, tags, marcap_num, s
             "oscCurrent": f"{'+' if osc_val>=0 else ''}{osc_val:.3f}%",
             "oscStatus": osc_status,
             "oscPercentile": osc_pct,
-            "entrySignalBadge": entry_badge,
-            "entrySignalType": entry_type,
-            "trailingStopBadge": tstop_badge,
-            "trailingStopPrice": f"{tstop_now:,}원",
-            "supplyCorrobBadge": supply_badge,
-            "supplyCorrobOk": supply_ok,
-            "opmBadge": None,
             "weeklyCandles": weekly_candles,
             "dailyOsc": daily_77,
             "_sortKey": sort_key
@@ -631,8 +570,8 @@ def main():
         return
 
     # 초입·진행 후보 종목들에 대해 네이버 기업실적분석에서 실제 업종명과 분기 영업이익/재무제표 추출 (적자지속 기업 배제)
-    onset_candidates = sorted([c for c in cards if c["stage"] == "onset"], key=lambda x: x.get("_sortKey", 0), reverse=True)
-    progress_candidates = sorted([c for c in cards if c["stage"] == "progress"], key=lambda x: x.get("_sortKey", 0), reverse=True)
+    onset_candidates = sorted([c for c in cards if c["stage"] == "onset"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:40]
+    progress_candidates = sorted([c for c in cards if c["stage"] == "progress"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:25]
 
     print(f"  -> 1차 기술적 필터 통과: 초입 후보 {len(onset_candidates)}종목 / 진행 후보 {len(progress_candidates)}종목 실적·업종 정밀 검증 중...")
 
@@ -646,8 +585,6 @@ def main():
         if det["opBadge"]:
             c["opBadge"] = det["opBadge"]
             c["opPositive"] = det["opPositive"]
-        if det.get("opmBadge"):
-            c["opmBadge"] = det["opmBadge"]
         if det["quarters"]:
             c["quarters"] = det["quarters"]
             c["earningsTitle"] = det["earningsTitle"]
@@ -668,8 +605,6 @@ def main():
         if det["opBadge"]:
             c["opBadge"] = det["opBadge"]
             c["opPositive"] = det["opPositive"]
-        if det.get("opmBadge"):
-            c["opmBadge"] = det["opmBadge"]
         if det["quarters"]:
             c["quarters"] = det["quarters"]
             c["earningsTitle"] = det["earningsTitle"]
@@ -679,8 +614,8 @@ def main():
         if len(verified_progress) >= TARGET_PROGRESS_MAX:
             break
 
-    warning_cards = sorted([c for c in cards if c["stage"] == "warning"], key=lambda x: x.get("_sortKey", 0), reverse=True)
-    longterm_cards = sorted([c for c in cards if c["stage"] == "longterm"], key=lambda x: x.get("_sortKey", 0), reverse=True)
+    warning_cards = sorted([c for c in cards if c["stage"] == "warning"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:10]
+    longterm_cards = sorted([c for c in cards if c["stage"] == "longterm"], key=lambda x: x.get("_sortKey", 0), reverse=True)[:10]
     exit_all = [c for c in cards if c["stage"] == "exit"]
     exit_cards = sorted(exit_all, key=lambda x: x.get("_sortKey", 0), reverse=True)[:30]
 

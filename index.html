@@ -198,7 +198,6 @@
               화학 · 플라스틱제품 제조업 · KOSDAQ · 시총 9,164억 · 금일 ▼4.5%
             </p>
             <div id="det-tags" class="flex flex-wrap gap-1 mt-1.5"></div>
-            <div id="det-shields-strip" class="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-gray-800/80 text-[11px] font-mono"></div>
           </div>
 
           <div class="flex items-center gap-1.5">
@@ -234,7 +233,6 @@
             <span class="flex items-center gap-1 text-orange-400"><span class="w-3 h-0.5 bg-orange-400 inline-block"></span> 13주선</span>
             <span class="flex items-center gap-1 text-blue-400"><span class="w-3 h-0.5 bg-blue-400 inline-block"></span> 26주선</span>
             <span class="flex items-center gap-1 text-purple-400"><span class="w-3 h-0.5 bg-purple-400 inline-block"></span> 52주선</span>
-            <span class="flex items-center gap-1 text-cyan-400"><span class="w-3 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span> 🛡️ATR방어선</span>
           </div>
           <span id="det-volume-label" class="text-[11px] font-mono text-gray-400">거래량 489.92K</span>
         </div>
@@ -669,16 +667,7 @@
 
             <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px]">
               <span class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300 font-mono">시총 ${stock.marketCap}</span>
-              <span class="px-2 py-0.5 rounded border font-mono ${opStyle}">${stock.opBadge}${stock.opmBadge ? ' · ' + stock.opmBadge : ''}</span>
-              ${stock.entrySignalBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${
-                stock.entrySignalType === 'PULLBACK' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' :
-                stock.entrySignalType === 'BREAKOUT' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' :
-                'bg-amber-500/15 text-amber-300 border-amber-500/30'
-              }">${stock.entrySignalBadge}</span>` : ''}
-              ${stock.trailingStopBadge ? `<span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono">${stock.trailingStopBadge}</span>` : ''}
-              ${stock.supplyCorrobBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${
-                stock.supplyCorrobOk ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' : 'bg-gray-800 text-gray-400 border-gray-700'
-              }">${stock.supplyCorrobBadge}</span>` : ''}
+              <span class="px-2 py-0.5 rounded border font-mono ${opStyle}">${stock.opBadge}</span>
               ${(stock.tags || []).map(t => `<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">${t}</span>`).join('')}
             </div>
           </div>
@@ -747,16 +736,6 @@
       document.getElementById('det-tags').innerHTML = (stock.tags || [])
         .map(t => `<span class="text-[11px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">${t}</span>`)
         .join('');
-
-      const shieldEl = document.getElementById('det-shields-strip');
-      if (shieldEl) {
-        shieldEl.innerHTML = [
-          stock.opmBadge ? `<span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">마진 ${stock.opmBadge}</span>` : '',
-          stock.entrySignalBadge ? `<span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">${stock.entrySignalBadge}</span>` : '',
-          stock.trailingStopBadge ? `<span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">${stock.trailingStopBadge}</span>` : '',
-          stock.supplyCorrobBadge ? `<span class="px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">${stock.supplyCorrobBadge}</span>` : ''
-        ].filter(Boolean).join('');
-      }
 
       const scoreBtn = document.getElementById('det-score-btn');
       if (stock.scoreBreakdown && stock.scoreBreakdown.length > 0) {
@@ -852,7 +831,6 @@
       const ma13Series = tvWeeklyChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, priceLineVisible: false });
       const ma26Series = tvWeeklyChart.addLineSeries({ color: '#3b82f6', lineWidth: 1.5, priceLineVisible: false });
       const ma52Series = tvWeeklyChart.addLineSeries({ color: '#a855f7', lineWidth: 1.5, priceLineVisible: false });
-      const tstopSeries = tvWeeklyChart.addLineSeries({ color: '#06b6d4', lineWidth: 1.5, lineStyle: 2, priceLineVisible: true, title: 'ATR방어' });
 
       const candles = stock.weeklyCandles || [];
       if (candles.length > 0) {
@@ -866,7 +844,6 @@
         ma13Series.setData(candles.filter(c => c.ma13 !== null).map(c => ({ time: c.time, value: c.ma13 })));
         ma26Series.setData(candles.filter(c => c.ma26 !== null).map(c => ({ time: c.time, value: c.ma26 })));
         ma52Series.setData(candles.filter(c => c.ma52 !== null).map(c => ({ time: c.time, value: c.ma52 })));
-        tstopSeries.setData(candles.filter(c => c.tstop !== undefined && c.tstop !== null).map(c => ({ time: c.time, value: c.tstop })));
         tvWeeklyChart.timeScale().fitContent();
       }
 
