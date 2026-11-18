@@ -10,6 +10,7 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
   <style>
     html {
       font-size: 17.5px; /* 기본 16px 대비 +1pt 이상 확대로 가독성 강화 */
@@ -19,9 +20,125 @@
       color: #e6edf3;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
       line-height: 1.55;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ===================================================================== */
+    /* ☀️ 데이 모드 (Light Theme) 고대비 가독성 스타일 오버라이드            */
+    /* ===================================================================== */
+    html.day-mode body {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    html.day-mode header {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    html.day-mode #night-watch-section,
+    html.day-mode #feedback-bar-section {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.day-mode .bg-\[\#161b22\],
+    html.day-mode .bg-\[\#111722\],
+    html.day-mode .bg-\[\#121721\],
+    html.day-mode .bg-\[\#0f1520\] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    html.day-mode .bg-\[\#161b22\]\/90,
+    html.day-mode .bg-\[\#161b22\]\/85,
+    html.day-mode .bg-\[\#0d1117\]\/90 {
+      background-color: rgba(255, 255, 255, 0.94) !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.day-mode .hover\:bg-\[\#1c232d\]:hover,
+    html.day-mode .hover\:bg-\[\#161e2c\]:hover,
+    html.day-mode .hover\:bg-gray-800:hover,
+    html.day-mode .hover\:bg-gray-900:hover {
+      background-color: #f1f5f9 !important;
+    }
+    html.day-mode .bg-\[\#0d1117\],
+    html.day-mode .bg-gray-800,
+    html.day-mode .bg-gray-800\/90,
+    html.day-mode .bg-gray-800\/80,
+    html.day-mode .bg-gray-900\/60 {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.day-mode .border-gray-800,
+    html.day-mode .border-gray-800\/90,
+    html.day-mode .border-gray-800\/80,
+    html.day-mode .border-gray-800\/70,
+    html.day-mode .border-gray-700 {
+      border-color: #cbd5e1 !important;
+    }
+    html.day-mode .divide-gray-800\/70 > :not([hidden]) ~ :not([hidden]),
+    html.day-mode .divide-gray-800\/60 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #e2e8f0 !important;
+    }
+    html.day-mode .text-white,
+    html.day-mode .text-gray-100,
+    html.day-mode .text-gray-200 {
+      color: #0f172a !important;
+    }
+    /* 파란/주황/초록/빨강 솔리드 버튼 내부의 흰색 글씨는 유지 */
+    html.day-mode .bg-blue-600.text-white,
+    html.day-mode .bg-blue-600 .text-white,
+    html.day-mode .bg-emerald-600.text-white,
+    html.day-mode .bg-rose-600.text-white,
+    html.day-mode .bg-amber-600.text-white,
+    html.day-mode #det-badge.bg-blue-600 {
+      color: #ffffff !important;
+    }
+    html.day-mode .text-gray-300 {
+      color: #1e293b !important;
+    }
+    html.day-mode .text-gray-400,
+    html.day-mode .text-gray-500 {
+      color: #475569 !important;
+    }
+    /* 주가 상승(빨강)·하락(파랑) 및 배지 텍스트 주간 가독성 고대비 보정 */
+    html.day-mode .text-red-400,
+    html.day-mode .text-rose-400,
+    html.day-mode .text-rose-300 {
+      color: #dc2626 !important;
+    }
+    html.day-mode .text-blue-400,
+    html.day-mode .text-blue-300,
+    html.day-mode .text-blue-200 {
+      color: #1d4ed8 !important;
+    }
+    html.day-mode .text-emerald-400,
+    html.day-mode .text-emerald-300 {
+      color: #047857 !important;
+    }
+    html.day-mode .text-amber-400,
+    html.day-mode .text-amber-300,
+    html.day-mode .text-amber-200,
+    html.day-mode .text-yellow-400 {
+      color: #b45309 !important;
+    }
+    html.day-mode .text-orange-400 {
+      color: #c2410c !important;
+    }
+    html.day-mode .text-indigo-400,
+    html.day-mode .text-indigo-300,
+    html.day-mode .text-indigo-200 {
+      color: #4338ca !important;
+    }
+    html.day-mode .text-purple-400,
+    html.day-mode .text-purple-300 {
+      color: #6d28d9 !important;
+    }
+    html.day-mode .text-cyan-400,
+    html.day-mode .text-cyan-300 {
+      color: #0e7490 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
@@ -50,6 +167,13 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 text-[13px]">
+          <button id="btn-theme-toggle" type="button" onclick="toggleDayNightTheme()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-amber-300 font-bold transition flex items-center gap-1" title="데이(밝은 화면) / 나이트(어두운 화면) 테마 전환">
+            <span id="theme-toggle-icon">☀️</span>
+            <span id="theme-toggle-text">데이 모드</span>
+          </button>
+          <button id="btn-nw-visibility" type="button" onclick="toggleNightWatchVisibility()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-emerald-300 font-semibold transition flex items-center gap-1" title="실시간 나이트워치 전광판 표시/숨김">
+            <span>🟢 LIVE 전광판</span>
+          </button>
           <div class="inline-flex items-center rounded bg-[#161b22] border border-gray-800 p-0.5 font-mono text-[12px]" title="글자 크기 조절">
             <button type="button" onclick="adjustRootFontSize(-1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-400 hover:text-white">가-</button>
             <button type="button" onclick="adjustRootFontSize(0)" id="font-size-label" class="px-1.5 py-0.2 rounded text-blue-300 font-bold">기본(+1pt)</button>
@@ -130,66 +254,85 @@
   </header>
 
   <!-- ===================================================================== -->
-  <!-- 🌙 상단 1줄 나이트워치 전광판 (야간선물 · 필라델피아 반도체 SOX · 나스닥 · 환율) -->
-  <!-- 평소엔 1줄 요약만 표시되며, 각 지수 배지를 클릭하면 미니 주봉차트가 펼쳐집니다 -->
+  <!-- 🟢 상단 1줄 실시간(LIVE) 나이트워치 전광판                            -->
+  <!-- ① 브라우저 실시간 시세 폴링(20초 주기) + ② TradingView 실시간 웹소켓 티커바 -->
+  <!-- ③ 배지 클릭 시 TradingView 실시간 스트리밍 차트 + 1년 추세 차트 동시 지원 -->
   <!-- ===================================================================== -->
   <section id="night-watch-section" class="bg-[#0f1520] border-b border-gray-800/90">
-    <div class="w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-1.5">
+    <div class="w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-1.5 space-y-1.5">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          <span class="shrink-0 px-2 py-0.5 rounded bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-bold text-xs flex items-center gap-1">
-            <span>🌙 나이트워치</span>
-            <span class="text-[11px] font-normal text-indigo-200/80 hidden sm:inline">(배지 클릭 시 차트)</span>
+          <span class="shrink-0 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>LIVE 나이트워치</span>
           </span>
           <div id="night-watch-pills" class="flex items-center gap-1.5"></div>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+
+        <div class="flex items-center gap-1.5 shrink-0 text-xs">
+          <span id="nw-live-clock" class="font-mono text-[11px] text-gray-400 hidden md:inline">실시간 연동 대기</span>
+          <button type="button" onclick="fetchAllLiveNightWatchQuotes(true)" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-blue-300 font-mono text-[11px] transition" title="즉시 실시간 시세 새로고침">
+            🔄 실시간 갱신
+          </button>
+          <button type="button" id="btn-nw-tv-tape" onclick="toggleNightWatchTvTape()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-indigo-300 font-semibold text-[11px] transition" title="트레이딩뷰 공식 실시간 웹소켓 티커바 펼치기/접기">
+            📺 TV 스트리밍 바
+          </button>
           <button type="button" onclick="toggleNightWatchChart('sox_index')" id="nw-overall-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
-            ⚠️ 국장 시초 경계 · 반도체 눌림 확인
+            ⚠️ 국장 시초 경계
+          </button>
+          <button type="button" onclick="toggleNightWatchVisibility()" class="px-1.5 py-0.5 rounded hover:bg-gray-800 text-gray-400 hover:text-white text-xs" title="나이트워치 바 숨기기">
+            ✕
           </button>
         </div>
       </div>
 
-      <!-- 클릭 시 펼쳐지는 아코디언 미니 차트 드로어 (기본 숨김) -->
-      <div id="night-watch-drawer" class="hidden mt-2 pt-2.5 pb-2 border-t border-gray-800/90 space-y-2.5">
+      <!-- 선택형: TradingView 공식 WebSocket 실시간 스트리밍 티커 테이프 (CORS 영향 없이 100% 실시간 작동) -->
+      <div id="nw-tv-tape-box" class="hidden rounded-lg overflow-hidden border border-gray-800">
+        <div id="nw-tv-tape-inner"></div>
+      </div>
+
+      <!-- 배지 클릭 시 펼쳐지는 실시간 TradingView 차트 + 1년 주봉 추이 드로어 (기본 숨김) -->
+      <div id="night-watch-drawer" class="hidden pt-2.5 pb-2 border-t border-gray-800/90 space-y-2.5">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex flex-wrap items-center gap-2">
             <span id="nw-det-title" class="text-sm font-bold text-white">💾 필라델피아 반도체 (SOX)</span>
             <span id="nw-det-price" class="text-sm font-mono font-bold text-blue-400">9,610.65 (▼ 5.28%)</span>
             <span id="nw-det-extra" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-xs font-mono text-gray-300">SOXX $141.22</span>
-            <span class="text-xs font-mono text-gray-400 flex items-center gap-2 ml-1">
-              <span class="text-yellow-400">— 4주선</span>
-              <span class="text-orange-400">— 13주선</span>
-              <span class="text-blue-400">— 26주선</span>
-            </span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-xs font-mono">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <div class="inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-xs font-semibold">
+              <button type="button" id="btn-nw-mode-live" onclick="setNightWatchChartMode('LIVE_TV')" class="px-2.5 py-0.5 rounded bg-emerald-600 text-white font-bold">🟢 실시간 TV 스트리밍 차트</button>
+              <button type="button" id="btn-nw-mode-hist" onclick="setNightWatchChartMode('HIST_MA')" class="px-2.5 py-0.5 rounded text-gray-400 hover:text-white">📊 1년 주봉·이평선 추이</button>
+            </div>
+            <div id="nw-hist-range-btns" class="hidden inline-flex rounded-lg bg-[#0d1117] p-0.5 border border-gray-800 text-xs font-mono">
               <button type="button" onclick="setNightWatchRange('ALL')" id="btn-nw-all" class="px-2 py-0.5 rounded bg-blue-600 text-white font-bold">1년</button>
               <button type="button" onclick="setNightWatchRange('6M')" id="btn-nw-6m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">6개월</button>
               <button type="button" onclick="setNightWatchRange('3M')" id="btn-nw-3m" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">3개월</button>
             </div>
             <button type="button" onclick="closeNightWatchDrawer()" class="px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold transition">
-              ✕ 차트 닫기
+              ✕ 닫기
             </button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 items-stretch">
-          <div class="lg:col-span-2 relative h-[245px] bg-[#0d1117] rounded-xl border border-gray-800 overflow-hidden">
-            <div id="nw-crosshair-legend" class="absolute top-2 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/90 border border-gray-800 text-xs font-mono text-gray-300 pointer-events-none"></div>
-            <div id="tv-nightwatch-chart" class="w-full h-full"></div>
+          <div class="lg:col-span-2 relative h-[280px] bg-[#0d1117] rounded-xl border border-gray-800 overflow-hidden">
+            <div id="nw-live-tv-widget-container" class="w-full h-full"></div>
+            <div id="nw-hist-chart-wrapper" class="hidden w-full h-full relative">
+              <div id="nw-crosshair-legend" class="absolute top-2 left-2.5 z-20 px-2 py-0.5 rounded bg-[#161b22]/90 border border-gray-800 text-xs font-mono text-gray-300 pointer-events-none"></div>
+              <div id="tv-nightwatch-chart" class="w-full h-full"></div>
+            </div>
           </div>
           <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3.5 flex flex-col justify-between space-y-2 text-xs">
             <div class="space-y-1.5">
               <div class="font-bold text-indigo-300 flex items-center justify-between">
                 <span>📌 한국장 시초 연동 핵심 포인트</span>
-                <span id="nw-updated-at" class="text-[11px] font-mono text-gray-400"></span>
+                <span id="nw-updated-at" class="text-[11px] font-mono text-emerald-400"></span>
               </div>
               <p id="nw-det-guide" class="text-gray-200 leading-relaxed"></p>
             </div>
             <div class="p-2.5 rounded-lg bg-[#0d1117] border border-gray-800 space-y-1">
-              <div class="font-bold text-amber-300">🧭 금일 장전 대응 요약</div>
+              <div class="font-bold text-amber-300">🧭 실시간 시초가 동조화 판정</div>
               <p id="nw-det-overall-comment" class="text-gray-300 leading-relaxed"></p>
             </div>
           </div>
@@ -1060,6 +1203,10 @@
       showFuture4QE: true,
       activeNwId: null,
       nwRange: 'ALL',
+      nwChartMode: 'LIVE_TV',
+      nwVisible: true,
+      nwTvTapeOpen: false,
+      themeMode: 'night',
       rootFontStep: 0,
       watchlist: new Set([]),
       oscSearch: '',
@@ -1146,6 +1293,273 @@
     // 1열 세로 카드 리스트 렌더링 (초입 / 진행 / 경계 / 장기 / 이탈)
     // =========================================================================
 
+
+    function getChartThemeLayout() {
+      const isDay = state.themeMode === 'day';
+      return {
+        layout: {
+          background: { type: 'solid', color: isDay ? '#ffffff' : '#0d1117' },
+          textColor: isDay ? '#334155' : '#9ca3af',
+          fontSize: 12,
+          fontFamily: "'JetBrains Mono', 'Inter', 'Pretendard', sans-serif"
+        },
+        grid: {
+          vertLines: { color: isDay ? '#e2e8f0' : '#1f2937' },
+          horzLines: { color: isDay ? '#e2e8f0' : '#1f2937' }
+        },
+        borderColor: isDay ? '#cbd5e1' : '#374151'
+      };
+    }
+
+    function applyThemeMode() {
+      const isDay = state.themeMode === 'day';
+      document.documentElement.classList.toggle('day-mode', isDay);
+      const iconEl = document.getElementById('theme-toggle-icon');
+      const txtEl = document.getElementById('theme-toggle-text');
+      if (iconEl) iconEl.textContent = isDay ? '🌙' : '☀️';
+      if (txtEl) txtEl.textContent = isDay ? '나이트 모드' : '데이 모드';
+
+      // Re-render active charts so canvas backgrounds/grids match Day or Night theme immediately
+      const tLayout = getChartThemeLayout();
+      [tvWeeklyChart, tvOscChart, tvEarnings12QChart, tvSupply60DChart, tvFgChart, tvBreadthMaChart, tvBreadthHlChart, tvNwChart].forEach(ch => {
+        if (ch) {
+          try {
+            ch.applyOptions({ layout: tLayout.layout, grid: tLayout.grid });
+          } catch (e) {}
+        }
+      });
+      Object.values(macroTvCharts || {}).forEach(entry => {
+        if (entry && entry.chart) {
+          try {
+            entry.chart.applyOptions({ layout: tLayout.layout, grid: tLayout.grid });
+          } catch (e) {}
+        }
+      });
+      if (state.nwTvTapeOpen) renderNightWatchTvTapeWidget();
+      if (state.activeNwId && state.nwChartMode === 'LIVE_TV') renderNightWatchLiveTvWidget();
+    }
+
+    function toggleDayNightTheme() {
+      state.themeMode = state.themeMode === 'day' ? 'night' : 'day';
+      try { localStorage.setItem('kr_explorer_theme', state.themeMode); } catch (e) {}
+      applyThemeMode();
+      renderAll();
+    }
+
+    function toggleNightWatchVisibility() {
+      state.nwVisible = !state.nwVisible;
+      const sec = document.getElementById('night-watch-section');
+      const btn = document.getElementById('btn-nw-visibility');
+      if (sec) sec.classList.toggle('hidden', !state.nwVisible);
+      if (btn) {
+        btn.innerHTML = state.nwVisible ? '<span>🟢 LIVE 전광판</span>' : '<span>⚪ 전광판 켜기</span>';
+        btn.className = state.nwVisible
+          ? 'px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-emerald-300 font-semibold transition flex items-center gap-1'
+          : 'px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-gray-400 font-semibold transition flex items-center gap-1';
+      }
+      try { localStorage.setItem('kr_explorer_nw_vis', state.nwVisible ? '1' : '0'); } catch (e) {}
+    }
+
+    function toggleNightWatchTvTape() {
+      state.nwTvTapeOpen = !state.nwTvTapeOpen;
+      const box = document.getElementById('nw-tv-tape-box');
+      if (box) box.classList.toggle('hidden', !state.nwTvTapeOpen);
+      if (state.nwTvTapeOpen) renderNightWatchTvTapeWidget();
+    }
+
+    function renderNightWatchTvTapeWidget() {
+      const inner = document.getElementById('nw-tv-tape-inner');
+      if (!inner) return;
+      inner.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'tradingview-widget-container';
+      const wDiv = document.createElement('div');
+      wDiv.className = 'tradingview-widget-container__widget';
+      wrap.appendChild(wDiv);
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+      s.async = true;
+      s.text = JSON.stringify({
+        symbols: [
+          { proName: 'AMEX:EWY', title: '🌙 한국야간(EWY·K200동조)' },
+          { proName: 'NASDAQ:SOXX', title: '💾 필반지수(SOXX)' },
+          { proName: 'AMEX:SOXL', title: '🔥 반도체3X(SOXL)' },
+          { proName: 'FOREXCOM:NSXUSD', title: '🇺🇸 나스닥100선물' },
+          { proName: 'FX_IDC:USDKRW', title: '💵 원/달러 환율' },
+          { proName: 'FOREXCOM:SPXUSD', title: '🇺🇸 S&P500선물' }
+        ],
+        showSymbolLogo: false,
+        isTransparent: false,
+        displayMode: 'compact',
+        colorTheme: state.themeMode === 'day' ? 'light' : 'dark',
+        locale: 'kr'
+      });
+      wrap.appendChild(s);
+      inner.appendChild(wrap);
+    }
+
+    function setNightWatchChartMode(mode) {
+      state.nwChartMode = mode;
+      const bLive = document.getElementById('btn-nw-mode-live');
+      const bHist = document.getElementById('btn-nw-mode-hist');
+      const rBtns = document.getElementById('nw-hist-range-btns');
+      const liveBox = document.getElementById('nw-live-tv-widget-container');
+      const histBox = document.getElementById('nw-hist-chart-wrapper');
+      if (bLive) {
+        bLive.className = mode === 'LIVE_TV'
+          ? 'px-2.5 py-0.5 rounded bg-emerald-600 text-white font-bold'
+          : 'px-2.5 py-0.5 rounded text-gray-400 hover:text-white';
+      }
+      if (bHist) {
+        bHist.className = mode === 'HIST_MA'
+          ? 'px-2.5 py-0.5 rounded bg-blue-600 text-white font-bold'
+          : 'px-2.5 py-0.5 rounded text-gray-400 hover:text-white';
+      }
+      if (rBtns) rBtns.classList.toggle('hidden', mode !== 'HIST_MA');
+      if (liveBox) liveBox.classList.toggle('hidden', mode !== 'LIVE_TV');
+      if (histBox) histBox.classList.toggle('hidden', mode !== 'HIST_MA');
+
+      if (mode === 'LIVE_TV') {
+        renderNightWatchLiveTvWidget();
+      } else {
+        renderNightWatchChartCanvas();
+      }
+    }
+
+    function renderNightWatchLiveTvWidget() {
+      const container = document.getElementById('nw-live-tv-widget-container');
+      if (!container || !NIGHT_WATCH_DATA) return;
+      const item = NIGHT_WATCH_DATA.items.find(x => x.id === state.activeNwId) || NIGHT_WATCH_DATA.items[0];
+      if (!item) return;
+
+      const tvSymMap = {
+        k200_night: 'AMEX:EWY',
+        sox_index: 'NASDAQ:SOXX',
+        nq_futures: 'FOREXCOM:NSXUSD',
+        usdkrw_night: 'FX_IDC:USDKRW'
+      };
+      const tvSym = tvSymMap[item.id] || 'NASDAQ:SOXX';
+      container.innerHTML = '<div id="nw_tv_live_inner" class="w-full h-full"></div>';
+      if (window.TradingView && window.TradingView.widget) {
+        new window.TradingView.widget({
+          autosize: true,
+          symbol: tvSym,
+          interval: '15',
+          timezone: 'Asia/Seoul',
+          theme: state.themeMode === 'day' ? 'light' : 'dark',
+          style: '1',
+          locale: 'kr',
+          toolbar_bg: state.themeMode === 'day' ? '#ffffff' : '#0d1117',
+          enable_publishing: false,
+          hide_top_toolbar: false,
+          hide_side_toolbar: true,
+          save_image: false,
+          container_id: 'nw_tv_live_inner'
+        });
+      }
+    }
+
+    // 100% 브라우저 실시간 시세 폴링 (Yahoo Finance v8 API 멀티 프록시 병렬 조회 -> 20초 주기 자동 갱신)
+    async function fetchSingleYahooQuoteLive(yahooSym) {
+      const target = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=5m&range=1d`;
+      const urls = [
+        `https://corsproxy.io/?${encodeURIComponent(target)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`
+      ];
+      for (const u of urls) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 3200);
+          const res = await fetch(u, { signal: ctrl.signal, cache: 'no-store' });
+          clearTimeout(tid);
+          if (!res.ok) continue;
+          const j = await res.json();
+          const meta = j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta;
+          if (meta && meta.regularMarketPrice) {
+            const price = Number(meta.regularMarketPrice);
+            const prev = Number(meta.chartPreviousClose || meta.previousClose || price);
+            const chg = price - prev;
+            const chgPct = prev > 0 ? (chg / prev) * 100.0 : 0.0;
+            return { price, prev, chg, chgPct };
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    async function fetchAllLiveNightWatchQuotes(manualClick = false) {
+      if (!NIGHT_WATCH_DATA || !NIGHT_WATCH_DATA.items) return;
+      const clockEl = document.getElementById('nw-live-clock');
+      if (clockEl && manualClick) clockEl.textContent = '실시간 시세 수신 중...';
+
+      const symMap = [
+        { id: 'k200_night', yahoo: 'EWY', isK200Proxy: true },
+        { id: 'sox_index', yahoo: '^SOX', fallbackYahoo: 'SOXX' },
+        { id: 'nq_futures', yahoo: 'NQ=F', fallbackYahoo: 'QQQ' },
+        { id: 'usdkrw_night', yahoo: 'KRW=X', isKrw: true }
+      ];
+
+      let updatedCount = 0;
+      await Promise.all(symMap.map(async cfg => {
+        let q = await fetchSingleYahooQuoteLive(cfg.yahoo);
+        if (!q && cfg.fallbackYahoo) {
+          q = await fetchSingleYahooQuoteLive(cfg.fallbackYahoo);
+        }
+        if (!q) return;
+        const item = NIGHT_WATCH_DATA.items.find(x => x.id === cfg.id);
+        if (!item) return;
+
+        updatedCount++;
+        const pct = Number(q.chgPct.toFixed(2));
+        const arrow = pct > 0 ? '▲' : (pct < 0 ? '▼' : '-');
+        item.changePct = pct;
+        item.changeText = `${arrow} ${Math.abs(pct).toFixed(2)}%`;
+
+        if (cfg.isK200Proxy) {
+          // EWY 실시간 변동률을 K200 야간선물 기준가에 연동 표시 + EWY 실시간 가격 병기
+          item.extraTag = `EWY 실시간 $${q.price.toFixed(2)} (${item.changeText})`;
+          const baseK200 = 670.66;
+          const estK200 = Number((baseK200 * (1 + pct / 100.0)).toFixed(2));
+          item.price = estK200;
+          item.priceText = estK200.toFixed(2);
+        } else if (cfg.isKrw) {
+          item.price = Number(q.price.toFixed(2));
+          item.priceText = `${q.price.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}원`;
+        } else {
+          item.price = Number(q.price.toFixed(2));
+          item.priceText = q.price.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }));
+
+      if (updatedCount > 0) {
+        const soxItem = NIGHT_WATCH_DATA.items.find(x => x.id === 'sox_index');
+        const k200Item = NIGHT_WATCH_DATA.items.find(x => x.id === 'k200_night');
+        const soxPct = soxItem ? soxItem.changePct : 0;
+        const k200Pct = k200Item ? k200Item.changePct : 0;
+        const avgScore = soxPct * 0.55 + k200Pct * 0.45;
+
+        if (avgScore >= 0.4) {
+          NIGHT_WATCH_DATA.overallSignal = 'BULL';
+          NIGHT_WATCH_DATA.overallBadge = `🟢 LIVE 시초 강세 우호 (필반 ${soxPct >= 0 ? '+' : ''}${soxPct}% · 야간 ${k200Pct >= 0 ? '+' : ''}${k200Pct}%)`;
+        } else if (avgScore <= -0.6) {
+          NIGHT_WATCH_DATA.overallSignal = 'CAUTION';
+          NIGHT_WATCH_DATA.overallBadge = `⚠️ LIVE 시초 경계 (필반 ${soxPct}% · 야간 ${k200Pct}% 눌림 확인)`;
+        } else {
+          NIGHT_WATCH_DATA.overallSignal = 'NEUTRAL';
+          NIGHT_WATCH_DATA.overallBadge = `🔵 LIVE 시초 보합·혼조 (필반 ${soxPct >= 0 ? '+' : ''}${soxPct}% · 개별 주도주 장세)`;
+        }
+
+        const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+        NIGHT_WATCH_DATA.updatedAt = `🟢 LIVE 실시간 연동됨 (${nowStr})`;
+        if (clockEl) clockEl.textContent = `🟢 LIVE ${nowStr} 갱신`;
+        renderNightWatchStrip();
+      } else if (clockEl) {
+        clockEl.textContent = '📺 TV 실시간 차트 연동 가능';
+      }
+    }
+
     function applyRootFontStep() {
       const basePx = 17.5 + (state.rootFontStep || 0) * 1.25;
       document.documentElement.style.fontSize = basePx + 'px';
@@ -1216,6 +1630,7 @@
       drawer.classList.remove('hidden');
       renderNightWatchStrip();
       renderNightWatchChartCanvas();
+      setNightWatchChartMode(state.nwChartMode || 'LIVE_TV');
     }
 
     function closeNightWatchDrawer() {
@@ -3198,7 +3613,7 @@
     async function loadDataAndInit() {
       loadSavedLocalState();
       try {
-        const res = await fetch('./data.json?v=v14_' + Date.now(), { cache: 'no-store' });
+        const res = await fetch('./data.json?v=v15_' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const d = await res.json();
           DATA_META = d.meta || DATA_META;
@@ -3219,8 +3634,23 @@
         const fs = parseInt(localStorage.getItem('kr_explorer_font_step') || '0', 10);
         if (!isNaN(fs)) state.rootFontStep = fs;
       } catch (e) {}
+      try {
+        const savedTheme = localStorage.getItem('kr_explorer_theme');
+        if (savedTheme === 'day' || savedTheme === 'night') state.themeMode = savedTheme;
+        const savedNwVis = localStorage.getItem('kr_explorer_nw_vis');
+        if (savedNwVis === '0') state.nwVisible = false;
+      } catch (e) {}
       applyRootFontStep();
+      applyThemeMode();
+      if (!state.nwVisible) {
+        state.nwVisible = true;
+        toggleNightWatchVisibility();
+      }
       renderNightWatchStrip();
+      fetchAllLiveNightWatchQuotes(false);
+      setInterval(() => {
+        if (state.nwVisible) fetchAllLiveNightWatchQuotes(false);
+      }, 25000);
 
       document.getElementById('price-date-badge').textContent = '가격 ' + (DATA_META.priceDate || '2026-11-17');
       const provEl = document.getElementById('provisional-week-badge');
