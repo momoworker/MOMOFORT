@@ -38,8 +38,11 @@
             </button>
           </div>
           <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">주도주 탐색기</h1>
-          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono text-[13px]">
-            가격 2026-11-16
+          <span id="provisional-week-badge" class="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 font-semibold text-[12px]">
+            잠정(주중)
+          </span>
+          <span id="price-date-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-[13px]">
+            가격 2026-11-17
           </span>
           <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-400 text-[13px]">
             17시 갱신 시작 · 18시/18:30/20시 재시도
@@ -3195,7 +3198,7 @@
     async function loadDataAndInit() {
       loadSavedLocalState();
       try {
-        const res = await fetch('./data.json?v=v13_' + Date.now(), { cache: 'no-store' });
+        const res = await fetch('./data.json?v=v14_' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const d = await res.json();
           DATA_META = d.meta || DATA_META;
@@ -3219,7 +3222,9 @@
       applyRootFontStep();
       renderNightWatchStrip();
 
-      document.getElementById('price-date-badge').textContent = '가격 ' + (DATA_META.priceDate || '2026-11-16');
+      document.getElementById('price-date-badge').textContent = '가격 ' + (DATA_META.priceDate || '2026-11-17');
+      const provEl = document.getElementById('provisional-week-badge');
+      if (provEl) provEl.textContent = DATA_META.provisionalStatus || '잠정(주중)';
       const vCount = (DATA_META.viewCount && DATA_META.viewCount > 0) ? DATA_META.viewCount : state.viewCount;
       document.getElementById('view-counter-badge').textContent = '조회 ' + Number(vCount).toLocaleString();
       document.getElementById('cnt-onset').textContent = STAGE_COUNTS.onset ?? STOCKS_DATA.filter(s => s.stage === 'onset').length;
