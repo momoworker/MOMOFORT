@@ -196,11 +196,11 @@
         </button>
         <button id="tab-progress" type="button" onclick="switchTab('progress')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>진행</span>
-          <span id="cnt-progress" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">5</span>
+          <span id="cnt-progress" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">3</span>
         </button>
         <button id="tab-warning" type="button" onclick="switchTab('warning')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>경계</span>
-          <span id="cnt-warning" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-400">0</span>
+          <span id="cnt-warning" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-amber-900/50 text-amber-300">2</span>
         </button>
         <button id="tab-longterm" type="button" onclick="switchTab('longterm')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>장기</span>
@@ -545,6 +545,7 @@
             <span class="flex items-center gap-1 text-purple-400"><span class="w-3 h-0.5 bg-purple-400 inline-block"></span> 52주선</span>
             <span class="flex items-center gap-1 text-cyan-400"><span class="w-3 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span> 🛡️ATR방어선</span>
             <span class="flex items-center gap-1 text-emerald-400 font-bold">↑ 돌파(Onset)</span>
+            <span class="flex items-center gap-1 text-rose-400 font-bold">↓ EXIT(이탈)</span>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5">
@@ -1165,7 +1166,7 @@
 
   <script>
     let DATA_META = { priceDate: '2026-11-16', viewCount: 2183, thermometerScore: 49.8 };
-    let STAGE_COUNTS = { onset: 20, progress: 5, warning: 0, longterm: 0, exit: 388 };
+    let STAGE_COUNTS = { onset: 20, progress: 3, warning: 2, longterm: 0, exit: 5 };
     let PARTICIPATION = { marketName: '코스닥', date: '2026-11-16', totalScanned: 1835, upRatio: 20.66, downRatio: 77.16, high52wRatio: 19.14, low52wRatio: 31.24, netBreadth: -56.5, netHighLow: -12.1 };
     let CREDIT_DATA = { date: '2026-11-13', totalTrillion: '26.0 조원', chg1w: '-8.4%', chg1m: '-19.4%', chg1y: '+0.5%', chgPeak: '-32.7%', peakInfo: '38.6 조원 (2026-06-24)', rows: [] };
     let STOCKS_DATA = [];
@@ -1762,7 +1763,11 @@
         return;
       }
 
-      container.innerHTML = list.map(stock => {
+      if (!state.listPageSize) state.listPageSize = 30;
+      const visibleList = list.slice(0, state.listPageSize);
+      const hasMore = list.length > visibleList.length;
+
+      const buildCardHtml = (stock => {
         const chgColor = stock.changePct > 0 ? 'text-red-400' : (stock.changePct < 0 ? 'text-blue-400' : 'text-gray-400');
 
         // StockEasy 스타일 절제된 배지 컬러 (단일 포인트 컬러 + 무채색 베이스)
@@ -1825,7 +1830,35 @@
             </div>
           </div>
         `;
-      }).join('');
+      });
+
+      container.innerHTML = visibleList.map(buildCardHtml).join('') + (hasMore ? `
+        <div id="infinite-scroll-sentinel" class="py-4 text-center">
+          <button type="button" onclick="loadMoreScreenerCards()" class="px-5 py-2 rounded-lg bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-xs font-mono text-gray-300 transition">
+            더 보기 (${visibleList.length} / ${list.length}종목 표시 중 · 스크롤 시 자동 로드)
+          </button>
+        </div>
+      ` : (list.length > 5 && st === 'exit' ? `
+        <div class="py-3 text-center text-xs font-mono text-gray-500">전체 이탈 종목 ${list.length}개를 모두 표시했습니다.</div>
+      ` : ''));
+
+      if (hasMore && 'IntersectionObserver' in window) {
+        const sentinel = document.getElementById('infinite-scroll-sentinel');
+        if (sentinel) {
+          if (window._listObserver) window._listObserver.disconnect();
+          window._listObserver = new IntersectionObserver(entries => {
+            if (entries.some(e => e.isIntersecting)) {
+              loadMoreScreenerCards();
+            }
+          }, { rootMargin: '240px' });
+          window._listObserver.observe(sentinel);
+        }
+      }
+    }
+
+    function loadMoreScreenerCards() {
+      state.listPageSize = (state.listPageSize || 30) + 30;
+      renderScreenerList();
     }
 
     // =========================================================================
@@ -2590,11 +2623,45 @@
             markers.push({ time: c.time, position: 'aboveBar', color: '#ef4444', shape: 'arrowDown', text: '이탈' });
           }
         });
-        if (markers.length === 0 && ['onset', 'progress'].includes(stock.stage)) {
-          const boIdx = Math.max(0, candles.length - 1 - Math.max(0, parseInt(stock.alignWeeks || 0, 10)));
+        if (!markers.some(m => m.text === '돌파') && ['onset', 'progress', 'warning', 'longterm', 'exit'].includes(stock.stage)) {
+          const boIdx = Math.max(0, candles.length - 1 - Math.min(candles.length - 2, Math.max(1, parseInt(stock.alignWeeks || 12, 10))));
           markers.push({ time: candles[boIdx].time, position: 'belowBar', color: '#22c55e', shape: 'arrowUp', text: '돌파' });
         }
+        if (stock.stage === 'exit' && !markers.some(m => m.text === '이탈' || m.text === 'EXIT')) {
+          markers.push({ time: candles[candles.length - 1].time, position: 'aboveBar', color: '#ef4444', shape: 'arrowDown', text: 'EXIT' });
+        }
+        markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
         tvWeeklyCandleSeries.setMarkers(markers);
+
+        // 이탈 종목 5대 이탈 신호 체크박스 렌더링
+        const exitBox = document.getElementById('det-exit-checklist-box');
+        if (exitBox) {
+          if (stock.stage === 'exit') {
+            exitBox.classList.remove('hidden');
+            const vTxt = String(stock.verdict || '');
+            const mddPill = document.getElementById('det-exit-mdd-pill');
+            if (mddPill) mddPill.textContent = stock.mddPct ? `MDD ${stock.mddPct}%` : (stock.statusLabel || 'EXIT');
+            const checks = [
+              { label: '정배열 경성붕괴', hit: vTxt.includes('경성붕괴') || vTxt.includes('26주선') },
+              { label: 'MDD ≥ 25% 하락', hit: vTxt.includes('MDD') || (stock.mddPct >= 25) },
+              { label: '4-26 데드크로스', hit: vTxt.includes('4-26DC') || vTxt.includes('데드크로스') },
+              { label: '거래대금 DC', hit: vTxt.includes('거래대금DC') },
+              { label: '신고가 18주+ 미경신', hit: vTxt.includes('신고가') && vTxt.includes('미경신') }
+            ];
+            const grid = document.getElementById('det-exit-checks-grid');
+            if (grid) {
+              grid.innerHTML = checks.map(ch => `
+                <div class="px-2.5 py-1.5 rounded-lg border ${ch.hit ? 'bg-rose-500/15 border-rose-500/40 text-rose-300 font-bold' : 'bg-[#0d1117] border-gray-800 text-gray-500'}">
+                  ${ch.hit ? '☑' : '☐'} ${ch.label}
+                </div>
+              `).join('');
+            }
+            const rawEl = document.getElementById('det-exit-raw-verdict');
+            if (rawEl) rawEl.textContent = '이탈 신호 요약: ' + vTxt;
+          } else {
+            exitBox.classList.add('hidden');
+          }
+        }
         volSeries.setData(candles.map(c => ({
           time: c.time,
           value: c.volume || 100000,
