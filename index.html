@@ -155,11 +155,11 @@
             </button>
           </div>
           <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">주도주 탐색기</h1>
-          <span id="provisional-week-badge" class="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 font-semibold text-[12px]">
+          <span id="provisional-week-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-medium text-[12px]">
             잠정(주중)
           </span>
-          <span id="price-date-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono font-semibold text-[13px]">
-            가격 2026-11-17
+          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono text-[12px]">
+            기준 2026-11-17
           </span>
           <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-400 text-[13px]">
             17시 갱신 시작 · 18시/18:30/20시 재시도
@@ -167,12 +167,12 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 text-[13px]">
-          <button id="btn-theme-toggle" type="button" onclick="toggleDayNightTheme()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-amber-300 font-bold transition flex items-center gap-1" title="데이(밝은 화면) / 나이트(어두운 화면) 테마 전환">
+          <button id="btn-theme-toggle" type="button" onclick="toggleDayNightTheme()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-200 font-medium transition flex items-center gap-1" title="데이(밝은 화면) / 나이트(어두운 화면) 테마 전환">
             <span id="theme-toggle-icon">☀️</span>
-            <span id="theme-toggle-text">데이 모드</span>
+            <span id="theme-toggle-text">데이</span>
           </button>
-          <button id="btn-nw-visibility" type="button" onclick="toggleNightWatchVisibility()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-emerald-300 font-semibold transition flex items-center gap-1" title="실시간 나이트워치 전광판 표시/숨김">
-            <span>🟢 LIVE 전광판</span>
+          <button id="btn-nw-visibility" type="button" onclick="toggleNightWatchVisibility()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 font-medium transition flex items-center gap-1" title="상단 지수 바 표시/숨김">
+            <span>지수바</span>
           </button>
           <div class="inline-flex items-center rounded bg-[#161b22] border border-gray-800 p-0.5 font-mono text-[12px]" title="글자 크기 조절">
             <button type="button" onclick="adjustRootFontSize(-1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-400 hover:text-white">가-</button>
@@ -192,7 +192,7 @@
       <nav id="tier1-nav-bar" class="mt-2 flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 border-b border-gray-800/70" aria-label="한국장 1단 탭">
         <button id="tab-onset" type="button" onclick="switchTab('onset')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>초입</span>
-          <span id="cnt-onset" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-blue-500/20 text-blue-300">20</span>
+          <span id="cnt-onset" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-300">20</span>
         </button>
         <button id="tab-progress" type="button" onclick="switchTab('progress')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>진행</span>
@@ -208,7 +208,7 @@
         </button>
         <button id="tab-exit" type="button" onclick="switchTab('exit')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>이탈</span>
-          <span id="cnt-exit" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-rose-500/20 text-rose-300">388</span>
+          <span id="cnt-exit" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-300">388</span>
         </button>
         <button id="tab-oscillator" type="button" onclick="switchTab('oscillator')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
           수급오실레이터
@@ -218,11 +218,11 @@
         </button>
         <button id="tab-thermometer" type="button" onclick="switchTab('thermometer')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>체온</span>
-          <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-amber-500/15 text-amber-300">49.8</span>
+          <span id="badge-thermometer-score" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-300">49.8</span>
         </button>
         <button id="tab-feargreed" type="button" onclick="switchTab('feargreed')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>공탐지수</span>
-          <span id="badge-fg-dual" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-indigo-500/20 text-indigo-300">韓34·美54</span>
+          <span id="badge-fg-dual" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-300">韓34·美54</span>
         </button>
         <button id="tab-participation" type="button" onclick="switchTab('participation')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
           <span>시장 참여도·신고가</span>
@@ -240,14 +240,14 @@
         </button>
         <button id="tab-rules" type="button" onclick="switchTab('rules')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1">
           <span>매수·매도 규칙</span>
-          <span class="text-[12px] px-1 rounded bg-indigo-500/20 text-indigo-300">글로벌</span>
+          <span class="text-[12px] px-1 rounded bg-gray-800 text-gray-300">글로벌</span>
         </button>
         <button id="tab-macro" type="button" onclick="switchTab('macro')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition">
           매크로
         </button>
         <button id="tab-research" type="button" onclick="switchTab('research')" class="t2-btn shrink-0 px-2.5 py-1 rounded-md text-[13px] font-medium transition flex items-center gap-1">
           <span>🔒 리서치</span>
-          <span class="text-[12px] px-1 rounded bg-rose-500/20 text-rose-300">UPDATE</span>
+          <span class="text-[12px] px-1 rounded bg-gray-800 text-gray-300">UPDATE</span>
         </button>
       </nav>
     </div>
@@ -260,28 +260,21 @@
   <!-- ===================================================================== -->
   <section id="night-watch-section" class="bg-[#0f1520] border-b border-gray-800/90">
     <div class="w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-1.5 space-y-1.5">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          <span class="shrink-0 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>LIVE 나이트워치</span>
-          </span>
-          <div id="night-watch-pills" class="flex items-center gap-1.5"></div>
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-4 overflow-x-auto no-scrollbar py-0.5">
+          <div id="night-watch-pills" class="flex items-center gap-4"></div>
         </div>
 
-        <div class="flex items-center gap-1.5 shrink-0 text-xs">
-          <span id="nw-live-clock" class="font-mono text-[11px] text-gray-400 hidden md:inline">실시간 연동 대기</span>
-          <button type="button" onclick="fetchAllLiveNightWatchQuotes(true)" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-blue-300 font-mono text-[11px] transition" title="즉시 실시간 시세 새로고침">
-            🔄 실시간 갱신
+        <div class="flex items-center gap-2 shrink-0 text-xs">
+          <span id="nw-live-clock" class="font-mono text-[11px] text-gray-400 hidden md:inline">실시간</span>
+          <button type="button" onclick="fetchAllLiveNightWatchQuotes(true)" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 font-mono text-[11px] transition">
+            갱신
           </button>
-          <button type="button" id="btn-nw-tv-tape" onclick="toggleNightWatchTvTape()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-indigo-300 font-semibold text-[11px] transition" title="트레이딩뷰 공식 실시간 웹소켓 티커바 펼치기/접기">
-            📺 TV 스트리밍 바
+          <button type="button" id="btn-nw-tv-tape" onclick="toggleNightWatchTvTape()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 text-[11px] transition">
+            티커바
           </button>
-          <button type="button" onclick="toggleNightWatchChart('sox_index')" id="nw-overall-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition">
-            ⚠️ 국장 시초 경계
-          </button>
-          <button type="button" onclick="toggleNightWatchVisibility()" class="px-1.5 py-0.5 rounded hover:bg-gray-800 text-gray-400 hover:text-white text-xs" title="나이트워치 바 숨기기">
-            ✕
+          <button type="button" onclick="toggleNightWatchChart('sox_index')" id="nw-overall-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-medium text-[11px] transition">
+            시황 요약
           </button>
         </div>
       </div>
@@ -385,9 +378,9 @@
           <select id="sector-filter-select" onchange="handleSectorFilter(this.value)" aria-label="업종 필터" class="bg-[#0d1117] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300">
             <option value="ALL">전체 업종</option>
           </select>
-          <button id="btn-breakout-imminent" type="button" onclick="toggleBreakoutImminentFilter()" class="px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-amber-500/40 text-amber-300 text-xs font-semibold transition flex items-center gap-1.5" title="52주 신고가 근접(또는 돌파 3주 이내) + 외인·기관 오실레이터 양수(>0) 종목만 압축">
-            <span>🔥 돌파 임박·수급 유입</span>
-            <span id="cnt-breakout-imminent" class="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-200 font-mono text-[12px]">0</span>
+          <button id="btn-breakout-imminent" type="button" onclick="toggleBreakoutImminentFilter()" class="px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-gray-200 text-xs font-semibold transition flex items-center gap-1.5" title="52주 신고가 근접(또는 돌파 3주 이내) + 외인·기관 오실레이터 양수(>0) 종목만 압축">
+            <span>돌파 임박 · 수급 유입</span>
+            <span id="cnt-breakout-imminent" class="px-1.5 py-0.2 rounded bg-gray-800 text-gray-300 font-mono text-[12px]">0</span>
           </button>
         </div>
         <div class="text-[13px] text-gray-400 font-mono">
@@ -724,7 +717,7 @@
         </div>
 
         <div class="p-3.5 rounded-xl bg-[#0d1117] border border-indigo-500/40 flex items-start gap-2.5 text-xs">
-          <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono font-bold shrink-0 mt-0.5">한·미 심리 진단</span>
+          <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-mono font-bold shrink-0 mt-0.5">한·미 심리 진단</span>
           <p id="fg-insight-banner" class="text-gray-200 leading-relaxed"></p>
         </div>
       </div>
@@ -1590,30 +1583,24 @@
       if (!pillsEl) return;
 
       if (badgeEl && NIGHT_WATCH_DATA.overallBadge) {
-        badgeEl.textContent = NIGHT_WATCH_DATA.overallBadge;
-        const sig = NIGHT_WATCH_DATA.overallSignal || 'CAUTION';
-        badgeEl.className = sig === 'BULL'
-          ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/25 transition'
-          : sig === 'CAUTION'
-            ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 transition'
-            : 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/40 hover:bg-blue-500/25 transition';
+        const cleanBadge = String(NIGHT_WATCH_DATA.overallBadge).replace(/[🟢⚠️🔵]/g, '').trim();
+        badgeEl.textContent = cleanBadge;
+        badgeEl.className = 'px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 text-[12px] font-medium transition';
       }
 
-      pillsEl.innerHTML = NIGHT_WATCH_DATA.items.map(item => {
+      pillsEl.innerHTML = NIGHT_WATCH_DATA.items.map((item, idx) => {
         const isUp = item.changePct > 0;
         const isDown = item.changePct < 0;
-        const cCol = isUp ? 'text-red-400' : (isDown ? 'text-blue-400' : 'text-gray-300');
+        const cCol = isUp ? 'text-red-400' : (isDown ? 'text-blue-400' : 'text-gray-400');
         const active = state.activeNwId === item.id;
-        const boxCls = active
-          ? 'bg-blue-600/25 border-blue-400 text-white shadow'
-          : 'bg-[#161b22] hover:bg-gray-800 border-gray-800 text-gray-200';
+        const underlineCls = active ? 'border-b-2 border-blue-500 pb-0.5' : 'hover:opacity-80';
+        const divider = idx < NIGHT_WATCH_DATA.items.length - 1 ? '<span class="text-gray-700 ml-3">|</span>' : '';
         return `
-          <button type="button" onclick="toggleNightWatchChart('${item.id}')" class="shrink-0 px-2.5 py-1 rounded-lg border ${boxCls} text-xs flex items-center gap-1.5 transition">
-            <span>${item.icon}</span>
-            <span class="font-semibold">${item.name}</span>
+          <button type="button" onclick="toggleNightWatchChart('${item.id}')" class="shrink-0 flex items-center gap-1.5 text-[13px] transition ${underlineCls}">
+            <span class="text-gray-400 font-medium">${item.name}</span>
             <span class="font-mono font-bold text-white">${item.priceText}</span>
-            <span class="font-mono font-bold ${cCol}">${item.changeText}</span>
-            <span class="text-[11px] text-gray-400">${active ? '▴' : '▾'}</span>
+            <span class="font-mono font-semibold ${cCol}">${item.changeText}</span>
+            ${divider}
           </button>
         `;
       }).join('');
@@ -1742,8 +1729,8 @@
       const immBtn = document.getElementById('btn-breakout-imminent');
       if (immBtn) {
         immBtn.className = state.breakoutImminentOnly
-          ? 'px-3 py-1.5 rounded-lg bg-amber-500/25 border-2 border-amber-400 text-amber-200 text-xs font-bold shadow transition flex items-center gap-1.5'
-          : 'px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-amber-500/40 text-amber-300 text-xs font-semibold transition flex items-center gap-1.5';
+          ? 'px-3 py-1.5 rounded-lg bg-blue-600 text-white border border-blue-500 text-xs font-bold shadow transition flex items-center gap-1.5'
+          : 'px-3 py-1.5 rounded-lg bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-gray-300 text-xs font-semibold transition flex items-center gap-1.5';
       }
 
       const list = stageAll.filter(s => {
@@ -1777,58 +1764,64 @@
 
       container.innerHTML = list.map(stock => {
         const chgColor = stock.changePct > 0 ? 'text-red-400' : (stock.changePct < 0 ? 'text-blue-400' : 'text-gray-400');
-        let badgeStyle = 'bg-blue-600/20 text-blue-400 border-blue-500/40';
-        if (stock.rightBadgeType === 'DIFF') badgeStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
-        if (stock.rightBadgeType === 'WARN') badgeStyle = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-        if (stock.rightBadgeType === 'EXIT') badgeStyle = 'bg-rose-600/25 text-rose-400 border-rose-500/50';
+
+        // StockEasy 스타일 절제된 배지 컬러 (단일 포인트 컬러 + 무채색 베이스)
+        let badgeStyle = 'bg-blue-600/15 text-blue-300 border-blue-500/30';
+        if (stock.rightBadge === 'W' || stock.rightBadgeType === 'WARN') {
+          badgeStyle = 'bg-gray-800 text-gray-300 border-gray-700';
+        } else if (stock.rightBadgeType === 'EXIT') {
+          badgeStyle = 'bg-gray-800 text-gray-400 border-gray-700';
+        }
 
         let midLine = '';
         if (stock.stage === 'onset') {
-          midLine = `정배열 ${stock.alignWeeks}주 · 준비 ${stock.prepWeeks || 20}주 · <strong class="text-blue-300">점수 ${stock.score}</strong> · 섹터${stock.sectorRank}${stock.rsPercentile ? ' · <span class="text-indigo-300">RS ' + stock.rsPercentile + '</span>' : ''}`;
+          midLine = `정배열 ${stock.alignWeeks}주 · 준비 ${stock.prepWeeks || 20}주 · 점수 <strong class="text-white">${stock.score}</strong> · 섹터 ${stock.sectorRank}${stock.rsPercentile ? ' · RS ' + stock.rsPercentile : ''}`;
         } else if (stock.stage === 'exit') {
-          midLine = `<strong class="text-rose-400">${stock.statusLabel || 'MDD 30%'}</strong> · ${stock.verdict}`;
+          midLine = `<span class="text-blue-400 font-semibold">${stock.statusLabel || 'MDD 30%'}</span> · ${stock.verdict}`;
         } else {
-          midLine = `정배열 ${stock.alignWeeks}주 · <strong class="text-emerald-300">${stock.statusLabel || '신고가'}</strong> · 섹터${stock.sectorRank}`;
+          midLine = `정배열 ${stock.alignWeeks}주 · <span class="text-white font-semibold">${stock.statusLabel || '신고가'}</span> · 섹터 ${stock.sectorRank}`;
         }
 
-        const opStyle = stock.opPositive
-          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-          : 'bg-rose-500/10 text-rose-300 border-rose-500/30';
+        const opTextColor = stock.opPositive ? 'text-red-400' : 'text-blue-400';
+        const cleanStop = stock.trailingStopPrice || '—';
+        const cleanSupply = (stock.investorDetail && stock.investorDetail.summaryBadge)
+          ? String(stock.investorDetail.summaryBadge).replace(/🏦\s*/g, '')
+          : '';
+        const cleanTarget = (stock.consensusData && stock.consensusData.targetPrice)
+          ? `목표가 ${stock.consensusData.targetPrice} (${stock.consensusData.upsideText})`
+          : '';
 
         return `
-          <div onclick="openStockDetailView('${stock.id}')" class="cursor-pointer bg-[#161b22] hover:bg-[#1c232d] border border-gray-800 hover:border-gray-700 rounded-xl p-3.5 transition">
-            <div class="flex items-start justify-between gap-2">
-              <div class="space-y-1">
+          <div onclick="openStockDetailView('${stock.id}')" class="cursor-pointer bg-[#161b22] hover:bg-[#1c232d] border border-gray-800 hover:border-gray-700 rounded-xl px-4 py-3.5 transition">
+            <div class="flex items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-sm sm:text-base font-bold text-white">${stock.name}</span>
-                  <span class="text-xs font-mono text-gray-400">${stock.ticker}·${stock.exchange}</span>
-                  <span class="text-xs font-mono font-bold ${chgColor}">${stock.changeText}</span>
-                  <span class="text-[13px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${stock.industry}</span>
+                  <span class="text-base font-bold text-white tracking-tight">${stock.name}</span>
+                  <span class="text-xs font-mono text-gray-400">${stock.ticker} · ${stock.exchange}</span>
+                  <span class="text-xs px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">${stock.industry}</span>
                   ${state.watchlist.has(stock.id) ? '<span class="text-amber-400 text-xs">★</span>' : ''}
                 </div>
-                <div class="text-xs font-mono text-gray-300">${midLine}</div>
+                <div class="text-xs font-mono text-gray-400 truncate">${midLine}</div>
               </div>
-              <span class="shrink-0 px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${badgeStyle}">
-                ${stock.rightBadge}
-              </span>
+
+              <div class="flex items-center gap-3 shrink-0">
+                <div class="text-right font-mono">
+                  <div class="text-sm sm:text-base font-bold text-white">${stock.lastClose || '—'}</div>
+                  <div class="text-xs font-bold ${chgColor}">${stock.changeText}</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold border ${badgeStyle}">
+                  ${stock.rightBadge}
+                </span>
+              </div>
             </div>
 
-            <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[13px]">
-              <span class="px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300 font-mono">현재가 ${stock.lastClose || '—'} · 시총 ${stock.marketCap}</span>
-              ${stock.pivotBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${stock.breakoutImminent ? 'bg-amber-500/15 text-amber-200 border-amber-500/40 font-semibold' : 'bg-[#0d1117] text-gray-400 border-gray-800'}">${stock.pivotBadge}</span>` : ''}
-              ${stock.investorDetail && stock.investorDetail.summaryBadge ? `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">${stock.investorDetail.summaryBadge}</span>` : ''}
-              ${stock.consensusData && stock.consensusData.upsideText ? `<span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30 font-mono">🎯 목표가 ${stock.consensusData.targetPrice} (${stock.consensusData.upsideText})</span>` : ''}
-              <span class="px-2 py-0.5 rounded border font-mono ${opStyle}">${stock.opBadge}${stock.opmBadge ? ' · ' + stock.opmBadge : ''}</span>
-              ${stock.entrySignalBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${
-                stock.entrySignalType === 'PULLBACK' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' :
-                stock.entrySignalType === 'BREAKOUT' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' :
-                'bg-amber-500/15 text-amber-300 border-amber-500/30'
-              }">${stock.entrySignalBadge}</span>` : ''}
-              ${stock.trailingStopBadge ? `<span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono">${stock.trailingStopBadge}</span>` : ''}
-              ${stock.supplyCorrobBadge ? `<span class="px-2 py-0.5 rounded border font-mono ${
-                stock.supplyCorrobOk ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' : 'bg-gray-800 text-gray-400 border-gray-700'
-              }">${stock.supplyCorrobBadge}</span>` : ''}
-              ${(stock.tags || []).map(t => `<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">${t}</span>`).join('')}
+            <!-- 하단 보조 지표 바: 무채색 단일 톤으로 통일하여 눈의 피로도 제거 -->
+            <div class="mt-2.5 pt-2 border-t border-gray-800/60 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-gray-400">
+              <span>시총 <strong class="text-gray-200">${stock.marketCap}</strong></span>
+              <span>실적 <strong class="${opTextColor}">${stock.opBadge}</strong>${stock.opmBadge ? ` (${stock.opmBadge})` : ''}</span>
+              <span>ATR방어선 <strong class="text-gray-200">${cleanStop}</strong></span>
+              ${cleanSupply ? `<span>수급 <strong class="text-gray-200">${cleanSupply}</strong></span>` : ''}
+              ${cleanTarget ? `<span>컨센서스 <strong class="text-gray-200">${cleanTarget}</strong></span>` : ''}
             </div>
           </div>
         `;
@@ -2004,11 +1997,12 @@
 
       const shieldEl = document.getElementById('det-shields-strip');
       if (shieldEl) {
+        const cleanText = s => String(s || '').replace(/[🎯🚀⚡⚠️🚫🛡️🤝📈🧱]/g, '').trim();
         shieldEl.innerHTML = [
-          stock.opmBadge ? `<span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">마진 ${stock.opmBadge}</span>` : '',
-          stock.entrySignalBadge ? `<span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">${stock.entrySignalBadge}</span>` : '',
-          stock.trailingStopBadge ? `<span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">${stock.trailingStopBadge}</span>` : '',
-          stock.supplyCorrobBadge ? `<span class="px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">${stock.supplyCorrobBadge}</span>` : ''
+          stock.opmBadge ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] text-gray-300 border border-gray-800">마진 ${cleanText(stock.opmBadge)}</span>` : '',
+          stock.entrySignalBadge ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] text-gray-300 border border-gray-800">${cleanText(stock.entrySignalBadge)}</span>` : '',
+          stock.trailingStopBadge ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] text-gray-300 border border-gray-800">${cleanText(stock.trailingStopBadge)}</span>` : '',
+          stock.supplyCorrobBadge ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] text-gray-300 border border-gray-800">${cleanText(stock.supplyCorrobBadge)}</span>` : ''
         ].filter(Boolean).join('');
       }
 
@@ -2073,10 +2067,11 @@
       if (quickPillsEl) {
         const cd = stock.consensusData || {};
         const idet = stock.investorDetail || {};
+        const cleanSup = idet.summaryBadge ? String(idet.summaryBadge).replace(/🏦\s*/g, '') : '';
         quickPillsEl.innerHTML = `
-          ${cd.targetPrice ? `<span class="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300">🎯 목표가 ${cd.targetPrice} (${cd.upsideText})</span>` : ''}
-          ${cd.fwdPer ? `<span class="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300">Fwd PER ${cd.fwdPer}</span>` : ''}
-          ${idet.summaryBadge ? `<span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">${idet.summaryBadge}</span>` : ''}
+          ${cd.targetPrice ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">목표가 <strong class="text-white">${cd.targetPrice}</strong> (${cd.upsideText})</span>` : ''}
+          ${cd.fwdPer ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">Fwd PER <strong class="text-white">${cd.fwdPer}</strong></span>` : ''}
+          ${cleanSup ? `<span class="px-2.5 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">${cleanSup}</span>` : ''}
         `;
       }
       const earnBoxEl = document.getElementById('det-earnings-box');
@@ -2325,7 +2320,7 @@
 
       const formatHover = item => {
         if (!item) return '';
-        const badge = item.isEstimate ? '<span class="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 mr-1">컨센서스(E)</span>' : '';
+        const badge = item.isEstimate ? '<span class="px-1.5 py-0.2 rounded bg-gray-800 text-gray-300 mr-1">컨센서스(E)</span>' : '';
         return `${badge}<span class="text-amber-300 font-bold">${item.q}</span> · <span class="text-blue-400">매출 ${Number(item.rev).toLocaleString('ko-KR')}억</span> · <span class="text-emerald-400">영익 ${Number(item.op).toLocaleString('ko-KR')}억</span>`;
       };
 
@@ -2442,7 +2437,7 @@
       gridEl.innerHTML = (idet.actors || []).map(ac => {
         const badgeCls = ac.streakPositive
           ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-          : 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+          : 'bg-gray-800 text-gray-300 border-rose-500/40';
         const vCol5 = String(ac.net5d).startsWith('+') ? 'text-red-400' : 'text-blue-400';
         const vCol20 = String(ac.net20d).startsWith('+') ? 'text-red-400' : 'text-blue-400';
         return `
@@ -2802,11 +2797,11 @@
     }
 
     function getFgBadgeStyle(score) {
-      if (score <= 24) return { label: '극단적 공포 (Extreme Fear)', textCol: 'text-blue-400', bgCol: 'bg-blue-500/20 text-blue-300 border-blue-500/40', barCol: 'bg-blue-500' };
+      if (score <= 24) return { label: '극단적 공포 (Extreme Fear)', textCol: 'text-blue-400', bgCol: 'bg-gray-800 text-gray-300 border-blue-500/40', barCol: 'bg-blue-500' };
       if (score <= 44) return { label: '공포 (Fear)', textCol: 'text-cyan-300', bgCol: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40', barCol: 'bg-cyan-400' };
       if (score <= 55) return { label: '중립 (Neutral)', textCol: 'text-gray-200', bgCol: 'bg-gray-800 text-gray-200 border-gray-700', barCol: 'bg-gray-300' };
       if (score <= 75) return { label: '탐욕 (Greed)', textCol: 'text-amber-300', bgCol: 'bg-amber-500/20 text-amber-300 border-amber-500/40', barCol: 'bg-amber-400' };
-      return { label: '극단적 탐욕 (Extreme Greed)', textCol: 'text-rose-400', bgCol: 'bg-rose-500/20 text-rose-300 border-rose-500/40', barCol: 'bg-rose-500' };
+      return { label: '극단적 탐욕 (Extreme Greed)', textCol: 'text-rose-400', bgCol: 'bg-gray-800 text-gray-300 border-rose-500/40', barCol: 'bg-rose-500' };
     }
 
     function buildFgMarketCardHtml(m) {
@@ -3099,7 +3094,7 @@
         leadEl.innerHTML = leaders.map(item => `
           <div onclick="openStockDetailView('KR-${item.ticker}')" class="cursor-pointer p-2.5 rounded-lg bg-[#0d1117] hover:bg-gray-800/80 border border-gray-800 flex items-center justify-between transition">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono font-bold text-[13px]">${item.stage}</span>
+              <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-mono font-bold text-[13px]">${item.stage}</span>
               <strong class="text-white">${item.name}</strong>
               <span class="text-gray-500 font-mono text-[13px]">${item.ticker}·${item.market}</span>
               <span class="text-gray-400 text-[13px] hidden sm:inline">(${item.sector})</span>
@@ -3613,7 +3608,7 @@
     async function loadDataAndInit() {
       loadSavedLocalState();
       try {
-        const res = await fetch('./data.json?v=v15_' + Date.now(), { cache: 'no-store' });
+        const res = await fetch('./data.json?v=v16_' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const d = await res.json();
           DATA_META = d.meta || DATA_META;
