@@ -9,7 +9,9 @@
     "provisionalStatus": "잠정(주중)",
     "priceStandard": "KRX 정규장 종가 (15:30 KST · NXT 대체거래소 제외)",
     "isFridayConfirmed": false,
-    "screenerMode": "Starfolio 2-Tier (주중 잠정고정 + 금요일 1,400종목 전수 스크리닝)"
+    "screenerMode": "KRX 전 종목(KOSPI·KOSDAQ ~2,400종목) 16-Thread 병렬 전수 스크리닝 (KRX 15:30 정규장 종가 기준)",
+    "universeTotal": 2438,
+    "universeFiltered": 1580
   },
   "STAGE_COUNTS": {
     "onset": 20,
