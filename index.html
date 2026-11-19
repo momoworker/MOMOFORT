@@ -210,6 +210,10 @@
           <span>이탈</span>
           <span id="cnt-exit" class="px-1.5 py-0.2 rounded-full text-[12px] font-mono bg-gray-800 text-gray-300">388</span>
         </button>
+        <button id="tab-scorecard" type="button" onclick="switchTab('scorecard')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+          <span>전략 성적표</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[11px] font-mono bg-blue-600/20 text-blue-400">EDGE</span>
+        </button>
         <button id="tab-oscillator" type="button" onclick="switchTab('oscillator')" class="t1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
           수급오실레이터
         </button>
@@ -388,6 +392,23 @@
         </div>
       </div>
 
+      <!-- [EDGE #3] 오늘의 주도 업종·테마 자금 히트맵 & 멀티 전략 프리셋 -->
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3 space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-white">주도 업종·테마 히트맵</span>
+            <span class="text-[11px] font-mono text-gray-400">클릭 시 해당 업종만 필터링</span>
+          </div>
+          <div id="strategy-preset-bar" class="flex flex-wrap items-center gap-1.5">
+            <button type="button" data-preset="ALL" onclick="setStrategyPreset('ALL')" class="preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-600 text-white border border-blue-500 transition">전체</button>
+            <button type="button" data-preset="VCP" onclick="setStrategyPreset('VCP')" class="preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#0d1117] text-gray-300 hover:bg-gray-800 border border-gray-700 transition">VCP 변동성수축</button>
+            <button type="button" data-preset="SUPPLY" onclick="setStrategyPreset('SUPPLY')" class="preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#0d1117] text-gray-300 hover:bg-gray-800 border border-gray-700 transition">연기금·사모 매집</button>
+            <button type="button" data-preset="EARNINGS" onclick="setStrategyPreset('EARNINGS')" class="preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#0d1117] text-gray-300 hover:bg-gray-800 border border-gray-700 transition">실적 턴어라운드·고성장</button>
+          </div>
+        </div>
+        <div id="sector-heatmap-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2"></div>
+      </div>
+
       <!-- 1-Column Vertical Card Stack (leader.starfolio.io 동일 구조) -->
       <div id="stock-cards-container" class="space-y-2"></div>
     </div>
@@ -530,6 +551,81 @@
         </div>
       </div>
 
+      <!-- [EDGE #2] 원클릭 실전 매매 · 포지션 및 손절/익절 계산기 -->
+      <div id="det-pos-calc-card" class="bg-[#161b22] rounded-xl border border-gray-800 p-3.5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-white">실전 포지션 · 손절/익절 계산기</span>
+            <span class="text-[11px] font-mono text-gray-400">ATR 방어선 자동 연동 · 리스크 기반 비중 산출</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="applyCalcStopPreset('ATR')" class="px-2 py-0.5 rounded bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-mono text-gray-300">ATR 방어선</button>
+            <button type="button" onclick="applyCalcStopPreset('PCT7')" class="px-2 py-0.5 rounded bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-mono text-gray-300">-7% 손절</button>
+            <button type="button" onclick="applyCalcStopPreset('PCT10')" class="px-2 py-0.5 rounded bg-[#0d1117] hover:bg-gray-800 border border-gray-700 text-[11px] font-mono text-gray-300">-10% 손절</button>
+            <button type="button" onclick="saveCalcPlanToJournal()" class="px-2.5 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-[11px] font-semibold text-white transition">매매일지에 계획 저장</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono">
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5 space-y-1">
+            <div class="flex items-center justify-between text-[11px] text-gray-400">
+              <span>총 투자금 (원)</span>
+              <span class="space-x-1">
+                <button type="button" onclick="setCalcCapital(10000000)" class="hover:text-white underline">1천만</button>
+                <button type="button" onclick="setCalcCapital(30000000)" class="hover:text-white underline">3천만</button>
+                <button type="button" onclick="setCalcCapital(50000000)" class="hover:text-white underline">5천만</button>
+              </span>
+            </div>
+            <input id="calc-capital" type="number" step="1000000" oninput="recalcPositionSizer()" class="w-full bg-transparent text-sm font-bold text-white focus:outline-none" value="10000000" />
+          </div>
+
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5 space-y-1">
+            <div class="flex items-center justify-between text-[11px] text-gray-400">
+              <span>1회 허용손실 (%)</span>
+              <span class="space-x-1">
+                <button type="button" onclick="setCalcRiskPct(1)" class="hover:text-white underline">1%</button>
+                <button type="button" onclick="setCalcRiskPct(2)" class="hover:text-white underline">2%</button>
+                <button type="button" onclick="setCalcRiskPct(3)" class="hover:text-white underline">3%</button>
+              </span>
+            </div>
+            <input id="calc-risk-pct" type="number" step="0.5" min="0.5" max="10" oninput="recalcPositionSizer()" class="w-full bg-transparent text-sm font-bold text-white focus:outline-none" value="2.0" />
+          </div>
+
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5 space-y-1">
+            <div class="text-[11px] text-gray-400">진입가 (KRX 종가)</div>
+            <input id="calc-entry" type="number" step="100" oninput="recalcPositionSizer()" class="w-full bg-transparent text-sm font-bold text-white focus:outline-none" value="0" />
+          </div>
+
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5 space-y-1">
+            <div class="text-[11px] text-gray-400">손절가 (방어선)</div>
+            <input id="calc-stop" type="number" step="100" oninput="recalcPositionSizer()" class="w-full bg-transparent text-sm font-bold text-blue-400 focus:outline-none" value="0" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono">
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5">
+            <div class="text-[11px] text-gray-400">적정 매수 수량 · 비중</div>
+            <div id="calc-out-qty" class="text-sm font-bold text-white mt-0.5">—</div>
+            <div id="calc-out-alloc" class="text-[11px] text-gray-400 mt-0.5">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5">
+            <div class="text-[11px] text-gray-400">손절 시 최대 손실</div>
+            <div id="calc-out-loss" class="text-sm font-bold text-blue-400 mt-0.5">—</div>
+            <div id="calc-out-stopdist" class="text-[11px] text-gray-400 mt-0.5">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5">
+            <div class="text-[11px] text-gray-400">1차 익절가 (손익비 1:2)</div>
+            <div id="calc-out-tp1" class="text-sm font-bold text-red-400 mt-0.5">—</div>
+            <div id="calc-out-tp1-profit" class="text-[11px] text-gray-400 mt-0.5">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-2.5">
+            <div class="text-[11px] text-gray-400">2차 익절가 (손익비 1:3)</div>
+            <div id="calc-out-tp2" class="text-sm font-bold text-red-400 mt-0.5">—</div>
+            <div id="calc-out-tp2-profit" class="text-[11px] text-gray-400 mt-0.5">—</div>
+          </div>
+        </div>
+      </div>
+
       <!-- TradingView Weekly Candlestick Chart Card (96주 · 약 1.85년) -->
       <div class="bg-[#161b22] rounded-xl border border-gray-800 p-3 sm:p-4 space-y-2.5">
         <!-- Top Controls & MA Legend Row -->
@@ -639,6 +735,58 @@
     <!-- =================================================================== -->
     <!-- 3. SUPPLY OSCILLATOR TAB (수급오실레이터: 검색창 + 2열 종목 그리드) -->
     <!-- =================================================================== -->
+    <!-- [EDGE #1] 전략 성적표 (가상 포트폴리오 성과 추적) -->
+    <div id="view-scorecard" class="hidden space-y-3">
+      <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base font-bold text-white">주도주 탐색기 전략 성적표 (가상 추적)</h2>
+            <p class="text-xs text-gray-400 mt-0.5">각 종목의 주봉 돌파(Onset) 기준가 대비 현재 KRX 종가 및 최고가 수익률을 실시간 집계합니다.</p>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs font-mono">
+            <button type="button" onclick="setScorecardFilter('ACTIVE')" id="sc-btn-active" class="px-2.5 py-1 rounded-md bg-blue-600 text-white font-semibold">진행·초입·경계</button>
+            <button type="button" onclick="setScorecardFilter('EXIT')" id="sc-btn-exit" class="px-2.5 py-1 rounded-md bg-[#0d1117] text-gray-300 border border-gray-700 font-semibold">이탈 확정</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 font-mono">
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
+            <div class="text-[11px] text-gray-400">평균 수익률</div>
+            <div id="sc-kpi-avg" class="text-lg font-bold text-white mt-0.5">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
+            <div class="text-[11px] text-gray-400">승률 (수익 종목 비율)</div>
+            <div id="sc-kpi-winrate" class="text-lg font-bold text-white mt-0.5">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
+            <div class="text-[11px] text-gray-400">최고 수익 종목</div>
+            <div id="sc-kpi-best" class="text-sm font-bold text-red-400 mt-1 truncate">—</div>
+          </div>
+          <div class="bg-[#0d1117] border border-gray-800 rounded-lg p-3">
+            <div class="text-[11px] text-gray-400">평균 최고 도달 수익률</div>
+            <div id="sc-kpi-peak" class="text-lg font-bold text-red-400 mt-0.5">—</div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs font-mono">
+            <thead>
+              <tr class="border-b border-gray-800 text-gray-400">
+                <th class="py-2 px-2">종목명</th>
+                <th class="py-2 px-2">단계</th>
+                <th class="py-2 px-2 text-right">돌파 기준가</th>
+                <th class="py-2 px-2 text-right">현재가(KRX)</th>
+                <th class="py-2 px-2 text-right">수익률</th>
+                <th class="py-2 px-2 text-right">최고 도달</th>
+                <th class="py-2 px-2 text-right">정배열</th>
+              </tr>
+            </thead>
+            <tbody id="sc-table-body" class="divide-y divide-gray-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div id="view-oscillator" class="hidden space-y-3">
       <div class="bg-[#161b22] rounded-xl border border-gray-800 p-4 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -1204,6 +1352,8 @@
       rootFontStep: 0,
       watchlist: new Set([]),
       oscSearch: '',
+      strategyPreset: 'ALL',
+      scorecardFilter: 'ACTIVE',
       viewCount: 1,
       tabLikes: { onset: 0, progress: 0, warning: 0, longterm: 0, exit: 0, oscillator: 0, credit: 0, thermometer: 0, feargreed: 0, participation: 0, industry: 0 },
       likedTabs: new Set(),
@@ -1722,6 +1872,7 @@
     }
 
     function renderScreenerList() {
+      renderSectorHeatmap();
       const st = state.activeTab;
       const stageAll = STOCKS_DATA.filter(s => s.stage === st);
       const immCount = stageAll.filter(s => s.breakoutImminent).length;
@@ -1737,6 +1888,20 @@
       const list = stageAll.filter(s => {
         if (state.watchlistOnly && !state.watchlist.has(s.id)) return false;
         if (state.breakoutImminentOnly && !s.breakoutImminent) return false;
+        if (state.strategyPreset === 'VCP') {
+          const nearHigh = (s.dist52wHighPct !== undefined && s.dist52wHighPct >= -12) || s.breakoutImminent;
+          const strongPrep = (s.prepWeeks || 0) >= 15 || (s.rsPercentile || 0) >= 80;
+          if (!(nearHigh && strongPrep)) return false;
+        } else if (state.strategyPreset === 'SUPPLY') {
+          const supTxt = String((s.investorDetail && s.investorDetail.summaryBadge) || s.supplyLine || '');
+          const oscPos = String(s.oscCurrent || '').startsWith('+');
+          if (!(supTxt.includes('연기금') || supTxt.includes('사모') || supTxt.includes('동반') || oscPos)) return false;
+        } else if (state.strategyPreset === 'EARNINGS') {
+          const opTxt = String(s.opBadge || '');
+          const m = opTxt.match(/\+(\d+)/);
+          const bigGrowth = m && parseInt(m[1], 10) >= 30;
+          if (!(opTxt.includes('흑자전환') || bigGrowth)) return false;
+        }
         if (state.sectorFilter !== 'ALL' && s.industry !== state.sectorFilter) return false;
         if (state.searchQuery.trim() !== '') {
           const q = state.searchQuery.trim().toLowerCase();
@@ -2017,6 +2182,7 @@
       if (!stock) return;
 
       document.getElementById('det-name').textContent = stock.name;
+      initPositionCalculator(stock);
       document.getElementById('det-ticker').textContent = stock.ticker;
       document.getElementById('det-badge').textContent = stock.stage === 'onset' ? `등급 ${stock.rightBadge}` : stock.rightBadge;
       document.getElementById('det-prep-meta').textContent =
@@ -3551,18 +3717,289 @@
       `).join('');
     }
 
+
+    // =========================================================================
+    // [EDGE #3] 오늘의 주도 업종·테마 히트맵 & 멀티 전략 프리셋
+    // =========================================================================
+    function setStrategyPreset(preset) {
+      state.strategyPreset = preset;
+      state.listPageSize = 30;
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        const active = btn.getAttribute('data-preset') === preset;
+        btn.className = active
+          ? 'preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-600 text-white border border-blue-500 transition'
+          : 'preset-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#0d1117] text-gray-300 hover:bg-gray-800 border border-gray-700 transition';
+      });
+      renderScreenerList();
+    }
+
+    function renderSectorHeatmap() {
+      const grid = document.getElementById('sector-heatmap-grid');
+      if (!grid) return;
+      const activePool = STOCKS_DATA.filter(s => ['onset', 'progress', 'warning', 'longterm'].includes(s.stage));
+      const map = {};
+      activePool.forEach(s => {
+        const ind = s.industry || '기타';
+        if (!map[ind]) map[ind] = { name: ind, count: 0, sumChg: 0, sumRs: 0 };
+        map[ind].count += 1;
+        map[ind].sumChg += Number(s.changePct || 0);
+        map[ind].sumRs += Number(s.rsPercentile || 80);
+      });
+      const top6 = Object.values(map).sort((a, b) => b.count - a.count || b.sumChg - a.sumChg).slice(0, 6);
+      grid.innerHTML = top6.map(sec => {
+        const avgChg = sec.count ? (sec.sumChg / sec.count) : 0;
+        const avgRs = sec.count ? Math.round(sec.sumRs / sec.count) : 80;
+        const selected = state.sectorFilter === sec.name;
+        const chgCol = avgChg > 0 ? 'text-red-400' : (avgChg < 0 ? 'text-blue-400' : 'text-gray-400');
+        const chgStr = `${avgChg > 0 ? '+' : ''}${avgChg.toFixed(1)}%`;
+        return `
+          <button type="button" onclick="toggleHeatmapSector('${sec.name.replace(/'/g, "\\'")}')" class="text-left p-2.5 rounded-lg border transition ${selected ? 'bg-blue-600/20 border-blue-500' : 'bg-[#0d1117] border-gray-800 hover:border-gray-700'}">
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-xs font-bold text-white truncate">${sec.name}</span>
+              <span class="text-[11px] font-mono text-gray-400">${sec.count}종목</span>
+            </div>
+            <div class="flex items-center justify-between mt-1 text-[11px] font-mono">
+              <span class="font-bold ${chgCol}">${chgStr}</span>
+              <span class="text-gray-400">RS ${avgRs}</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleHeatmapSector(sectorName) {
+      state.sectorFilter = (state.sectorFilter === sectorName) ? 'ALL' : sectorName;
+      const sel = document.getElementById('sector-filter-select');
+      if (sel) sel.value = state.sectorFilter;
+      renderScreenerList();
+    }
+
+    // =========================================================================
+    // [EDGE #2] 원클릭 실전 포지션 · 손절/익절 계산기
+    // =========================================================================
+    function parsePriceNum(v) {
+      const s = String(v || '').replace(/[^0-9]/g, '');
+      return s ? parseInt(s, 10) : 0;
+    }
+
+    function roundKrxTickJs(price) {
+      const p = Math.round(Number(price) || 0);
+      if (p <= 0) return 0;
+      if (p < 2000) return p;
+      if (p < 5000) return Math.round(p / 5) * 5;
+      if (p < 20000) return Math.round(p / 10) * 10;
+      if (p < 50000) return Math.round(p / 50) * 50;
+      if (p < 200000) return Math.round(p / 100) * 100;
+      if (p < 500000) return Math.round(p / 500) * 500;
+      return Math.round(p / 1000) * 1000;
+    }
+
+    function initPositionCalculator(stock) {
+      const capEl = document.getElementById('calc-capital');
+      const riskEl = document.getElementById('calc-risk-pct');
+      const entryEl = document.getElementById('calc-entry');
+      const stopEl = document.getElementById('calc-stop');
+      if (!capEl || !entryEl || !stopEl) return;
+
+      try {
+        const savedCap = localStorage.getItem('kr_calc_capital');
+        const savedRisk = localStorage.getItem('kr_calc_risk');
+        if (savedCap) capEl.value = savedCap;
+        if (savedRisk) riskEl.value = savedRisk;
+      } catch (e) {}
+
+      const curP = parsePriceNum(stock.lastClose || stock.price);
+      let stopP = parsePriceNum(stock.trailingStopPrice);
+      if (!stopP || stopP >= curP) stopP = roundKrxTickJs(curP * 0.92);
+      entryEl.value = curP;
+      stopEl.value = stopP;
+      recalcPositionSizer();
+    }
+
+    function setCalcCapital(val) {
+      const el = document.getElementById('calc-capital');
+      if (el) { el.value = val; recalcPositionSizer(); }
+    }
+
+    function setCalcRiskPct(val) {
+      const el = document.getElementById('calc-risk-pct');
+      if (el) { el.value = val; recalcPositionSizer(); }
+    }
+
+    function applyCalcStopPreset(mode) {
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId);
+      const entryP = Number(document.getElementById('calc-entry')?.value || 0);
+      const stopEl = document.getElementById('calc-stop');
+      if (!stopEl || entryP <= 0) return;
+      if (mode === 'ATR' && stock) {
+        const atrP = parsePriceNum(stock.trailingStopPrice);
+        stopEl.value = (atrP > 0 && atrP < entryP) ? atrP : roundKrxTickJs(entryP * 0.92);
+      } else if (mode === 'PCT7') {
+        stopEl.value = roundKrxTickJs(entryP * 0.93);
+      } else if (mode === 'PCT10') {
+        stopEl.value = roundKrxTickJs(entryP * 0.90);
+      }
+      recalcPositionSizer();
+    }
+
+    function recalcPositionSizer() {
+      const cap = Math.max(0, Number(document.getElementById('calc-capital')?.value || 0));
+      const riskPct = Math.max(0.1, Number(document.getElementById('calc-risk-pct')?.value || 2));
+      const entry = Math.max(0, Number(document.getElementById('calc-entry')?.value || 0));
+      const stop = Math.max(0, Number(document.getElementById('calc-stop')?.value || 0));
+
+      try {
+        localStorage.setItem('kr_calc_capital', String(cap));
+        localStorage.setItem('kr_calc_risk', String(riskPct));
+      } catch (e) {}
+
+      const qtyEl = document.getElementById('calc-out-qty');
+      const allocEl = document.getElementById('calc-out-alloc');
+      const lossEl = document.getElementById('calc-out-loss');
+      const distEl = document.getElementById('calc-out-stopdist');
+      const tp1El = document.getElementById('calc-out-tp1');
+      const tp1pEl = document.getElementById('calc-out-tp1-profit');
+      const tp2El = document.getElementById('calc-out-tp2');
+      const tp2pEl = document.getElementById('calc-out-tp2-profit');
+      if (!qtyEl) return;
+
+      if (entry <= 0 || stop <= 0 || stop >= entry) {
+        qtyEl.textContent = '손절가 < 진입가 필요';
+        allocEl.textContent = '—'; lossEl.textContent = '—'; distEl.textContent = '—';
+        tp1El.textContent = '—'; tp1pEl.textContent = '—'; tp2El.textContent = '—'; tp2pEl.textContent = '—';
+        return;
+      }
+
+      const riskPerShare = entry - stop;
+      const stopDistPct = ((stop / entry) - 1) * 100;
+      const maxRiskAmt = cap * (riskPct / 100);
+      let qty = Math.floor(maxRiskAmt / riskPerShare);
+      const maxAffordable = Math.floor(cap / entry);
+      if (qty > maxAffordable) qty = maxAffordable;
+
+      const invested = qty * entry;
+      const allocPct = cap > 0 ? (invested / cap) * 100 : 0;
+      const actualLoss = qty * riskPerShare;
+      const tp1 = roundKrxTickJs(entry + riskPerShare * 2);
+      const tp2 = roundKrxTickJs(entry + riskPerShare * 3);
+      const tp1Profit = qty * (tp1 - entry);
+      const tp2Profit = qty * (tp2 - entry);
+
+      qtyEl.textContent = `${qty.toLocaleString()}주`;
+      allocEl.textContent = `${invested.toLocaleString()}원 (비중 ${allocPct.toFixed(1)}%)`;
+      lossEl.textContent = `-${actualLoss.toLocaleString()}원`;
+      distEl.textContent = `손절폭 ${stopDistPct.toFixed(1)}% (계좌 -${(cap > 0 ? (actualLoss / cap) * 100 : 0).toFixed(1)}%)`;
+      tp1El.textContent = `${tp1.toLocaleString()}원 (+${(((tp1 / entry) - 1) * 100).toFixed(1)}%)`;
+      tp1pEl.textContent = `예상 +${tp1Profit.toLocaleString()}원`;
+      tp2El.textContent = `${tp2.toLocaleString()}원 (+${(((tp2 / entry) - 1) * 100).toFixed(1)}%)`;
+      tp2pEl.textContent = `예상 +${tp2Profit.toLocaleString()}원`;
+    }
+
+    function saveCalcPlanToJournal() {
+      const stock = STOCKS_DATA.find(s => s.id === state.selectedStockId);
+      if (!stock) return;
+      const entry = Number(document.getElementById('calc-entry')?.value || 0);
+      const stop = Number(document.getElementById('calc-stop')?.value || 0);
+      const qtyTxt = document.getElementById('calc-out-qty')?.textContent || '0주';
+      const tp1Txt = document.getElementById('calc-out-tp1')?.textContent || '';
+      const tp2Txt = document.getElementById('calc-out-tp2')?.textContent || '';
+      const stageKo = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈' }[stock.stage] || '초입';
+      const note = `진입 ${entry.toLocaleString()}원 · ${qtyTxt} · 손절 ${stop.toLocaleString()}원 · 1차 ${tp1Txt} · 2차 ${tp2Txt}`;
+      state.journalEntries.unshift({
+        id: Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        stock: `${stock.name}(${stock.ticker})`,
+        stage: stageKo,
+        note
+      });
+      saveLocalState();
+      const cntEl = document.getElementById('journal-count-badge');
+      if (cntEl) cntEl.textContent = state.journalEntries.length;
+      alert(`'${stock.name}' 매수 계획이 [내 기록] 탭에 저장되었습니다.`);
+    }
+
+    // =========================================================================
+    // [EDGE #1] 전략 성적표 (가상 포트폴리오 성과 추적)
+    // =========================================================================
+    function setScorecardFilter(mode) {
+      state.scorecardFilter = mode;
+      renderScorecardTab();
+    }
+
+    function renderScorecardTab() {
+      const mode = state.scorecardFilter || 'ACTIVE';
+      const bAct = document.getElementById('sc-btn-active');
+      const bEx = document.getElementById('sc-btn-exit');
+      if (bAct) bAct.className = mode === 'ACTIVE' ? 'px-2.5 py-1 rounded-md bg-blue-600 text-white font-semibold' : 'px-2.5 py-1 rounded-md bg-[#0d1117] text-gray-300 border border-gray-700 font-semibold';
+      if (bEx) bEx.className = mode === 'EXIT' ? 'px-2.5 py-1 rounded-md bg-blue-600 text-white font-semibold' : 'px-2.5 py-1 rounded-md bg-[#0d1117] text-gray-300 border border-gray-700 font-semibold';
+
+      const pool = STOCKS_DATA.filter(s => mode === 'ACTIVE' ? ['onset', 'progress', 'warning', 'longterm'].includes(s.stage) : s.stage === 'exit');
+      const stageMapKo = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈' };
+
+      const rows = pool.map(s => {
+        const wc = s.weeklyCandles || [];
+        const curP = parsePriceNum(s.lastClose || s.price) || (wc.length ? wc[wc.length - 1].close : 0);
+        let boIdx = wc.findIndex(c => c.marker === 'BREAKOUT');
+        if (boIdx < 0 && wc.length > 0) {
+          boIdx = Math.max(0, wc.length - 1 - Math.min(wc.length - 1, Math.max(1, parseInt(s.alignWeeks || 4, 10))));
+        }
+        const entryP = (boIdx >= 0 && wc[boIdx]) ? wc[boIdx].close : curP;
+        const postSlice = boIdx >= 0 ? wc.slice(boIdx) : wc;
+        const peakP = postSlice.length ? Math.max(...postSlice.map(c => c.high || c.close)) : curP;
+        const roi = entryP > 0 ? ((curP / entryP) - 1) * 100 : 0;
+        const peakRoi = entryP > 0 ? ((peakP / entryP) - 1) * 100 : 0;
+        return { stock: s, entryP, curP, roi, peakRoi };
+      }).sort((a, b) => b.roi - a.roi);
+
+      const n = rows.length;
+      const avgRoi = n ? rows.reduce((acc, r) => acc + r.roi, 0) / n : 0;
+      const avgPeak = n ? rows.reduce((acc, r) => acc + r.peakRoi, 0) / n : 0;
+      const winRate = n ? (rows.filter(r => r.roi > 0).length / n) * 100 : 0;
+      const best = rows[0];
+
+      const avgEl = document.getElementById('sc-kpi-avg');
+      if (avgEl) {
+        avgEl.textContent = `${avgRoi >= 0 ? '+' : ''}${avgRoi.toFixed(1)}%`;
+        avgEl.className = `text-lg font-bold mt-0.5 ${avgRoi >= 0 ? 'text-red-400' : 'text-blue-400'}`;
+      }
+      const wrEl = document.getElementById('sc-kpi-winrate');
+      if (wrEl) wrEl.textContent = `${winRate.toFixed(1)}% (${rows.filter(r => r.roi > 0).length}/${n})`;
+      const bestEl = document.getElementById('sc-kpi-best');
+      if (bestEl) bestEl.textContent = best ? `${best.stock.name} (${best.roi >= 0 ? '+' : ''}${best.roi.toFixed(1)}%)` : '—';
+      const peakEl = document.getElementById('sc-kpi-peak');
+      if (peakEl) peakEl.textContent = `+${avgPeak.toFixed(1)}%`;
+
+      const tbody = document.getElementById('sc-table-body');
+      if (tbody) {
+        tbody.innerHTML = rows.slice(0, 100).map(r => {
+          const roiCol = r.roi > 0 ? 'text-red-400' : (r.roi < 0 ? 'text-blue-400' : 'text-gray-400');
+          return `
+            <tr onclick="openStockDetailView('${r.stock.id}')" class="cursor-pointer hover:bg-[#1c232d] transition">
+              <td class="py-2.5 px-2 font-sans font-bold text-white">${r.stock.name} <span class="font-mono font-normal text-gray-500 text-[11px]">${r.stock.ticker}</span></td>
+              <td class="py-2.5 px-2 text-gray-300">${stageMapKo[r.stock.stage] || r.stock.stage}</td>
+              <td class="py-2.5 px-2 text-right text-gray-300">${r.entryP.toLocaleString()}원</td>
+              <td class="py-2.5 px-2 text-right text-white font-semibold">${r.curP.toLocaleString()}원</td>
+              <td class="py-2.5 px-2 text-right font-bold ${roiCol}">${r.roi >= 0 ? '+' : ''}${r.roi.toFixed(1)}%</td>
+              <td class="py-2.5 px-2 text-right text-red-400/90">+${r.peakRoi.toFixed(1)}%</td>
+              <td class="py-2.5 px-2 text-right text-gray-400">${r.stock.alignWeeks || 1}주</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
     function renderAll() {
       // 1단 탭 표시/숨김 (상세 뷰 열릴 때는 1단 탭 숨김 — leader.starfolio.io 동일 동작)
       document.getElementById('tier1-nav-bar').classList.toggle('hidden', state.detailOpen);
       document.getElementById('feedback-bar-section').classList.toggle('hidden', state.detailOpen);
-      const tabNamesMap = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈', oscillator: '수급오실레이터', credit: '신용잔고', thermometer: '체온', feargreed: '공탐지수(韓·美)', participation: '시장 참여도·신고가', industry: '산업 강도', journal: '내 기록', rules: '매수·매도 규칙', macro: '매크로', research: '리서치' };
+      const tabNamesMap = { onset: '초입', progress: '진행', warning: '경계', longterm: '장기', exit: '이탈', scorecard: '전략 성적표', oscillator: '수급오실레이터', credit: '신용잔고', thermometer: '체온', feargreed: '공탐지수(韓·美)', participation: '시장 참여도·신고가', industry: '산업 강도', journal: '내 기록', rules: '매수·매도 규칙', macro: '매크로', research: '리서치' };
       const fbLabel = document.getElementById('feedback-tab-label');
       if (fbLabel) fbLabel.textContent = (tabNamesMap[state.activeTab] || '현재') + ' 탭 메모·의견';
       const lkEl = document.getElementById('like-count-display');
       if (lkEl) lkEl.textContent = state.tabLikes[state.activeTab] || 0;
       renderCommentsList();
 
-      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'oscillator', 'credit', 'thermometer', 'feargreed', 'participation', 'industry'];
+      const t1Tabs = ['onset', 'progress', 'warning', 'longterm', 'exit', 'scorecard', 'oscillator', 'credit', 'thermometer', 'feargreed', 'participation', 'industry'];
       t1Tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (!el) return;
@@ -3584,6 +4021,7 @@
 
       document.getElementById('view-screener-list').classList.toggle('hidden', !(isScreenerStage && !state.detailOpen));
       document.getElementById('view-stock-detail').classList.toggle('hidden', !state.detailOpen);
+      document.getElementById('view-scorecard').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'scorecard');
       document.getElementById('view-oscillator').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'oscillator');
       document.getElementById('view-credit').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'credit');
       document.getElementById('view-thermometer').classList.toggle('hidden', state.detailOpen || state.activeTab !== 'thermometer');
@@ -3599,6 +4037,8 @@
         renderStockDetailView();
       } else if (isScreenerStage) {
         renderScreenerList();
+      } else if (state.activeTab === 'scorecard') {
+        renderScorecardTab();
       } else if (state.activeTab === 'oscillator') {
         renderOscillatorTab();
       } else if (state.activeTab === 'credit') {

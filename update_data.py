@@ -603,8 +603,74 @@ def main():
     with open(data_file, "w", encoding="utf-8") as f:
         f.write(serialized)
 
+    send_telegram_closing_report(active_stocks, stage_counts, TODAY_STR)
+
     final_mb = len(serialized.encode("utf-8")) / (1024 * 1024)
     print(f"[완료] 전 종목 {len(scan_results)}개 스캔 | 이탈: {added_exits}종목 | 단계별: {stage_counts} | data.json 크기: {final_mb:.2f} MiB ({time.time() - t0:.1f}초)")
+
+
+
+def send_telegram_closing_report(stocks: list, stage_counts: dict, price_date: str):
+    """
+    [EDGE #4] 장 마감 후 텔레그램 자동 리포트 발송 (GitHub Secrets 설정 시 자동 작동)
+    - 필요 Secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+    - 미설정 시 에러 없이 조용히 건너뜁니다.
+    """
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+    if not token or not chat_id:
+        print("[Telegram] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 미설정 -> 알림 생략")
+        return
+
+    onsets = [s for s in stocks if s.get("stage") == "onset"]
+    warnings = [s for s in stocks if s.get("stage") == "warning"]
+    near_stop = []
+    for s in stocks:
+        if s.get("stage") in ("onset", "progress", "warning", "longterm"):
+            cur_p = parse_int_digits(s.get("lastClose") or s.get("price"))
+            stp_p = parse_int_digits(s.get("trailingStopPrice"))
+            if cur_p > 0 and stp_p > 0:
+                gap_pct = (cur_p / stp_p - 1.0) * 100.0
+                if gap_pct <= 5.0:
+                    near_stop.append((s.get("name"), cur_p, stp_p, gap_pct))
+
+    lines = [
+        f"📊 [주도주 탐색기] {price_date} KRX 정규장 마감 리포트",
+        f"• 현황: 초입 {stage_counts.get('onset',0)} · 진행 {stage_counts.get('progress',0)} · 경계 {stage_counts.get('warning',0)} · 장기 {stage_counts.get('longterm',0)} · 이탈 {stage_counts.get('exit',0)}",
+        ""
+    ]
+
+    top_onsets = sorted(onsets, key=lambda x: float(x.get("changePct") or 0), reverse=True)[:5]
+    if top_onsets:
+        lines.append("🔥 초입 주요 종목 (KRX 15:30 종가)")
+        for s in top_onsets:
+            lines.append(f"  - {s.get('name')}({s.get('ticker')}): {s.get('lastClose')} ({s.get('changeText')}) · 방어선 {s.get('trailingStopPrice','—')}")
+        lines.append("")
+
+    if warnings:
+        lines.append("⚠️ 건강도 경계 종목 (고점 -20%~-24.9%)")
+        for s in warnings[:5]:
+            lines.append(f"  - {s.get('name')}: {s.get('lastClose')} ({s.get('statusLabel','')})")
+        lines.append("")
+
+    if near_stop:
+        lines.append("🚨 ATR 방어선 근접 경고 (5% 이내)")
+        for name, cur_p, stp_p, gap in near_stop[:5]:
+            lines.append(f"  - {name}: 현재 {cur_p:,}원 / 방어선 {stp_p:,}원 (여유 {gap:+.1f}%)")
+        lines.append("")
+
+    lines.append("🔗 바로가기: https://momofort.chulsung80.workers.dev/")
+    msg_text = "\n".join(lines)
+
+    try:
+        api_url = f"https://api.telegram.org/bot{token}/sendMessage"
+        body = json.dumps({"chat_id": chat_id, "text": msg_text}).encode("utf-8")
+        req = urllib.request.Request(api_url, data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status == 200:
+                print("[Telegram] 마감 리포트 발송 완료!")
+    except Exception as e:
+        print("[Telegram Warn]", e)
 
 
 if __name__ == "__main__":
