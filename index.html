@@ -4,89 +4,210 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>주도주 탐색기 · 한국장</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://s3.tradingview.com/tv.js"></script>
   <style>
+    :root {
+      --bg-canvas: #09090b;
+      --bg-surface: #121317;
+      --bg-surface-hover: #181a20;
+      --bg-subtle: #191b22;
+      --border-hairline: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.13);
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-blue: #3182f6;
+      --kr-up: #f04452;
+      --kr-down: #3182f6;
+    }
+
     html {
-      font-size: 17.5px; /* 기본 16px 대비 +1pt 이상 확대로 가독성 강화 */
+      font-size: 16.5px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
     body {
-      background-color: #0d1117;
-      color: #e6edf3;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background-color: var(--bg-canvas) !important;
+      color: var(--text-primary) !important;
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
+      letter-spacing: -0.015em;
       line-height: 1.55;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      transition: background-color 0.22s ease, color 0.22s ease;
     }
+
+    /* 한글이 굴림/모노스페이스로 깨져 올드해 보이는 문제 해결 -> 토스증권식 tabular-nums 적용 */
+    .font-mono {
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-variant-numeric: tabular-nums !important;
+      letter-spacing: -0.02em;
+    }
+
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* ===================================================================== */
-    /* ☀️ 데이 모드 (Light Theme) 고대비 가독성 스타일 오버라이드            */
+    /* 🌙 모던 옵시디언 다크 테마 (Toss Securities / Linear 스타일)          */
     /* ===================================================================== */
+    header {
+      background-color: rgba(9, 9, 11, 0.82) !important;
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid var(--border-hairline) !important;
+    }
+
+    #night-watch-section {
+      background-color: rgba(18, 19, 23, 0.72) !important;
+      border-bottom: 1px solid var(--border-hairline) !important;
+    }
+
+    /* 불필요한 상단 공간만 차지하던 커뮤니티 피드백 바는 숨김 (화면 깔끔화) */
+    #feedback-bar-section {
+      display: none !important;
+    }
+
+    /* 서피스 & 카드 계층 통일 */
+    .bg-\[\#161b22\],
+    .bg-\[\#111722\],
+    .bg-\[\#121721\],
+    .bg-\[\#0f1520\] {
+      background-color: var(--bg-surface) !important;
+    }
+
+    .bg-\[\#0d1117\] {
+      background-color: var(--bg-subtle) !important;
+    }
+
+    .border-gray-800,
+    .border-gray-800\/90,
+    .border-gray-800\/80,
+    .border-gray-800\/70,
+    .border-gray-800\/60,
+    .border-gray-700 {
+      border-color: var(--border-hairline) !important;
+    }
+
+    .rounded-xl {
+      border-radius: 16px !important;
+    }
+
+    /* 종목 카드 호버 리프트 & 현대적 그림자 */
+    .stock-card-modern {
+      background-color: var(--bg-surface) !important;
+      border: 1px solid var(--border-hairline) !important;
+      border-radius: 18px !important;
+      transition: transform 0.16s ease, border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .stock-card-modern:hover {
+      background-color: var(--bg-surface-hover) !important;
+      border-color: var(--border-strong) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    /* 한국 증시 표준 토스 스타일 레드/블루 */
+    .text-red-400, .text-rose-400 { color: var(--kr-up) !important; }
+    .text-blue-400 { color: #5b9dff !important; }
+    .bg-blue-600 { background-color: var(--accent-blue) !important; }
+    .bg-blue-600:hover { background-color: #1b64da !important; }
+
+    /* 인풋 & 셀렉트 현대화 */
+    input[type="text"], input[type="number"], select {
+      border-radius: 12px !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      border-color: var(--accent-blue) !important;
+      box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.18);
+    }
+
+    /* ===================================================================== */
+    /* ☀️ 모던 데이 모드 (Toss / Apple Clean White 스타일)                   */
+    /* ===================================================================== */
+    html.day-mode {
+      --bg-canvas: #f4f6f9;
+      --bg-surface: #ffffff;
+      --bg-surface-hover: #f9fafb;
+      --bg-subtle: #f2f4f6;
+      --border-hairline: #e5e8eb;
+      --border-strong: #d1d6db;
+      --text-primary: #191f28;
+      --text-secondary: #4e5968;
+      --text-muted: #8b95a1;
+    }
+
     html.day-mode body {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
+      background-color: #f4f6f9 !important;
+      color: #191f28 !important;
     }
+
     html.day-mode header {
-      background-color: rgba(255, 255, 255, 0.96) !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      background-color: rgba(255, 255, 255, 0.86) !important;
+      border-bottom: 1px solid #e5e8eb !important;
+      box-shadow: 0 1px 12px rgba(15, 23, 42, 0.04);
     }
-    html.day-mode #night-watch-section,
-    html.day-mode #feedback-bar-section {
-      background-color: #f8fafc !important;
-      border-color: #cbd5e1 !important;
+
+    html.day-mode #night-watch-section {
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #e5e8eb !important;
     }
+
     html.day-mode .bg-\[\#161b22\],
     html.day-mode .bg-\[\#111722\],
     html.day-mode .bg-\[\#121721\],
-    html.day-mode .bg-\[\#0f1520\] {
+    html.day-mode .bg-\[\#0f1520\],
+    html.day-mode .stock-card-modern {
+      background-color: #ffffff !important;
+      border-color: #e5e8eb !important;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.035);
+    }
+
+    html.day-mode .stock-card-modern:hover {
       background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
     }
-    html.day-mode .bg-\[\#161b22\]\/90,
-    html.day-mode .bg-\[\#161b22\]\/85,
-    html.day-mode .bg-\[\#0d1117\]\/90 {
-      background-color: rgba(255, 255, 255, 0.94) !important;
-      border-color: #cbd5e1 !important;
-    }
-    html.day-mode .hover\:bg-\[\#1c232d\]:hover,
-    html.day-mode .hover\:bg-\[\#161e2c\]:hover,
-    html.day-mode .hover\:bg-gray-800:hover,
-    html.day-mode .hover\:bg-gray-900:hover {
-      background-color: #f1f5f9 !important;
-    }
+
     html.day-mode .bg-\[\#0d1117\],
     html.day-mode .bg-gray-800,
     html.day-mode .bg-gray-800\/90,
     html.day-mode .bg-gray-800\/80,
     html.day-mode .bg-gray-900\/60 {
-      background-color: #f8fafc !important;
-      border-color: #cbd5e1 !important;
+      background-color: #f2f4f6 !important;
+      border-color: #e5e8eb !important;
     }
+
+    html.day-mode .hover\:bg-\[\#1c232d\]:hover,
+    html.day-mode .hover\:bg-\[\#161e2c\]:hover,
+    html.day-mode .hover\:bg-gray-800:hover,
+    html.day-mode .hover\:bg-gray-900:hover {
+      background-color: #e5e8eb !important;
+    }
+
     html.day-mode .border-gray-800,
     html.day-mode .border-gray-800\/90,
     html.day-mode .border-gray-800\/80,
     html.day-mode .border-gray-800\/70,
     html.day-mode .border-gray-700 {
-      border-color: #cbd5e1 !important;
+      border-color: #e5e8eb !important;
     }
+
     html.day-mode .divide-gray-800\/70 > :not([hidden]) ~ :not([hidden]),
     html.day-mode .divide-gray-800\/60 > :not([hidden]) ~ :not([hidden]) {
-      border-color: #e2e8f0 !important;
+      border-color: #e5e8eb !important;
     }
+
     html.day-mode .text-white,
     html.day-mode .text-gray-100,
     html.day-mode .text-gray-200 {
-      color: #0f172a !important;
+      color: #191f28 !important;
     }
-    /* 파란/주황/초록/빨강 솔리드 버튼 내부의 흰색 글씨는 유지 */
+
     html.day-mode .bg-blue-600.text-white,
     html.day-mode .bg-blue-600 .text-white,
     html.day-mode .bg-emerald-600.text-white,
@@ -95,50 +216,16 @@
     html.day-mode #det-badge.bg-blue-600 {
       color: #ffffff !important;
     }
-    html.day-mode .text-gray-300 {
-      color: #1e293b !important;
-    }
-    html.day-mode .text-gray-400,
-    html.day-mode .text-gray-500 {
-      color: #475569 !important;
-    }
-    /* 주가 상승(빨강)·하락(파랑) 및 배지 텍스트 주간 가독성 고대비 보정 */
-    html.day-mode .text-red-400,
-    html.day-mode .text-rose-400,
-    html.day-mode .text-rose-300 {
-      color: #dc2626 !important;
-    }
-    html.day-mode .text-blue-400,
-    html.day-mode .text-blue-300,
-    html.day-mode .text-blue-200 {
-      color: #1d4ed8 !important;
-    }
-    html.day-mode .text-emerald-400,
-    html.day-mode .text-emerald-300 {
-      color: #047857 !important;
-    }
-    html.day-mode .text-amber-400,
-    html.day-mode .text-amber-300,
-    html.day-mode .text-amber-200,
-    html.day-mode .text-yellow-400 {
-      color: #b45309 !important;
-    }
-    html.day-mode .text-orange-400 {
-      color: #c2410c !important;
-    }
-    html.day-mode .text-indigo-400,
-    html.day-mode .text-indigo-300,
-    html.day-mode .text-indigo-200 {
-      color: #4338ca !important;
-    }
-    html.day-mode .text-purple-400,
-    html.day-mode .text-purple-300 {
-      color: #6d28d9 !important;
-    }
-    html.day-mode .text-cyan-400,
-    html.day-mode .text-cyan-300 {
-      color: #0e7490 !important;
-    }
+
+    html.day-mode .text-gray-300 { color: #333d4b !important; }
+    html.day-mode .text-gray-400, html.day-mode .text-gray-500 { color: #6b7684 !important; }
+    html.day-mode .text-red-400, html.day-mode .text-rose-400, html.day-mode .text-rose-300 { color: #e11d48 !important; }
+    html.day-mode .text-blue-400, html.day-mode .text-blue-300, html.day-mode .text-blue-200 { color: #1b64da !important; }
+    html.day-mode .text-emerald-400, html.day-mode .text-emerald-300 { color: #059669 !important; }
+    html.day-mode .text-amber-400, html.day-mode .text-amber-300, html.day-mode .text-yellow-400 { color: #d97706 !important; }
+    html.day-mode .text-orange-400 { color: #ea580c !important; }
+    html.day-mode .text-purple-400 { color: #7c3aed !important; }
+    html.day-mode .text-cyan-400 { color: #0891b2 !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
@@ -146,43 +233,40 @@
   <!-- Sticky Top Header (leader.starfolio.io 스타일) -->
   <header class="sticky top-0 z-30 bg-[#0d1117]/95 backdrop-blur border-b border-gray-800">
     <div class="w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-2">
-      <!-- Top Row: Country Pill, Title, Refresh Info, Date & View Count -->
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div class="flex flex-wrap items-center gap-2">
-          <div class="flex items-center bg-[#161b22] p-0.5 rounded-lg border border-gray-800">
-            <button type="button" onclick="resetToKoreaMain()" class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow">
-              🇰🇷 한국
-            </button>
+      <!-- Modern Clean Top Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2.5 py-1 text-xs">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button type="button" onclick="resetToKoreaMain()" class="flex items-center gap-2 group">
+            <span class="w-7 h-7 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-sm">M</span>
+            <h1 class="text-base sm:text-lg font-extrabold text-white tracking-tight group-hover:opacity-85 transition">주도주 탐색기</h1>
+          </button>
+          <div class="flex items-center gap-1.5 pl-1">
+            <span id="provisional-week-badge" class="px-2.5 py-0.5 rounded-full bg-[#161b22] border border-gray-800 text-gray-300 font-medium text-[11px]">
+              잠정(주중)
+            </span>
+            <span id="price-date-badge" class="px-2.5 py-0.5 rounded-full bg-[#161b22] border border-gray-800 text-gray-400 font-mono text-[11px]">
+              KRX종가
+            </span>
           </div>
-          <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">주도주 탐색기</h1>
-          <span id="provisional-week-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-medium text-[12px]">
-            잠정(주중)
-          </span>
-          <span id="price-date-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono text-[12px]">
-            기준 2026-11-17
-          </span>
-          <span class="hidden md:inline-block px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-400 text-[13px]">
-            17시 갱신 시작 · 18시/18:30/20시 재시도
-          </span>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 text-[13px]">
-          <button id="btn-theme-toggle" type="button" onclick="toggleDayNightTheme()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-200 font-medium transition flex items-center gap-1" title="데이(밝은 화면) / 나이트(어두운 화면) 테마 전환">
+        <div class="flex flex-wrap items-center gap-1.5 text-[12px]">
+          <button id="btn-theme-toggle" type="button" onclick="toggleDayNightTheme()" class="px-3 py-1 rounded-full bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-200 font-medium transition flex items-center gap-1" title="데이/나이트 전환">
             <span id="theme-toggle-icon">☀️</span>
             <span id="theme-toggle-text">데이</span>
           </button>
-          <button id="btn-nw-visibility" type="button" onclick="toggleNightWatchVisibility()" class="px-2 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 font-medium transition flex items-center gap-1" title="상단 지수 바 표시/숨김">
+          <button id="btn-nw-visibility" type="button" onclick="toggleNightWatchVisibility()" class="px-3 py-1 rounded-full bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-gray-300 font-medium transition flex items-center gap-1" title="상단 지수 바 표시/숨김">
             <span>지수바</span>
           </button>
-          <div class="inline-flex items-center rounded bg-[#161b22] border border-gray-800 p-0.5 font-mono text-[12px]" title="글자 크기 조절">
-            <button type="button" onclick="adjustRootFontSize(-1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-400 hover:text-white">가-</button>
-            <button type="button" onclick="adjustRootFontSize(0)" id="font-size-label" class="px-1.5 py-0.2 rounded text-blue-300 font-bold">기본(+1pt)</button>
-            <button type="button" onclick="adjustRootFontSize(1)" class="px-1.5 py-0.2 rounded hover:bg-gray-800 text-gray-300 hover:text-white font-bold">가+</button>
+          <div class="inline-flex items-center rounded-full bg-[#161b22] border border-gray-800 px-1 py-0.5 font-mono text-[11px]" title="글자 크기 조절">
+            <button type="button" onclick="adjustRootFontSize(-1)" class="px-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white">가-</button>
+            <button type="button" onclick="adjustRootFontSize(0)" id="font-size-label" class="px-1.5 rounded-full text-blue-400 font-semibold">기본</button>
+            <button type="button" onclick="adjustRootFontSize(1)" class="px-1.5 rounded-full hover:bg-gray-800 text-gray-300 hover:text-white font-semibold">가+</button>
           </div>
-          <span id="view-counter-badge" class="px-2 py-0.5 rounded bg-[#161b22] border border-gray-800 text-gray-300 font-mono">
+          <span id="view-counter-badge" class="hidden sm:inline-block px-2.5 py-1 rounded-full bg-[#161b22] border border-gray-800 text-gray-400 font-mono text-[11px]">
             조회 1
           </span>
-          <button id="btn-watchlist-only" type="button" onclick="toggleWatchlistFilter()" class="px-2.5 py-0.5 rounded bg-[#161b22] hover:bg-gray-800 border border-gray-700 text-amber-400 font-semibold transition">
+          <button id="btn-watchlist-only" type="button" onclick="toggleWatchlistFilter()" class="px-3 py-1 rounded-full bg-[#161b22] hover:bg-gray-800 border border-gray-800 text-amber-400 font-semibold transition">
             ★ 관심 <span id="watchlist-count">0</span>
           </button>
         </div>
@@ -369,7 +453,7 @@
   </section>
 
   <!-- Main Viewport-Wide Container -->
-  <main class="flex-1 w-full max-w-[1440px] mx-auto px-3 sm:px-5 py-3">
+  <main class="flex-1 w-full max-w-[1360px] mx-auto px-4 sm:px-6 py-5">
 
     <!-- =================================================================== -->
     <!-- 1. SCREENER 1-COLUMN CARD LIST VIEW (초입 / 진행 / 경계 / 장기 / 이탈) -->
@@ -411,7 +495,7 @@
       </div>
 
       <!-- 1-Column Vertical Card Stack (leader.starfolio.io 동일 구조) -->
-      <div id="stock-cards-container" class="space-y-2"></div>
+      <div id="stock-cards-container" class="space-y-3"></div>
     </div>
 
     <!-- =================================================================== -->
@@ -1443,14 +1527,14 @@
       const isDay = state.themeMode === 'day';
       return {
         layout: {
-          background: { type: 'solid', color: isDay ? '#ffffff' : '#0d1117' },
+          background: { type: 'solid', color: isDay ? '#ffffff' : '#121317' },
           textColor: isDay ? '#334155' : '#9ca3af',
           fontSize: 12,
-          fontFamily: "'JetBrains Mono', 'Inter', 'Pretendard', sans-serif"
+          fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif"
         },
         grid: {
-          vertLines: { color: isDay ? '#e2e8f0' : '#1f2937' },
-          horzLines: { color: isDay ? '#e2e8f0' : '#1f2937' }
+          vertLines: { color: isDay ? '#f1f3f5' : 'rgba(255,255,255,0.04)' },
+          horzLines: { color: isDay ? '#f1f3f5' : 'rgba(255,255,255,0.04)' }
         },
         borderColor: isDay ? '#cbd5e1' : '#374151'
       };
@@ -1965,37 +2049,36 @@
           : '';
 
         return `
-          <div onclick="openStockDetailView('${stock.id}')" class="cursor-pointer bg-[#161b22] hover:bg-[#1c232d] border border-gray-800 hover:border-gray-700 rounded-xl px-4 py-3.5 transition">
-            <div class="flex items-center justify-between gap-3">
-              <div class="space-y-1 min-w-0">
+          <div onclick="openStockDetailView('${stock.id}')" class="stock-card-modern cursor-pointer px-5 py-4">
+            <div class="flex items-start sm:items-center justify-between gap-4">
+              <div class="space-y-1.5 min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-base font-bold text-white tracking-tight">${stock.name}</span>
-                  <span class="text-xs font-mono text-gray-400">${stock.ticker} · ${stock.exchange}</span>
-                  <span class="text-xs px-2 py-0.5 rounded bg-[#0d1117] border border-gray-800 text-gray-300">${stock.industry}</span>
-                  ${(() => { const sig = computeTimingSignal(stock); return `<span class="text-[11px] font-mono px-2 py-0.5 rounded border ${sig.badgeCls}" title="${sig.reason}">${sig.icon} ${sig.label}</span>`; })()}
+                  <span class="text-[17px] font-bold text-white tracking-tight">${stock.name}</span>
+                  <span class="text-xs font-mono text-gray-500">${stock.ticker}</span>
+                  <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-[#0d1117] text-gray-300 font-medium">${stock.industry}</span>
+                  ${(() => { const sig = computeTimingSignal(stock); return `<span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${sig.badgeCls}" title="${sig.reason}">${sig.icon} ${sig.label}</span>`; })()}
                   ${state.watchlist.has(stock.id) ? '<span class="text-amber-400 text-xs">★</span>' : ''}
                 </div>
-                <div class="text-xs font-mono text-gray-400 truncate">${midLine}</div>
+                <div class="text-[13px] font-mono text-gray-400 truncate">${midLine}</div>
               </div>
 
-              <div class="flex items-center gap-3 shrink-0">
+              <div class="flex items-center gap-3.5 shrink-0">
                 <div class="text-right font-mono">
-                  <div class="text-sm sm:text-base font-bold text-white">${stock.lastClose || '—'}</div>
+                  <div class="text-[17px] font-extrabold text-white tracking-tight">${stock.lastClose || '—'}</div>
                   <div class="text-xs font-bold ${chgColor}">${stock.changeText}</div>
                 </div>
-                <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold border ${badgeStyle}">
+                <span class="min-w-[36px] text-center px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold border ${badgeStyle}">
                   ${stock.rightBadge}
                 </span>
               </div>
             </div>
 
-            <!-- 하단 보조 지표 바: 무채색 단일 톤으로 통일하여 눈의 피로도 제거 -->
-            <div class="mt-2.5 pt-2 border-t border-gray-800/60 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-gray-400">
-              <span>시총 <strong class="text-gray-200">${stock.marketCap}</strong></span>
-              <span>실적 <strong class="${opTextColor}">${stock.opBadge}</strong>${stock.opmBadge ? ` (${stock.opmBadge})` : ''}</span>
-              <span>ATR방어선 <strong class="text-gray-200">${cleanStop}</strong></span>
-              ${cleanSupply ? `<span>수급 <strong class="text-gray-200">${cleanSupply}</strong></span>` : ''}
-              ${cleanTarget ? `<span>컨센서스 <strong class="text-gray-200">${cleanTarget}</strong></span>` : ''}
+            <div class="mt-3 pt-2.5 border-t border-gray-800/60 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[12px] font-mono text-gray-400">
+              <span class="inline-flex items-center gap-1.5"><span class="text-gray-500">시총</span><strong class="text-gray-200 font-semibold">${stock.marketCap}</strong></span>
+              <span class="inline-flex items-center gap-1.5"><span class="text-gray-500">실적</span><strong class="${opTextColor} font-semibold">${stock.opBadge}</strong>${stock.opmBadge ? `<span class="text-gray-500">(${stock.opmBadge})</span>` : ''}</span>
+              <span class="inline-flex items-center gap-1.5"><span class="text-gray-500">방어선</span><strong class="text-gray-200 font-semibold">${cleanStop}</strong></span>
+              ${cleanSupply ? `<span class="inline-flex items-center gap-1.5"><span class="text-gray-500">수급</span><strong class="text-gray-200 font-semibold">${cleanSupply}</strong></span>` : ''}
+              ${cleanTarget ? `<span class="inline-flex items-center gap-1.5"><span class="text-gray-500">목표가</span><strong class="text-gray-200 font-semibold">${cleanTarget.replace('목표가 ', '')}</strong></span>` : ''}
             </div>
           </div>
         `;
@@ -4055,8 +4138,8 @@
         const el = document.getElementById(`tab-${t}`);
         if (!el) return;
         el.className = state.activeTab === t
-          ? 't1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-blue-600/20 text-blue-400 border border-blue-500/50'
-          : 't1-btn shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 text-gray-400 hover:text-gray-200 border border-transparent';
+          ? 't1-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-sm'
+          : 't1-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-[#161b22]';
       });
 
       const t2Tabs = ['journal', 'rules', 'macro', 'research'];
